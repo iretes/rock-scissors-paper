@@ -20,24 +20,22 @@ rules_3_species = {
     (2, 0): 2
 }
 
-rules_4_species_asym = {
+rules_4_species = {
     (0, 1): 0,
-    (0, 2): 0,
+    (1, 0): 0,
     (1, 2): 1,
-    (1, 3): 1,
-    (2, 3): 2,
-    (3, 0): 3
-}
+    (2, 1): 1,
 
-rules_4_species_sym = {
-    (0, 1): 0,
-    (0, 2): 0,
-    (1, 2): 1,
-    (1, 3): 1,
+    (2, 0): 2, # soglia 2
+    (0, 2): 0, # soglia 2
+
     (2, 3): 2,
-    (2, 0): 2,
+    (3, 2): 2,
     (3, 0): 3,
-    (3, 1): 3
+    (0, 3): 3,
+
+    (3, 1): 3, # soglia 2
+    (1, 3): 1 # # soglia 2
 }
 
 rules_5_species = {
@@ -53,7 +51,7 @@ rules_5_species = {
     (4, 1): 4
 }
 
-for contestanst, winner in rules_4_species_sym.items():
+for contestanst, winner in rules_4_species.items():
     if winner == contestanst[0]:
         print(contestanst[0]>contestanst[1])
     else:
@@ -69,7 +67,7 @@ color_map = {
 }
 
 str = '<b>RULES</b><br />'
-for contestanst, winner in rules_4_species_sym.items():
+for contestanst, winner in rules_4_species.items():
     if winner == contestanst[0]:
         str += f'{contestanst[0]} > {contestanst[1]}<br />'
     else:
@@ -77,7 +75,8 @@ for contestanst, winner in rules_4_species_sym.items():
 model_params = {
     "height": 100,
     "width": 100,
-    "rules": rules_4_species_sym,#rules_5_species,#rules_4_species_asym,
+    "rules": rules_4_species,
+    "threshold": 2,
     "rules_descr": StaticText(str),
     "n_species": N_SPECIES,
     "color_map": color_map

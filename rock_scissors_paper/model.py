@@ -9,13 +9,14 @@ class RockScissorsPaper(mesa.Model):
     Represents the 2-dimensional array of cells in Rock-Scissors-Paper Game.
     """
 
-    def __init__(self, rules, n_species, color_map=sns.color_palette().as_hex(), width=50, height=50):
+    def __init__(self, rules, n_species, threshold, color_map=sns.color_palette().as_hex(), width=50, height=50):
         """
         Create a new playing area of (width, height) cells.
         """
         super().__init__()
 
         self.rules = rules
+        self.threshold = threshold
         self.n_species = n_species
         self.color_map = color_map
 

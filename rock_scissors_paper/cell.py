@@ -13,6 +13,7 @@ class Cell(mesa.Agent):
         self.rules = model.rules
         self.n_species = model.n_species
         self.color_map = model.color_map
+        self.threshold = model.threshold
         self.x, self.y = pos
         self.state = init_state
         self._nextState = None
@@ -35,17 +36,18 @@ class Cell(mesa.Agent):
         for neighbor in neighbors:
             if neighbor.state == self.state:
                 continue
-            if (neighbor.state, self.state) in self.rules:
-                contestants = (neighbor.state, self.state)
-            else:
-                contestants = (self.state, neighbor.state)
+            # if (neighbor.state, self.state) in self.rules:
+            #     contestants = (neighbor.state, self.state)
+            # elif (self.state, neighbor.state) in self.rules:
+            #     contestants = (self.state, neighbor.state)
+            contestants = (self.state, neighbor.state)
             winner = self.rules[contestants]
             defeat_counts[winner] += 1
         # Compute the winner species
         winners = np.argwhere(defeat_counts == np.max(defeat_counts)).reshape(-1)
         np.random.shuffle(winners)
         for i in range(len(winners)):
-            if defeat_counts[winners[i]] >= 3: # TODO: dipende dal vicinato
+            if defeat_counts[winners[i]] >= self.threshold:
                 self._nextState = winners[i]
                 break
 
