@@ -2,62 +2,22 @@ import mesa
 from .model import RockScissorsPaper
 from .portrayal import portrayCell
 from mesa.visualization.modules import ChartModule
-from mesa.visualization import StaticText
-
-# prendi argomenti da linea di comando...
+from mesa.visualization import StaticText, Choice
 
 # Make a world that is 50x50, on a 500x500 display.
 canvas_element = mesa.visualization.CanvasGrid(portrayCell, 100, 100, 500, 500)
 
-rules_3_species = {
-    (0, 1): 0,
-    (1, 2): 1,
-    (2, 0): 2
-}
-rules_3_species = {
-    (0, 1): 0,
-    (1, 2): 1,
-    (2, 0): 2
-}
+rules_descr = '<b>Rules with 3 species:</b><br />'
+for key, val in RockScissorsPaper.rules3.items():
+    rules_descr += f'{key} > {val[0]}<br />'
+rules_descr += '<b>Rules with 4 species:</b><br />'
+for key, val in RockScissorsPaper.rules4.items():
+    rules_descr += f'{key} > {val[0]}<br />'
+rules_descr += '(<0,2> and <1,3> do not compete)<br />'
+rules_descr += '<b>Rules with 5 species:</b><br />'
+for key, val in RockScissorsPaper.rules5.items():
+    rules_descr += f'{key} > {val[0]}, {val[1]}<br />'
 
-rules_4_species = {
-    (0, 1): 0,
-    (1, 0): 0,
-    (1, 2): 1,
-    (2, 1): 1,
-
-    (2, 0): 2, # soglia 2
-    (0, 2): 0, # soglia 2
-
-    (2, 3): 2,
-    (3, 2): 2,
-    (3, 0): 3,
-    (0, 3): 3,
-
-    (3, 1): 3, # soglia 2
-    (1, 3): 1 # # soglia 2
-}
-
-rules_5_species = {
-    (0, 1): 0,
-    (0, 2): 0,
-    (1, 2): 1,
-    (1, 3): 1,
-    (2, 3): 2,
-    (2, 4): 2,
-    (3, 0): 3,
-    (3, 4): 3,
-    (4, 0): 4,
-    (4, 1): 4
-}
-
-for contestanst, winner in rules_4_species.items():
-    if winner == contestanst[0]:
-        print(contestanst[0]>contestanst[1])
-    else:
-        print(contestanst[1]>contestanst[0])
-
-N_SPECIES = 4
 color_map = {
     0: 'red',
     1: 'yellow',
@@ -66,24 +26,26 @@ color_map = {
     4: 'blue'
 }
 
-str = '<b>RULES</b><br />'
-for contestanst, winner in rules_4_species.items():
-    if winner == contestanst[0]:
-        str += f'{contestanst[0]} > {contestanst[1]}<br />'
-    else:
-        str += f'{contestanst[1]} > {contestanst[0]}<br />'
 model_params = {
     "height": 100,
     "width": 100,
-    "rules": rules_4_species,
-    "threshold": 2,
-    "rules_descr": StaticText(str),
-    "n_species": N_SPECIES,
+    "rules_descr": StaticText(rules_descr),
+    "n_species": Choice(
+        "Number of species",
+        value=3,
+        choices=[3,4,5],
+        description="Number of species"
+    ),
     "color_map": color_map
 }
 
+# TODO: conta quante volte c'è pareggio
+# TODO: metti la quantità di specie con slider
+# TODO: commenti
+# TODO: sviluppa come agenti
+
 chart = []
-for i in range(N_SPECIES):
+for i in range(5):
     chart.append({'Label': i, 'Color': color_map[i]})
 chart_element = mesa.visualization.ChartModule(chart)
 

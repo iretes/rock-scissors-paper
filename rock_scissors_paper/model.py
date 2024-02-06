@@ -1,6 +1,4 @@
 import mesa
-import numpy as np
-import seaborn as sns
 from .cell import Cell
 from mesa.datacollection import DataCollector
 
@@ -9,16 +7,30 @@ class RockScissorsPaper(mesa.Model):
     Represents the 2-dimensional array of cells in Rock-Scissors-Paper Game.
     """
 
-    def __init__(self, rules, n_species, threshold, color_map=sns.color_palette().as_hex(), width=50, height=50):
+    rules3 = {0: [1], 1: [2], 2: [0]}
+    rules4 = {0: [1], 1: [2], 2: [3], 3: [0]}
+    rules5 = {0: [1,2], 1: [2,3], 2: [3,4], 3: [4,0], 4: [0,1]}
+
+    def __init__(self, n_species, color_map, width=50, height=50):
         """
         Create a new playing area of (width, height) cells.
         """
         super().__init__()
 
-        self.rules = rules
-        self.threshold = threshold
         self.n_species = n_species
         self.color_map = color_map
+
+        if self.n_species == 3:
+            self.threshold = 3
+            self.rules = self.rules3
+        elif self.n_species == 4:
+            self.threshold = 2
+            self.rules = self.rules4
+        else: # n_species == 5
+            self.threshold = 3
+            self.rules = self.rules5
+
+        # TODO: self.rules_descr
 
         # Set up the grid and schedule.
 

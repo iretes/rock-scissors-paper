@@ -1,6 +1,5 @@
 import mesa
 import numpy as np
-from enum import Enum
 
 class Cell(mesa.Agent):
     """Represents a single cell in the simulation."""
@@ -36,15 +35,13 @@ class Cell(mesa.Agent):
         for neighbor in neighbors:
             if neighbor.state == self.state:
                 continue
-            # if (neighbor.state, self.state) in self.rules:
-            #     contestants = (neighbor.state, self.state)
-            # elif (self.state, neighbor.state) in self.rules:
-            #     contestants = (self.state, neighbor.state)
-            contestants = (self.state, neighbor.state)
-            winner = self.rules[contestants]
-            defeat_counts[winner] += 1
+            if self.state in self.rules[neighbor.state]:
+                defeat_counts[neighbor.state] += 1
+        
         # Compute the winner species
         winners = np.argwhere(defeat_counts == np.max(defeat_counts)).reshape(-1)
+        # if defeat_counts[winners[0]] >= self.threshold:
+        #     self._nextState = winners[0]
         np.random.shuffle(winners)
         for i in range(len(winners)):
             if defeat_counts[winners[i]] >= self.threshold:
