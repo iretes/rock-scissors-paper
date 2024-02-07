@@ -36,11 +36,50 @@ model_params = {
         choices=[3,4,5],
         description="Number of species"
     ),
+    "prob0": mesa.visualization.Slider(
+        "Fraction of individuals of species 0",
+        0.33,
+        0,
+        1,
+        0.05,
+        description="Fraction of individuals of species 0",
+    ),
+    "prob1": mesa.visualization.Slider(
+        "Fraction of individuals of species 1",
+        0.33,
+        0,
+        1,
+        0.05,
+        description="Fraction of individuals of species 1",
+    ),
+    "prob2": mesa.visualization.Slider(
+        "Fraction of individuals of species 2",
+        0.33,
+        0,
+        1,
+        0.05,
+        description="Fraction of individuals of species 2",
+    ),
+    "prob3": mesa.visualization.Slider(
+        "Fraction of individuals of species 3",
+        0,
+        0,
+        1,
+        0.05,
+        description="Fraction of individuals of species 3",
+    ),
+    "prob4": mesa.visualization.Slider(
+        "Fraction of individuals of species 4",
+        0,
+        0,
+        1,
+        0.05,
+        description="Fraction of individuals of species 4",
+    ),
     "color_map": color_map
 }
 
-# TODO: conta quante volte c'è pareggio
-# TODO: metti la quantità di specie con slider
+# TODO: capisci meglio pesi random (0.33?), capisci se c'è modo sequenziale...
 # TODO: commenti
 # TODO: sviluppa come agenti
 

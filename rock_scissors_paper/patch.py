@@ -1,12 +1,12 @@
 import mesa
 import numpy as np
 
-class Cell(mesa.Agent):
-    """Represents a single cell in the simulation."""
+class Patch(mesa.Agent):
+    """Represents a single patch in the simulation."""
 
     def __init__(self, pos, model, init_state):
         """
-        Create a cell, in the given state, at the given x, y position.
+        Create a patch, in the given state, at the given x, y position.
         """
         super().__init__(pos, model)
         self.rules = model.rules
@@ -19,7 +19,7 @@ class Cell(mesa.Agent):
 
     def step(self):
         """
-        Compute if the cell will be rock, scissors or paper at the next tick.  This is
+        Compute if the patch will be rock, scissors or paper at the next tick.  This is
         based on the number of rock, scissors and paper in the neighborhood.
         The state is not changed here, but is just computed and stored in self._nextState,
         because our current state may still be necessary for our neighbors
@@ -30,6 +30,7 @@ class Cell(mesa.Agent):
         self._nextState = self.state
         # Get the neighbors (Moore neighborhood, including diagonals)
         neighbors = self.model.grid.get_neighbors((self.x, self.y), True)
+
         # Count the number defeats of each type
         defeat_counts = np.zeros(self.n_species)
         for neighbor in neighbors:
@@ -42,7 +43,7 @@ class Cell(mesa.Agent):
         winners = np.argwhere(defeat_counts == np.max(defeat_counts)).reshape(-1)
         # if defeat_counts[winners[0]] >= self.threshold:
         #     self._nextState = winners[0]
-        np.random.shuffle(winners)
+        np.random.shuffle(winners) # TODO: seed?
         for i in range(len(winners)):
             if defeat_counts[winners[i]] >= self.threshold:
                 self._nextState = winners[i]
