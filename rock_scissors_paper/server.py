@@ -1,11 +1,24 @@
 import mesa
 from .model import RockScissorsPaper
-from .portrayal import portrayCell
-from mesa.visualization.modules import ChartModule
-from mesa.visualization import StaticText, Choice
+from .portrayal import portraySquarePatch, portrayHexPatch
+from mesa.visualization import CanvasHexGrid, CanvasGrid, StaticText, Choice, ChartModule, Slider, ModularServer
 
-# Make a world that is 50x50, on a 500x500 display.
-canvas_element = mesa.visualization.CanvasGrid(portrayCell, 100, 100, 500, 500)
+grid_width = 50
+grid_height = 50
+hex_canvas_element = CanvasHexGrid(
+    portrayHexPatch,
+    grid_width=grid_width,
+    grid_height=grid_height,
+    canvas_width=500,
+    canvas_height=500
+) 
+square_canvas_element = CanvasGrid(
+    portraySquarePatch,
+    grid_width=grid_width,
+    grid_height=grid_height,
+    canvas_width=500,
+    canvas_height=500
+)
 
 rules_descr = '<b>Rules with 3 species:</b><br />'
 for key, val in RockScissorsPaper.rules3.items():
@@ -27,8 +40,8 @@ color_map = {
 }
 
 model_params = {
-    "height": 100,
-    "width": 100,
+    "height": grid_height,
+    "width": grid_width,
     "rules_descr": StaticText(rules_descr),
     "n_species": Choice(
         "Number of species",
@@ -36,58 +49,58 @@ model_params = {
         choices=[3,4,5],
         description="Number of species"
     ),
-    "prob0": mesa.visualization.Slider(
+    "prob0": Slider(
         "Fraction of individuals of species 0",
         0.33,
         0,
         1,
-        0.05,
+        0.01,
         description="Fraction of individuals of species 0",
     ),
-    "prob1": mesa.visualization.Slider(
+    "prob1": Slider(
         "Fraction of individuals of species 1",
         0.33,
         0,
         1,
-        0.05,
+        0.01,
         description="Fraction of individuals of species 1",
     ),
-    "prob2": mesa.visualization.Slider(
+    "prob2": Slider(
         "Fraction of individuals of species 2",
         0.33,
         0,
         1,
-        0.05,
+        0.01,
         description="Fraction of individuals of species 2",
     ),
-    "prob3": mesa.visualization.Slider(
+    "prob3": Slider(
         "Fraction of individuals of species 3",
         0,
         0,
         1,
-        0.05,
+        0.01,
         description="Fraction of individuals of species 3",
     ),
-    "prob4": mesa.visualization.Slider(
+    "prob4": Slider(
         "Fraction of individuals of species 4",
         0,
         0,
         1,
-        0.05,
+        0.01,
         description="Fraction of individuals of species 4",
     ),
     "color_map": color_map
 }
 
-# TODO: capisci meglio pesi random (0.33?), capisci se c'è modo sequenziale...
-# TODO: commenti
-# TODO: sviluppa come agenti
-
 chart = []
 for i in range(5):
     chart.append({'Label': i, 'Color': color_map[i]})
-chart_element = mesa.visualization.ChartModule(chart)
+chart_element = ChartModule(chart)
 
-server = mesa.visualization.ModularServer(
-    RockScissorsPaper, [canvas_element, chart_element], "Rock Scissors Paper", model_params
+hex_server = ModularServer(
+    RockScissorsPaper, [hex_canvas_element, chart_element], "Rock Scissors Paper", model_params
+)
+
+square_server = ModularServer(
+    RockScissorsPaper, [square_canvas_element, chart_element], "Rock Scissors Paper", model_params
 )

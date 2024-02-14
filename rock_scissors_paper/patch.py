@@ -43,7 +43,7 @@ class Patch(mesa.Agent):
         winners = np.argwhere(defeat_counts == np.max(defeat_counts)).reshape(-1)
         # if defeat_counts[winners[0]] >= self.threshold:
         #     self._nextState = winners[0]
-        np.random.shuffle(winners) # TODO: seed?
+        self.random.shuffle(winners)
         for i in range(len(winners)):
             if defeat_counts[winners[i]] >= self.threshold:
                 self._nextState = winners[i]

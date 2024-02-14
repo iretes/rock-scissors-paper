@@ -1,6 +1,7 @@
 import mesa
 from .patch import Patch
 from mesa.datacollection import DataCollector
+import numpy as np
 
 class RockScissorsPaper(mesa.Model):
     """
@@ -23,7 +24,7 @@ class RockScissorsPaper(mesa.Model):
 
         if self.n_species == 3:
             self.probabilities = [prob0, prob1, prob2]
-            self.threshold = 3
+            self.threshold = 2#3
             self.rules = self.rules3
         elif self.n_species == 4:
             self.probabilities = [prob0, prob1, prob2, prob3]
@@ -43,11 +44,13 @@ class RockScissorsPaper(mesa.Model):
         self.schedule = mesa.time.SimultaneousActivation(self)
 
         # Use a simple grid, where edges wrap around.
-        self.grid = mesa.space.SingleGrid(width, height, torus=True)
+        #self.grid = mesa.space.SingleGrid(width, height, torus=True)
+        self.grid = mesa.space.HexSingleGrid(width, height, torus=True)
 
         # Place a patch at each location, initializing it as ROCK, SCISSOR, or PAPER
         for _, (x, y) in self.grid.coord_iter():
             patch_init_state = self.random.choices(range(0, self.n_species), weights=self.probabilities, k=1)[0]
+            # np.random.choice(range(0, self.n_species), size=1, p=self.probabilities)[0]
             patch = Patch(pos=(x, y), model=self, init_state=patch_init_state)
             self.grid.place_agent(patch, (x, y))
             self.schedule.add(patch)
