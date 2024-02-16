@@ -97,10 +97,14 @@ for i in range(5):
     chart.append({'Label': i, 'Color': color_map[i]})
 chart_element = ChartModule(chart)
 
+hex_model_params = model_params.copy()
+hex_model_params['hex'] = True
 hex_server = ModularServer(
-    RockScissorsPaper, [hex_canvas_element, chart_element], "Rock Scissors Paper", model_params
+    RockScissorsPaper, [hex_canvas_element, chart_element], "Rock Scissors Paper", hex_model_params
 )
 
+square_model_params = model_params.copy()
+square_model_params['hex'] = False
 square_server = ModularServer(
-    RockScissorsPaper, [square_canvas_element, chart_element], "Rock Scissors Paper", model_params
+    RockScissorsPaper, [square_canvas_element, chart_element], "Rock Scissors Paper", square_model_params
 )

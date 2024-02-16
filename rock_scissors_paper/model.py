@@ -12,11 +12,13 @@ class RockScissorsPaper(mesa.Model):
     rules4 = {0: [1], 1: [2], 2: [3], 3: [0]}
     rules5 = {0: [1,2], 1: [2,3], 2: [3,4], 3: [4,0], 4: [0,1]}
 
-    def __init__(self, prob0, prob1, prob2, prob3, prob4, n_species, color_map, width=50, height=50):
+    def __init__(self, hex, prob0, prob1, prob2, prob3, prob4, n_species, color_map, width=50, height=50):
         """
         Create a new playing area of (width, height) patches.
         """
         super().__init__()
+
+        self.hex = hex
 
         self.n_species = n_species
 
@@ -24,7 +26,7 @@ class RockScissorsPaper(mesa.Model):
 
         if self.n_species == 3:
             self.probabilities = [prob0, prob1, prob2]
-            self.threshold = 2#3
+            self.threshold = 2 if self.hex else 3
             self.rules = self.rules3
         elif self.n_species == 4:
             self.probabilities = [prob0, prob1, prob2, prob3]
@@ -32,7 +34,7 @@ class RockScissorsPaper(mesa.Model):
             self.rules = self.rules4
         else: # n_species == 5
             self.probabilities = [prob0, prob1, prob2, prob3, prob4]
-            self.threshold = 3
+            self.threshold = 2 if self.hex else 3
             self.rules = self.rules5
 
         # Set up the grid and schedule.
@@ -44,8 +46,10 @@ class RockScissorsPaper(mesa.Model):
         self.schedule = mesa.time.SimultaneousActivation(self)
 
         # Use a simple grid, where edges wrap around.
-        #self.grid = mesa.space.SingleGrid(width, height, torus=True)
-        self.grid = mesa.space.HexSingleGrid(width, height, torus=True)
+        if hex:
+            self.grid = mesa.space.HexSingleGrid(width, height, torus=True)
+        else:
+            self.grid = mesa.space.SingleGrid(width, height, torus=True)
 
         # Place a patch at each location, initializing it as ROCK, SCISSOR, or PAPER
         for _, (x, y) in self.grid.coord_iter():
