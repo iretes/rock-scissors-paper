@@ -1,7 +1,7 @@
 import mesa
 import numpy as np
 
-class Patch(mesa.Agent):
+class PatchEmpty(mesa.Agent):
     """Represents a single patch in the simulation."""
 
     def __init__(self, pos, model, init_state):
@@ -12,7 +12,6 @@ class Patch(mesa.Agent):
         self.rules = model.rules
         self.n_species = model.n_species
         self.color_map = model.color_map
-        self.threshold = model.threshold
         self.x, self.y = pos
         self.state = init_state
         self._nextState = None
@@ -25,35 +24,28 @@ class Patch(mesa.Agent):
         because our current state may still be necessary for our neighbors
         to calculate their next state.
         """
-
-        # Assume nextState is unchanged, unless changed below.
-        self._nextState = self.state
         # Get the neighbors
         if self.model.hex:
             neighbors = self.model.grid.get_neighbors((self.x, self.y), include_center=False)
         else:
             neighbors = self.model.grid.get_neighbors((self.x, self.y), moore=True)
 
-        # Count the number defeats of each type
-        defeat_counts = np.zeros(self.n_species)
-        for neighbor in neighbors:
-            if neighbor.state == self.state:
-                continue
-            if self.state in self.rules[neighbor.state]:
-                defeat_counts[neighbor.state] += 1
-        
-        # Compute the winner species
-        winners = np.argwhere(defeat_counts == np.max(defeat_counts)).reshape(-1)
-        # if defeat_counts[winners[0]] >= self.threshold:
-        #     self._nextState = winners[0]
-        self.random.shuffle(winners)
-        for i in range(len(winners)):
-            if defeat_counts[winners[i]] >= self.threshold:
-                self._nextState = winners[i]
-                break
-
-    def advance(self):
-        """
-        Set the state to the new computed state -- computed in step().
-        """
-        self.state = self._nextState
+        # swap, fight, reproduce
+        action = self.random.choice(['swap', 'fight', 'reproduce'])
+        # select a random neighbor
+        neighbor = self.random.choice(neighbors)
+        # act
+        if action == 'swap':
+            self._nextState = neighbor.state
+            neighbor.state = self.state
+            self.state = self._nextState
+        elif action == 'fight':
+            if neighbor.state != 0 and self.state in self.rules[neighbor.state]:
+                self.state = 0
+            if self.state != 0 and neighbor.state in self.rules[self.state]:
+                neighbor.state = 0
+        else:
+            if neighbor.state == 0:
+                neighbor.state = self.state
+            elif self.state == 0:
+                self.state = neighbor.state
