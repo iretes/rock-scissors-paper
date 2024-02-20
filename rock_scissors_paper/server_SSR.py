@@ -1,10 +1,10 @@
 import mesa
-from .model_empty import RockScissorsPaperEmpty
+from .model_SSR import RockScissorsPaperSSR
 from .portrayal import portraySquarePatch, portrayHexPatch
 from mesa.visualization import CanvasHexGrid, CanvasGrid, StaticText, Choice, ChartModule, Slider, ModularServer
 
-grid_width = 150
-grid_height = 150
+grid_width = 50#150
+grid_height = 50##150
 hex_canvas_element = CanvasHexGrid(
     portrayHexPatch,
     grid_width=grid_width,
@@ -21,14 +21,14 @@ square_canvas_element = CanvasGrid(
 )
 
 rules_descr = '<b>Rules with 3 species:</b><br />'
-for key, val in RockScissorsPaperEmpty.rules3.items():
+for key, val in RockScissorsPaperSSR.rules3.items():
     rules_descr += f'{key} > {val[0]}<br />'
 rules_descr += '<b>Rules with 4 species:</b><br />'
-for key, val in RockScissorsPaperEmpty.rules4.items():
+for key, val in RockScissorsPaperSSR.rules4.items():
     rules_descr += f'{key} > {val[0]}<br />'
 rules_descr += '(<0,2> and <1,3> do not compete)<br />'
 rules_descr += '<b>Rules with 5 species:</b><br />'
-for key, val in RockScissorsPaperEmpty.rules5.items():
+for key, val in RockScissorsPaperSSR.rules5.items():
     rules_descr += f'{key} > {val[0]}, {val[1]}<br />'
 
 color_map = {
@@ -108,12 +108,12 @@ chart_element = ChartModule(chart)
 
 hex_model_params = model_params.copy()
 hex_model_params['hex'] = True
-hex_server = ModularServer(
-    RockScissorsPaperEmpty, [hex_canvas_element, chart_element], "Rock Scissors Paper", hex_model_params
+hex_empty_server = ModularServer(
+    RockScissorsPaperSSR, [hex_canvas_element, chart_element], "Rock Scissors Paper", hex_model_params
 )
 
 square_model_params = model_params.copy()
 square_model_params['hex'] = False
-square_server = ModularServer(
-    RockScissorsPaperEmpty, [square_canvas_element, chart_element], "Rock Scissors Paper", square_model_params
+square_empty_server = ModularServer(
+    RockScissorsPaperSSR, [square_canvas_element, chart_element], "Rock Scissors Paper", square_model_params
 )

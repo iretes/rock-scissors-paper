@@ -1,9 +1,8 @@
 import mesa
-from .patch_empty import PatchEmpty
+from .patch_SSR import PatchSSR
 from mesa.datacollection import DataCollector
-import numpy as np
 
-class RockScissorsPaperEmpty(mesa.Model):
+class RockScissorsPaperSSR(mesa.Model):
     """
     Represents the 2-dimensional array of patches in Rock-Scissors-Paper Game.
     """
@@ -47,8 +46,7 @@ class RockScissorsPaperEmpty(mesa.Model):
         # Place a patch at each location, initializing it as ROCK, SCISSOR, or PAPER
         for _, (x, y) in self.grid.coord_iter():
             patch_init_state = self.random.choices(range(0, self.n_species+1), weights=self.probabilities, k=1)[0]
-            # np.random.choice(range(0, self.n_species), size=1, p=self.probabilities)[0]
-            patch = PatchEmpty(pos=(x, y), model=self, init_state=patch_init_state)
+            patch = PatchSSR(pos=(x, y), model=self, init_state=patch_init_state)
             self.grid.place_agent(patch, (x, y))
             self.schedule.add(patch)
 
@@ -75,6 +73,6 @@ class RockScissorsPaperEmpty(mesa.Model):
         self.schedule.step()
         self.datacollector.collect(self)
 
-        n_existint_species = sum([1 for i in range(self.n_species+1) if self.count_patches(i) == 0])
-        if n_existint_species == self.n_species+1:
+        n_existint_species = sum([1 for i in range(1, self.n_species+1) if self.count_patches(i) == 0])
+        if n_existint_species == self.n_species-1:
             self.running = False

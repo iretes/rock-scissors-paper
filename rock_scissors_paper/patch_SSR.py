@@ -1,7 +1,6 @@
 import mesa
-import numpy as np
 
-class PatchEmpty(mesa.Agent):
+class PatchSSR(mesa.Agent):
     """Represents a single patch in the simulation."""
 
     def __init__(self, pos, model, init_state):
@@ -30,8 +29,8 @@ class PatchEmpty(mesa.Agent):
         else:
             neighbors = self.model.grid.get_neighbors((self.x, self.y), moore=True)
 
-        # swap, fight, reproduce
-        action = self.random.choice(['swap', 'fight', 'reproduce'])
+        # swap, select, reproduce
+        action = self.random.choice(['swap', 'select', 'reproduce'])
         # select a random neighbor
         neighbor = self.random.choice(neighbors)
         # act
@@ -39,7 +38,7 @@ class PatchEmpty(mesa.Agent):
             self._nextState = neighbor.state
             neighbor.state = self.state
             self.state = self._nextState
-        elif action == 'fight':
+        elif action == 'select':
             if neighbor.state != 0 and self.state in self.rules[neighbor.state]:
                 self.state = 0
             if self.state != 0 and neighbor.state in self.rules[self.state]:

@@ -10,8 +10,8 @@ def portraySquarePatch(cell):
     
     return {
         "Shape": "rect",
-        "w": 1.5,
-        "h": 1.5,
+        "w": 1,
+        "h": 1,
         "Filled": "true",
         "Layer": 0,
         "x": cell.x,

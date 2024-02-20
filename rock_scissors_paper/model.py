@@ -1,7 +1,6 @@
 import mesa
 from .patch import Patch
 from mesa.datacollection import DataCollector
-import numpy as np
 
 class RockScissorsPaper(mesa.Model):
     """
@@ -54,7 +53,6 @@ class RockScissorsPaper(mesa.Model):
         # Place a patch at each location, initializing it as ROCK, SCISSOR, or PAPER
         for _, (x, y) in self.grid.coord_iter():
             patch_init_state = self.random.choices(range(0, self.n_species), weights=self.probabilities, k=1)[0]
-            # np.random.choice(range(0, self.n_species), size=1, p=self.probabilities)[0]
             patch = Patch(pos=(x, y), model=self, init_state=patch_init_state)
             self.grid.place_agent(patch, (x, y))
             self.schedule.add(patch)
@@ -81,3 +79,7 @@ class RockScissorsPaper(mesa.Model):
         """
         self.schedule.step()
         self.datacollector.collect(self)
+
+        n_existint_species = sum([1 for i in range(self.n_species) if self.count_patches(i) == 0])
+        if n_existint_species == self.n_species-1:
+            self.running = False
