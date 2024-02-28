@@ -1,8 +1,8 @@
 import mesa
-from .patch import Patch
+from .patch_MV import PatchMV
 from mesa.datacollection import DataCollector
 
-class RockScissorsPaper(mesa.Model):
+class RockScissorsPaperMV(mesa.Model):
     """
     Represents the 2-dimensional array of patches in Rock-Scissors-Paper Game.
     """
@@ -53,7 +53,7 @@ class RockScissorsPaper(mesa.Model):
         # Place a patch at each location, initializing it as ROCK, SCISSOR, or PAPER
         for _, (x, y) in self.grid.coord_iter():
             patch_init_state = self.random.choices(range(0, self.n_species), weights=self.probabilities, k=1)[0]
-            patch = Patch(pos=(x, y), model=self, init_state=patch_init_state)
+            patch = PatchMV(pos=(x, y), model=self, init_state=patch_init_state)
             self.grid.place_agent(patch, (x, y))
             self.schedule.add(patch)
 

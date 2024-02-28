@@ -1,7 +1,7 @@
 import mesa
 import numpy as np
 
-class Patch(mesa.Agent):
+class PatchMV(mesa.Agent):
     """Represents a single patch in the simulation."""
 
     def __init__(self, pos, model, init_state):
