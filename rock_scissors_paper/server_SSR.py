@@ -18,7 +18,7 @@ model_params_SSR = {
         description="Number of species"
     ),
     "prob0": Slider(
-        "Fraction of individuals of species 0",
+        "Fraction of empty patches",
         0.25,
         0,
         1,
