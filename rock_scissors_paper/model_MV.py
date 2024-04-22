@@ -11,7 +11,7 @@ class RockScissorsPaperMV(mesa.Model):
     rules4 = {0: [1], 1: [2], 2: [3], 3: [0]}
     rules5 = {0: [1,2], 1: [2,3], 2: [3,4], 3: [4,0], 4: [0,1]}
 
-    def __init__(self, hex, prob0, prob1, prob2, prob3, prob4, n_species, color_map, width=50, height=50):
+    def __init__(self, hex, init0, init1, init2, init3, init4, n_species, color_map, width=50, height=50):
         """
         Create a new playing area of (width, height) patches.
         """
@@ -24,11 +24,11 @@ class RockScissorsPaperMV(mesa.Model):
         self.color_map = color_map
 
         if self.n_species == 3:
-            self.probabilities = [prob0, prob1, prob2]
+            self.probabilities = [init0, init1, init2]
             self.threshold = 2 if self.hex else 3
             self.rules = self.rules3
         elif self.n_species == 4:
-            self.probabilities = [prob0, prob1, prob2, prob3]
+            self.probabilities = [init0, init1, init2, init3]
             self.threshold = 2
             self.rules = self.rules4
         else: # n_species == 5
@@ -52,7 +52,7 @@ class RockScissorsPaperMV(mesa.Model):
 
         # Place a patch at each location, initializing it as ROCK, SCISSOR, or PAPER
         for _, (x, y) in self.grid.coord_iter():
-            patch_init_state = self.random.choices(range(0, self.n_species), weights=self.probabilities, k=1)[0]
+            patch_init_state = self.random.choices(range(self.n_species), weights=self.probabilities, k=1)[0]
             patch = PatchMV(pos=(x, y), model=self, init_state=patch_init_state)
             self.grid.place_agent(patch, (x, y))
             self.schedule.add(patch)

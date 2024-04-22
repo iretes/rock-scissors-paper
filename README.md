@@ -2,6 +2,14 @@
 
 TODO: description
 
+# How to install
+
+To install the dependencies, execute the following command:
+
+```bash
+pip install -r requirements.txt
+```
+
 ## How to run
 
 To run the model interactively, execute the following command:

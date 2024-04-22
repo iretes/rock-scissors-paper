@@ -1,6 +1,6 @@
 import mesa
 
-class PatchSSR(mesa.Agent):
+class PatchO(mesa.Agent):
     """Represents a single patch in the simulation."""
 
     def __init__(self, pos, model, init_state):
@@ -9,6 +9,7 @@ class PatchSSR(mesa.Agent):
         """
         super().__init__(pos, model)
         self.rules = model.rules
+        self.invasion_rates = model.invasion_rates
         self.n_species = model.n_species
         self.color_map = model.color_map
         self.x, self.y = pos
@@ -27,24 +28,28 @@ class PatchSSR(mesa.Agent):
         if self.model.hex:
             neighbors = self.model.grid.get_neighbors((self.x, self.y), include_center=False)
         else:
-            neighbors = self.model.grid.get_neighbors((self.x, self.y), moore=False) # TODO: 4 neighbors
+            neighbors = self.model.grid.get_neighbors((self.x, self.y), moore=True)
 
-        # swap, select, reproduce
-        action = self.random.choice(['swap', 'select', 'reproduce'])
         # select a random neighbor
         neighbor = self.random.choice(neighbors)
-        # act
-        if action == 'swap':
-            self._nextState = neighbor.state
-            neighbor.state = self.state
-            self.state = self._nextState
-        elif action == 'select':
-            if neighbor.state != 0 and self.state in self.rules[neighbor.state]:
-                self.state = 0
-            if self.state != 0 and neighbor.state in self.rules[self.state]:
-                neighbor.state = 0
-        else:
-            if neighbor.state == 0:
-                neighbor.state = self.state
-            elif self.state == 0:
-                self.state = neighbor.state
+
+        # TODO: doppia azione?
+        # if self.state in self.rules[neighbor.state]:
+        #     defeat_rate = self.invasion_rates[neighbor.state]
+        #     self.state = self.random.choices(
+        #         [neighbor.state, self.state],
+        #         weights=[defeat_rate, 1-defeat_rate],
+        #         k=1)[0]
+        # elif neighbor.state in self.rules[self.state]:
+        #     win_rate = self.invasion_rates[self.state]
+        #     neighbor.state = self.random.choices(
+        #         [self.state, neighbor.state],
+        #         weights=[win_rate, 1-win_rate],
+        #         k=1)[0]
+            
+        if neighbor.state in self.rules[self.state]:
+            win_rate = self.invasion_rates[self.state]
+            neighbor.state = self.random.choices(
+                [self.state, neighbor.state],
+                weights=[win_rate, 1-win_rate],
+                k=1)[0]

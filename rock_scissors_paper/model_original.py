@@ -1,17 +1,18 @@
 import mesa
-from .patch_SSR import PatchSSR
+from .patch_original import PatchO
 from mesa.datacollection import DataCollector
 
-class RockScissorsPaperSSR(mesa.Model):
+class RockScissorsPaperO(mesa.Model):
     """
     Represents the 2-dimensional array of patches in Rock-Scissors-Paper Game.
     """
 
-    rules3 = {1: [2], 2: [3], 3: [1]}
-    rules4 = {1: [2], 2: [3], 3: [4], 4: [1]}
-    rules5 = {1: [2,3], 2: [3,4], 3: [4,5], 4: [5,1], 5: [1,2]}
+    rules = {0: [1], 1: [2], 2: [0]}
 
-    def __init__(self, hex, init0, init1, init2, init3, init4, init5, n_species, color_map, width=50, height=50):
+    def __init__(self, hex,
+                 init0, init1, init2,
+                 inv0, inv1, inv2,
+                 color_map, width=50, height=50):
         """
         Create a new playing area of (width, height) patches.
         """
@@ -19,19 +20,14 @@ class RockScissorsPaperSSR(mesa.Model):
 
         self.hex = hex
 
-        self.n_species = n_species
+        self.n_species = 3
 
         self.color_map = color_map
 
-        if self.n_species == 3:
-            self.probabilities = [init0, init1, init2, init3]
-            self.rules = self.rules3
-        elif self.n_species == 4:
-            self.probabilities = [init0, init1, init2, init3, init4]
-            self.rules = self.rules4
-        else: # n_species == 5
-            self.probabilities = [init0, init1, init2, init3, init4, init5]
-            self.rules = self.rules5
+        
+        self.probabilities = [init0, init1, init2]
+        self.invasion_rates = [inv0, inv1, inv2]
+        self.rules = self.rules
 
         # Set up the grid and schedule.
 
@@ -45,15 +41,15 @@ class RockScissorsPaperSSR(mesa.Model):
 
         # Place a patch at each location, initializing it as ROCK, SCISSOR, or PAPER
         for _, (x, y) in self.grid.coord_iter():
-            patch_init_state = self.random.choices(range(0, self.n_species+1), weights=self.probabilities, k=1)[0]
-            patch = PatchSSR(pos=(x, y), model=self, init_state=patch_init_state)
+            patch_init_state = self.random.choices(range(self.n_species), weights=self.probabilities, k=1)[0]
+            patch = PatchO(pos=(x, y), model=self, init_state=patch_init_state)
             self.grid.place_agent(patch, (x, y))
             self.schedule.add(patch)
 
         self.running = True
         
         model_reporter = {}
-        for i in range(self.n_species+1):
+        for i in range(self.n_species):
             model_reporter[i] = lambda model, species=i: model.count_patches(species)
         self.datacollector = DataCollector(
             model_reporter
@@ -73,6 +69,6 @@ class RockScissorsPaperSSR(mesa.Model):
         self.schedule.step()
         self.datacollector.collect(self)
 
-        n_existint_species = sum([1 for i in range(1, self.n_species+1) if self.count_patches(i) == 0])
+        n_existint_species = sum([1 for i in range(self.n_species) if self.count_patches(i) == 0])
         if n_existint_species == self.n_species-1:
             self.running = False

@@ -4,8 +4,8 @@ from mesa.visualization import Choice, ChartModule, Slider
 color_map_SSR = {
     0: 'black',
     1: 'red',
-    2: 'yellow',
-    3: 'purple',
+    2: 'purple',
+    3: 'yellow',
     4: 'green',
     5: 'blue'
 }
@@ -17,53 +17,53 @@ model_params_SSR = {
         choices=[3,4,5],
         description="Number of species"
     ),
-    "prob0": Slider(
-        "Fraction of empty patches",
+    "init0": Slider(
+        "Initial weight of empty cells",
         0.25,
         0,
         1,
         0.01,
-        description="Fraction of empty patches",
+        description="Initial weight of empty cells",
     ),
-    "prob1": Slider(
-        "Fraction of individuals of species 1",
+    "init1": Slider(
+        "Initial weight of species 1",
         0.25,
         0,
         1,
         0.01,
-        description="Fraction of individuals of species 1",
+        description="Initial weight of species 1",
     ),
-    "prob2": Slider(
-        "Fraction of individuals of species 2",
+    "init2": Slider(
+        "Initial weight of species 2",
         0.25,
         0,
         1,
         0.01,
-        description="Fraction of individuals of species 2",
+        description="Initial weight of species 2",
     ),
-    "prob3": Slider(
-        "Fraction of individuals of species 3",
+    "init3": Slider(
+        "Initial weight of species 3",
         0.25,
         0,
         1,
         0.01,
-        description="Fraction of individuals of species 3",
+        description="Initial weight of species 3",
     ),
-    "prob4": Slider(
-        "Fraction of individuals of species 4",
+    "init4": Slider(
+        "Initial weight of species 4",
         0,
         0,
         1,
         0.01,
-        description="Fraction of individuals of species 4",
+        description="Initial weight of species 4",
     ),
-    "prob5": Slider(
-        "Fraction of individuals of species 5",
+    "init5": Slider(
+        "Initial weight of species 5",
         0,
         0,
         1,
         0.01,
-        description="Fraction of individuals of species 5",
+        description="Initial weight of species 5",
     ),
     "color_map": color_map_SSR
 }

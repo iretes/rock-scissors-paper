@@ -3,8 +3,8 @@ from mesa.visualization import Choice, ChartModule, Slider
 
 color_map_MV = {
     0: 'red',
-    1: 'yellow',
-    2: 'purple',
+    1: 'purple',
+    2: 'yellow',
     3: 'green',
     4: 'blue'
 }
@@ -16,45 +16,45 @@ model_params_MV = {
         choices=[3,4,5],
         description="Number of species"
     ),
-    "prob0": Slider(
-        "Fraction of individuals of species 0",
+    "init0": Slider(
+        "Initial weight of species 1",
         0.33,
         0,
         1,
         0.01,
-        description="Fraction of individuals of species 0",
+        description="Initial weight of species 1",
     ),
-    "prob1": Slider(
-        "Fraction of individuals of species 1",
+    "init1": Slider(
+        "Initial weight of species 2",
         0.33,
         0,
         1,
         0.01,
-        description="Fraction of individuals of species 1",
+        description="Initial weight of species 2",
     ),
-    "prob2": Slider(
-        "Fraction of individuals of species 2",
+    "init2": Slider(
+        "Initial weight of species 3",
         0.33,
         0,
         1,
         0.01,
-        description="Fraction of individuals of species 2",
+        description="Initial weight of species 3",
     ),
-    "prob3": Slider(
-        "Fraction of individuals of species 3",
+    "init3": Slider(
+        "Initial weight of species 4",
         0,
         0,
         1,
         0.01,
-        description="Fraction of individuals of species 3",
+        description="Initial weight of species 4",
     ),
-    "prob4": Slider(
-        "Fraction of individuals of species 4",
+    "init4": Slider(
+        "Initial weight of species 5",
         0,
         0,
         1,
         0.01,
-        description="Fraction of individuals of species 4",
+        description="Initial weight of species 5",
     ),
     "color_map": color_map_MV
 }
