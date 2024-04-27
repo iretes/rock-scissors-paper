@@ -1,4 +1,4 @@
-RunId,iteration,Step,height,width,hex,init0,init1,init2,color_map,inv0,inv1,inv2,rock,scissors,paper,inv_comb
+RunId,iteration,Step,height,width,hex,init0,init1,init2,color_map,inv0,inv1,inv2,$n_r$,$n_s$,$n_p$,inv_comb
 0,0,0,100,100,False,0.33,0.33,0.33,"{0: 'red', 1: 'purple', 2: 'yellow'}",0.0,0.0,1.0,3364,3370,3266,0
 0,0,1,100,100,False,0.33,0.33,0.33,"{0: 'red', 1: 'purple', 2: 'yellow'}",0.0,0.0,1.0,2312,3370,4318,0
 0,0,2,100,100,False,0.33,0.33,0.33,"{0: 'red', 1: 'purple', 2: 'yellow'}",0.0,0.0,1.0,1454,3370,5176,0

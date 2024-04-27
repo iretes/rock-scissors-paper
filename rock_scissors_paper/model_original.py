@@ -5,7 +5,7 @@ from mesa.datacollection import DataCollector
 class RockScissorsPaperO(mesa.Model):
     """
     Represents the 2-dimensional array of patches in Rock-Scissors-Paper Game.
-    """
+    """ # TODO: modifcare, appare in 'About'
 
     rules = {0: [1], 1: [2], 2: [0]}
 

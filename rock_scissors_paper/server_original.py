@@ -8,7 +8,7 @@ color_map_O = {
 }
 
 model_params_O = {
-    "prob0": Slider(
+    "init0": Slider(
         "Fraction of individuals of species 1",
         0.33,
         0,
@@ -16,7 +16,7 @@ model_params_O = {
         0.01,
         description="Fraction of individuals of species 1",
     ),
-    "prob1": Slider(
+    "init1": Slider(
         "Fraction of individuals of species 2",
         0.33,
         0,
@@ -24,7 +24,7 @@ model_params_O = {
         0.01,
         description="Fraction of individuals of species 2",
     ),
-    "prob2": Slider(
+    "init2": Slider(
         "Fraction of individuals of species 3",
         0.33,
         0,
