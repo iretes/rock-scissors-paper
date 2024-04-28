@@ -5,9 +5,9 @@
 # R + S  --> S + 2R, Pr
 # R + P --> P, Pp
 # S + P --> P + 2S, Ps
-# S + R --> R, Ps
-# P + R --> R + 2P, Pr
-# P + S --> S, Pr
+# S + R --> R, Pr
+# P + R --> R + 2P, Pp
+# P + S --> S, Ps
 
 R1:
     R + S > S + R + R
@@ -23,15 +23,15 @@ R3:
 
 R4:
     S + R > R
-    S*R*Ps
+    S*R*Pr
 
 R5:
     P + R > R + P + P
-    P*R*Pr
+    P*R*Pp
 
 R6:
     P + S > S
-    P*S*Pr
+    P*S*Ps
 
 #InitPar
 Pr = 0.2
