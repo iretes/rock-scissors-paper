@@ -12,7 +12,9 @@ class RockScissorsPaperO(mesa.Model):
     def __init__(self, hex,
                  init0, init1, init2,
                  inv0, inv1, inv2,
-                 color_map, width=50, height=50):
+                 color_map, 
+                 increase_rate=False,
+                 width=50, height=50):
         """
         Create a new playing area of (width, height) patches.
         """
@@ -24,6 +26,7 @@ class RockScissorsPaperO(mesa.Model):
 
         self.color_map = color_map
 
+        self.increase_rate = increase_rate
         
         self.probabilities = [init0, init1, init2]
         self.invasion_rates = [inv0, inv1, inv2]
@@ -51,6 +54,8 @@ class RockScissorsPaperO(mesa.Model):
         model_reporter = {}
         for i in range(self.n_species):
             model_reporter[i] = lambda model, species=i: model.count_patches(species)
+        if self.increase_rate:
+            model_reporter['inv0'] = lambda model: model.invasion_rates[0]
         self.datacollector = DataCollector(
             model_reporter
         )

@@ -9,7 +9,6 @@ class PatchO(mesa.Agent):
         """
         super().__init__(pos, model)
         self.rules = model.rules
-        self.invasion_rates = model.invasion_rates
         self.n_species = model.n_species
         self.color_map = model.color_map
         self.x, self.y = pos
@@ -48,8 +47,15 @@ class PatchO(mesa.Agent):
         #         k=1)[0]
             
         if neighbor.state in self.rules[self.state]:
-            win_rate = self.invasion_rates[self.state]
-            neighbor.state = self.random.choices(
+            win_rate = self.model.invasion_rates[self.state]
+            new_neigh_state = self.random.choices(
                 [self.state, neighbor.state],
                 weights=[win_rate, 1-win_rate],
                 k=1)[0]
+            neighbor.state = new_neigh_state
+            if (self.model.increase_rate and self.state==0 and \
+                new_neigh_state==self.state and self.model.schedule.steps>10):
+                rand = self.random.uniform(0, 1e-4)
+                new_rate = self.model.invasion_rates[self.state] + rand
+                if 0 < new_rate < 1:
+                    self.model.invasion_rates[self.state] = new_rate
