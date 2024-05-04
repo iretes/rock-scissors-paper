@@ -32,7 +32,7 @@ class RockScissorsPaperMV(mesa.Model):
             self.threshold = 2
             self.rules = self.rules4
         else: # n_species == 5
-            self.probabilities = [prob0, prob1, prob2, prob3, prob4]
+            self.probabilities = [init0, init1, init2, init3, init4]
             self.threshold = 2 if self.hex else 3
             self.rules = self.rules5
 
