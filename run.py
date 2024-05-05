@@ -1,5 +1,5 @@
 import mesa
-from rock_scissors_paper.model_original import RockScissorsPaperO
+from rock_scissors_paper.model_random_act import RockScissorsPaper
 from rock_scissors_paper.portrayal import portraySquarePatch
 from mesa.visualization import ChartModule, Slider, CanvasGrid, ModularServer
 
@@ -10,7 +10,7 @@ color_map = {
 }
 
 model_params = {
-    "init0": Slider(
+    "r0": Slider(
         "Initial weight of species 1",
         0.33,
         0,
@@ -18,7 +18,7 @@ model_params = {
         0.01,
         description="Initial weight of species 1",
     ),
-    "init1": Slider(
+    "s0": Slider(
         "Initial weight of species 2",
         0.33,
         0,
@@ -26,7 +26,7 @@ model_params = {
         0.01,
         description="Initial weight of species 2",
     ),
-    "init2": Slider(
+    "p0": Slider(
         "Initial weight of species 3",
         0.33,
         0,
@@ -34,7 +34,7 @@ model_params = {
         0.01,
         description="Initial weight of species 3",
     ),
-    "inv0": Slider(
+    "Pr": Slider(
         "Invasion rate of species 1",
         0.33,
         0,
@@ -42,7 +42,7 @@ model_params = {
         0.01,
         description="Invasion rate of species 1",
     ),
-    "inv1": Slider(
+    "Ps": Slider(
         "Invasion rate of species 2",
         0.33,
         0,
@@ -50,7 +50,7 @@ model_params = {
         0.01,
         description="Invasion rate of species 2",
     ),
-    "inv2": Slider(
+    "Pp": Slider(
         "Invasion rate of species 3",
         0.33,
         0,
@@ -78,9 +78,9 @@ canvas_element = CanvasGrid(
 )
 
 server = ModularServer(
-     RockScissorsPaperO,
+     RockScissorsPaper,
      [canvas_element, chart_element],
-     "Rock Scissors Paper: Original",
+     "Rock Scissors Paper (random activation of agents)",
      model_params
 )
 server.launch(open_browser=True)

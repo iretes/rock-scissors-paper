@@ -8,7 +8,7 @@ color_map_O = {
 }
 
 model_params_O = {
-    "init0": Slider(
+    "r0": Slider(
         "Fraction of individuals of species 1",
         0.33,
         0,
@@ -16,7 +16,7 @@ model_params_O = {
         0.01,
         description="Fraction of individuals of species 1",
     ),
-    "init1": Slider(
+    "s0": Slider(
         "Fraction of individuals of species 2",
         0.33,
         0,
@@ -24,7 +24,7 @@ model_params_O = {
         0.01,
         description="Fraction of individuals of species 2",
     ),
-    "init2": Slider(
+    "p0": Slider(
         "Fraction of individuals of species 3",
         0.33,
         0,
@@ -32,7 +32,7 @@ model_params_O = {
         0.01,
         description="Fraction of individuals of species 3",
     ),
-    "inv0": Slider(
+    "Pr": Slider(
         "Invasion rate of species 1",
         0.33,
         0,
@@ -40,7 +40,7 @@ model_params_O = {
         0.01,
         description="Invasion rate of species 1",
     ),
-    "inv1": Slider(
+    "Ps": Slider(
         "Invasion rate of species 2",
         0.33,
         0,
@@ -48,7 +48,7 @@ model_params_O = {
         0.01,
         description="Invasion rate of species 2",
     ),
-    "inv2": Slider(
+    "Pp": Slider(
         "Invasion rate of species 3",
         0.33,
         0,

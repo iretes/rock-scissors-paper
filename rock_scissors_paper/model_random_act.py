@@ -1,17 +1,18 @@
 import mesa
-from .patch_original import PatchO
+from .patch_random_act import Patch
 from mesa.datacollection import DataCollector
 
-class RockScissorsPaperO(mesa.Model):
+class RockScissorsPaper(mesa.Model):
     """
-    Represents the 2-dimensional array of patches in Rock-Scissors-Paper Game.
-    """ # TODO: modifcare, appare in 'About'
+    A system with three species in a competitive loop: a rock beats a pair of scissors,
+    scissors beat a sheet of paper and paper beats a rock.
+    """
 
     rules = {0: [1], 1: [2], 2: [0]}
 
     def __init__(self, hex,
-                 init0, init1, init2,
-                 inv0, inv1, inv2,
+                 r0, s0, p0,
+                 Pr, Ps, Pp,
                  color_map, 
                  increase_rate=False,
                  width=50, height=50):
@@ -28,8 +29,8 @@ class RockScissorsPaperO(mesa.Model):
 
         self.increase_rate = increase_rate
         
-        self.probabilities = [init0, init1, init2]
-        self.invasion_rates = [inv0, inv1, inv2]
+        self.probabilities = [r0, s0, p0]
+        self.invasion_rates = [Pr, Ps, Pp]
         self.rules = self.rules
 
         # Set up the grid and schedule.
@@ -45,7 +46,7 @@ class RockScissorsPaperO(mesa.Model):
         # Place a patch at each location, initializing it as ROCK, SCISSOR, or PAPER
         for _, (x, y) in self.grid.coord_iter():
             patch_init_state = self.random.choices(range(self.n_species), weights=self.probabilities, k=1)[0]
-            patch = PatchO(pos=(x, y), model=self, init_state=patch_init_state)
+            patch = Patch(pos=(x, y), model=self, init_state=patch_init_state)
             self.grid.place_agent(patch, (x, y))
             self.schedule.add(patch)
 
@@ -55,7 +56,7 @@ class RockScissorsPaperO(mesa.Model):
         for i in range(self.n_species):
             model_reporter[i] = lambda model, species=i: model.count_patches(species)
         if self.increase_rate:
-            model_reporter['inv0'] = lambda model: model.invasion_rates[0]
+            model_reporter['Pr'] = lambda model: model.invasion_rates[0]
         self.datacollector = DataCollector(
             model_reporter
         )

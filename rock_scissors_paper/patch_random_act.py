@@ -1,6 +1,6 @@
 import mesa
 
-class PatchO(mesa.Agent):
+class Patch(mesa.Agent):
     """Represents a single patch in the simulation."""
 
     def __init__(self, pos, model, init_state):
@@ -33,18 +33,6 @@ class PatchO(mesa.Agent):
         neighbor = self.random.choice(neighbors)
 
         # TODO: doppia azione?
-        # if self.state in self.rules[neighbor.state]:
-        #     defeat_rate = self.invasion_rates[neighbor.state]
-        #     self.state = self.random.choices(
-        #         [neighbor.state, self.state],
-        #         weights=[defeat_rate, 1-defeat_rate],
-        #         k=1)[0]
-        # elif neighbor.state in self.rules[self.state]:
-        #     win_rate = self.invasion_rates[self.state]
-        #     neighbor.state = self.random.choices(
-        #         [self.state, neighbor.state],
-        #         weights=[win_rate, 1-win_rate],
-        #         k=1)[0]
             
         if neighbor.state in self.rules[self.state]:
             win_rate = self.model.invasion_rates[self.state]
