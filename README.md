@@ -27,5 +27,9 @@ python ./run_random_act.py
 
 Then open your browser to http://127.0.0.1:8521/.
 
+## Demo
+
+![Demo](./demo.gif)
+
 ## References
 - Frean, Marcus, and Edward R. Abraham. "Rock–scissors–paper and the survival of the weakest." Proceedings of the Royal Society of London. Series B: Biological Sciences 268.1474 (2001): 1323-1327.
