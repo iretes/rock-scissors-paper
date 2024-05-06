@@ -1,7 +1,10 @@
 import mesa
-from mesa.visualization import Choice, ChartModule, Slider
+from rock_scissors_paper.model_simultaneous_act import RockScissorsPaperSimultaneousActivation
+from rock_scissors_paper.portrayal import portraySquarePatch
+from mesa.visualization import ChartModule, Slider, CanvasGrid, ModularServer, Choice
 
-color_map_MV = {
+
+color_map_simultaneous = {
     0: 'red',
     1: 'purple',
     2: 'yellow',
@@ -9,7 +12,7 @@ color_map_MV = {
     4: 'blue'
 }
 
-model_params_MV = {
+model_params_simultaneous = {
     "n_species": Choice(
         "Number of species",
         value=3,
@@ -56,10 +59,34 @@ model_params_MV = {
         0.01,
         description="Initial weight of species 5",
     ),
-    "color_map": color_map_MV
+    "color_map": color_map_simultaneous,
+    "hex_grid": False,
+    "height": 100,
+    "width": 100,
 }
 
 chart = []
 for i in range(5):
-    chart.append({'Label': i, 'Color': color_map_MV[i]})
-chart_element_MV = ChartModule(chart)
+    chart.append({'Label': i, 'Color': color_map_simultaneous[i]})
+chart_element_simultaneous = ChartModule(chart, canvas_height=15, canvas_width=50)
+
+chart = []
+for i in range(5):
+    chart.append({'Label': i, 'Color': color_map_simultaneous[i]})
+chart_element = ChartModule(chart, canvas_height=15, canvas_width=50)
+
+canvas_element = CanvasGrid(
+    portraySquarePatch,
+    grid_width=100,
+    grid_height=100,
+    canvas_width=400,
+    canvas_height=400
+)
+
+server = ModularServer(
+     RockScissorsPaperSimultaneousActivation,
+     [canvas_element, chart_element],
+     "Rock Scissors Paper (simultaneaous activation of agents)",
+     model_params_simultaneous
+)
+server.launch(open_browser=True)

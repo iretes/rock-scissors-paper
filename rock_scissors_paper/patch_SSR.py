@@ -24,7 +24,7 @@ class PatchSSR(mesa.Agent):
         to calculate their next state.
         """
         # Get the neighbors
-        if self.model.hex:
+        if self.model.hex_grid:
             neighbors = self.model.grid.get_neighbors((self.x, self.y), include_center=False)
         else:
             neighbors = self.model.grid.get_neighbors((self.x, self.y), moore=False) # TODO: 4 neighbors

@@ -11,13 +11,13 @@ class RockScissorsPaperSSR(mesa.Model):
     rules4 = {1: [2], 2: [3], 3: [4], 4: [1]}
     rules5 = {1: [2,3], 2: [3,4], 3: [4,5], 4: [5,1], 5: [1,2]}
 
-    def __init__(self, hex, init0, init1, init2, init3, init4, init5, n_species, color_map, width=50, height=50):
+    def __init__(self, hex_grid, init0, init1, init2, init3, init4, init5, n_species, color_map, width=50, height=50):
         """
         Create a new playing area of (width, height) patches.
         """
         super().__init__()
 
-        self.hex = hex
+        self.hex_grid = hex_grid
 
         self.n_species = n_species
 
@@ -38,7 +38,7 @@ class RockScissorsPaperSSR(mesa.Model):
         self.schedule = mesa.time.RandomActivation(self)
 
         # Use a simple grid, where edges wrap around.
-        if hex:
+        if hex_grid:
             self.grid = mesa.space.HexSingleGrid(width, height, torus=True)
         else:
             self.grid = mesa.space.SingleGrid(width, height, torus=True)

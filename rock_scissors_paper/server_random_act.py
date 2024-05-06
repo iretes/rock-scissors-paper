@@ -1,13 +1,13 @@
 import mesa
 from mesa.visualization import Choice, ChartModule, Slider
 
-color_map_O = {
+color_map = {
     0: 'red',
     1: 'purple',
     2: 'yellow'
 }
 
-model_params_O = {
+model_params = {
     "r0": Slider(
         "Fraction of individuals of species 1",
         0.33,
@@ -56,10 +56,10 @@ model_params_O = {
         0.01,
         description="Invasion rate of species 3",
     ),
-    "color_map": color_map_O
+    "color_map": color_map
 }
 
-chart_O = []
+chart = []
 for i in range(3):
-    chart_O.append({'Label': i, 'Color': color_map_O[i]})
-chart_element_O = ChartModule(chart_O)
+    chart.append({'Label': i, 'Color': color_map[i]})
+chart_element = ChartModule(chart, canvas_height=15, canvas_width=50)

@@ -8,28 +8,26 @@ class RockScissorsPaper(mesa.Model):
     scissors beat a sheet of paper and paper beats a rock.
     """
 
+    # ROCK (0) beats SCISSOR (1), SCISSOR (1) beats PAPER (2), PAPER (2) beats ROCK (0)
     rules = {0: [1], 1: [2], 2: [0]}
 
-    def __init__(self, hex,
+    def __init__(self,
                  r0, s0, p0,
                  Pr, Ps, Pp,
-                 color_map, 
-                 increase_rate=False,
+                 color_map={0: "red", 1: "purple", 2: "yellow"}, 
+                 increase_r_rate=False,
+                 hex_grid=False,
                  width=50, height=50):
         """
         Create a new playing area of (width, height) patches.
         """
         super().__init__()
 
-        self.hex = hex
-
+        self.hex_grid = hex_grid
         self.n_species = 3
-
         self.color_map = color_map
-
-        self.increase_rate = increase_rate
-        
-        self.probabilities = [r0, s0, p0]
+        self.increase_r_rate = increase_r_rate
+        self.init_probabilities = [r0, s0, p0]
         self.invasion_rates = [Pr, Ps, Pp]
         self.rules = self.rules
 
@@ -38,14 +36,14 @@ class RockScissorsPaper(mesa.Model):
         self.schedule = mesa.time.RandomActivation(self)
 
         # Use a simple grid, where edges wrap around.
-        if hex:
+        if self.hex_grid:
             self.grid = mesa.space.HexSingleGrid(width, height, torus=True)
         else:
             self.grid = mesa.space.SingleGrid(width, height, torus=True)
 
         # Place a patch at each location, initializing it as ROCK, SCISSOR, or PAPER
         for _, (x, y) in self.grid.coord_iter():
-            patch_init_state = self.random.choices(range(self.n_species), weights=self.probabilities, k=1)[0]
+            patch_init_state = self.random.choices(range(self.n_species), weights=self.init_probabilities, k=1)[0]
             patch = Patch(pos=(x, y), model=self, init_state=patch_init_state)
             self.grid.place_agent(patch, (x, y))
             self.schedule.add(patch)
@@ -55,7 +53,7 @@ class RockScissorsPaper(mesa.Model):
         model_reporter = {}
         for i in range(self.n_species):
             model_reporter[i] = lambda model, species=i: model.count_patches(species)
-        if self.increase_rate:
+        if self.increase_r_rate:
             model_reporter['Pr'] = lambda model: model.invasion_rates[0]
         self.datacollector = DataCollector(
             model_reporter

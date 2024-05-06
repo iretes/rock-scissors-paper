@@ -24,7 +24,7 @@ class Patch(mesa.Agent):
         to calculate their next state.
         """
         # Get the neighbors
-        if self.model.hex:
+        if self.model.hex_grid:
             neighbors = self.model.grid.get_neighbors((self.x, self.y), include_center=False)
         else:
             neighbors = self.model.grid.get_neighbors((self.x, self.y), moore=True)
@@ -41,7 +41,9 @@ class Patch(mesa.Agent):
                 weights=[win_rate, 1-win_rate],
                 k=1)[0]
             neighbor.state = new_neigh_state
-            if (self.model.increase_rate and self.state==0 and \
+            
+            # TODO: sposta in altro metodo
+            if (self.model.increase_r_rate and self.state==0 and \
                 new_neigh_state==self.state and self.model.schedule.steps>500):
                 rand = self.random.uniform(0, 1e-5)
                 new_rate = self.model.invasion_rates[self.state] + rand

@@ -11,70 +11,70 @@ color_map = {
 
 model_params = {
     "r0": Slider(
-        "Initial weight of species 1",
+        "Initial weight of species 'rock'",
         0.33,
         0,
         1,
         0.01,
-        description="Initial weight of species 1",
+        description="Initial weight of species 'rock'",
     ),
     "s0": Slider(
-        "Initial weight of species 2",
+        "Initial weight of species 'scissors'",
         0.33,
         0,
         1,
         0.01,
-        description="Initial weight of species 2",
+        description="Initial weight of species 'scissors'",
     ),
     "p0": Slider(
-        "Initial weight of species 3",
+        "Initial weight of species 'paper'",
         0.33,
         0,
         1,
         0.01,
-        description="Initial weight of species 3",
+        description="Initial weight of species 'paper'",
     ),
     "Pr": Slider(
-        "Invasion rate of species 1",
+        "Invasion rate of species 'rock'",
         0.33,
         0,
         1,
         0.01,
-        description="Invasion rate of species 1",
+        description="Invasion rate of species 'rock'",
     ),
     "Ps": Slider(
-        "Invasion rate of species 2",
+        "Invasion rate of species 'scissors'",
         0.33,
         0,
         1,
         0.01,
-        description="Invasion rate of species 2",
+        description="Invasion rate of species 'scissors'",
     ),
     "Pp": Slider(
-        "Invasion rate of species 3",
+        "Invasion rate of species 'paper'",
         0.33,
         0,
         1,
         0.01,
-        description="Invasion rate of species 3",
+        description="Invasion rate of species 'paper'",
     ),
     "color_map": color_map,
-    "height": 200,
-    "width": 200,
-    "hex": False
+    "height": 100,
+    "width": 100,
+    "hex_grid": False
 }
 
 chart = []
 for i in range(3):
     chart.append({'Label': i, 'Color': color_map[i]})
-chart_element = ChartModule(chart)
+chart_element = ChartModule(chart, canvas_height=15, canvas_width=50)
 
 canvas_element = CanvasGrid(
     portraySquarePatch,
-    grid_width=200,
-    grid_height=200,
-    canvas_width=600,
-    canvas_height=600
+    grid_width=100,
+    grid_height=100,
+    canvas_width=400,
+    canvas_height=400
 )
 
 server = ModularServer(

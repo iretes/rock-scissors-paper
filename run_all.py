@@ -1,11 +1,11 @@
 import mesa
 from rock_scissors_paper.model_SSR import RockScissorsPaperSSR
-from rock_scissors_paper.model_MV import RockScissorsPaperMV
+from rock_scissors_paper.model_simultaneous_act import RockScissorsPaperSimultaneousActivation
 from rock_scissors_paper.model_random_act import RockScissorsPaper
 from rock_scissors_paper.portrayal import portraySquarePatch, portrayHexPatch
 from rock_scissors_paper.server_SSR import model_params_SSR, chart_element_SSR
-from rock_scissors_paper.server_MV import model_params_MV, chart_element_MV
-from rock_scissors_paper.server_original import model_params_O, chart_element_O
+from rock_scissors_paper.server_simultaneous_act import model_params_simultaneous, chart_element_simultaneous
+from rock_scissors_paper.server_random_act import model_params, chart_element
 from mesa.visualization import CanvasHexGrid, CanvasGrid, StaticText, ModularServer
 
 while True:
@@ -31,11 +31,11 @@ while True:
     else:
         print("Invalid input")
 
-MAJORITY_VOTING = "1"
+SIMULTANEOUS_ACTIVATIONS = "1"
 SWAP_FIGHT_REPRODUCE = "2"
-ORIGINAL = "3"
+RANDOM_ACTIVATIONS = "3"
 while True:
-    model_type = input("Enter '1' for majority-voting model; '2' for swap-fight-reproduce model; '3' for original implementation: ")
+    model_type = input("Enter '1' for simultaneous activations; '2' for swap-fight-reproduce model; '3' for random activations: ")
     if model_type in ["1", "2", "3"]:
         break
     else:
@@ -69,14 +69,14 @@ rules_descr += '<b>Rules with 5 species:</b><br />'
 for key, val in RockScissorsPaperSSR.rules5.items():
     rules_descr += f'{key} > {val[0]}, {val[1]}<br />'
 
-model_params = model_params_MV if model_type == MAJORITY_VOTING else model_params_SSR if model_type == SWAP_FIGHT_REPRODUCE else model_params_O
+model_params = model_params_simultaneous if model_type == SIMULTANEOUS_ACTIVATIONS else model_params_SSR if model_type == SWAP_FIGHT_REPRODUCE else model_params
 model_params['height'] = grid_height
 model_params['width'] = grid_width
 model_params['rules_descr'] = StaticText(rules_descr)
-model_params['hex'] = True if grid_type == "H" else False
-model = RockScissorsPaperMV if model_type == MAJORITY_VOTING else RockScissorsPaperSSR if model_type == SWAP_FIGHT_REPRODUCE else RockScissorsPaper
-chart_element = chart_element_MV if model_type == MAJORITY_VOTING else chart_element_SSR if model_type == SWAP_FIGHT_REPRODUCE else chart_element_O
-model_descr = "Rock Scissors Paper: Majority Voting" if model_type == MAJORITY_VOTING else "Rock Scissors Paper: Swap Fight Reproduce" if model_type == SWAP_FIGHT_REPRODUCE else "Rock Scissors Paper: Original"
+model_params['hex_grid'] = True if grid_type == "H" else False
+model = RockScissorsPaperSimultaneousActivation if model_type == SIMULTANEOUS_ACTIVATIONS else RockScissorsPaperSSR if model_type == SWAP_FIGHT_REPRODUCE else RockScissorsPaper
+chart_element = chart_element_simultaneous if model_type == SIMULTANEOUS_ACTIVATIONS else chart_element_SSR if model_type == SWAP_FIGHT_REPRODUCE else chart_element
+model_descr = "Rock Scissors Paper: Simultaneous Activations" if model_type == SIMULTANEOUS_ACTIVATIONS else "Rock Scissors Paper: Swap Fight Reproduce" if model_type == SWAP_FIGHT_REPRODUCE else "Rock Scissors Paper: Random activations"
 
 server = ModularServer(
     model, [canvas_element, chart_element], model_descr, model_params
