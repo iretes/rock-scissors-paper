@@ -29,7 +29,7 @@ Then open your browser to http://127.0.0.1:8521/.
 
 ## Demo
 
-https://github.com/iretes/rock-scissors-paper/blob/af2f5238598075f7e105e4dbdb0236f954696bdf/img/demo.mov
+https://github.com/iretes/rock-scissors-paper/assets/46034276/2a1055cc-fee6-4a60-b513-3b3d7210b7ad
 
 ## References
 - Frean, Marcus, and Edward R. Abraham. "Rock–scissors–paper and the survival of the weakest." Proceedings of the Royal Society of London. Series B: Biological Sciences 268.1474 (2001): 1323-1327.
