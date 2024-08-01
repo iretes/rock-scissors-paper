@@ -3,7 +3,7 @@
 A simulation of an agent-based model built with the [Mesa](https://mesa.readthedocs.io/en/stable/) framework.
 It models a system with three species in a competitive loop: a rock beats (and replicates into) a pair of scissors, scissors beat a sheet of paper and paper beats a rock.
 
-# How to install
+## How to install
 
 To install the dependencies, execute the following command:
 
