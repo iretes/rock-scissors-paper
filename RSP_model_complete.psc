@@ -1,5 +1,3 @@
-# PySCeS input file: https://stochpy.sourceforge.net/html/inputfile_doc.html#pysces-inputfile
-# Stochastic Simulation Algorithm input format
 # Rock Scissors Paper model
 
 # R + S  --> S + 2R, Pr
