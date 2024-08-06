@@ -1,0 +1,19 @@
+ctmc
+
+const double Pr = 0.2;
+const double Ps = 0.5;
+const double Pp = 0.3;
+
+const int MAX = 100;
+
+module RSP
+
+  r : [0..MAX] init 50;
+  s : [0..MAX] init 30;
+  p : [0..MAX] init 20;
+
+  [] r>0 & r<MAX & s>0 -> Pr*r*s : (r'=r+1) & (s'=s-1);
+  [] s>0 & s<MAX & p>0 -> Ps*s*p : (s'=s+1) & (p'=p-1);
+  [] p>0 & p<MAX & r>0 -> Pp*p*r : (p'=p+1) & (r'=r-1);
+
+endmodule

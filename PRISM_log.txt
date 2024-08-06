@@ -1,0 +1,375 @@
+PRISM
+=====
+
+Version: 4.8.1
+Date: Tue Aug 06 15:43:24 CEST 2024
+Hostname: susypc
+Memory limits: cudd=1g, java(heap)=1g
+
+Type:        CTMC
+Modules:     RSP
+Variables:   r s
+
+---------------------------------------------------------------------
+
+Model checking: P=? [ F r=0 ]
+
+Building model...
+
+Computing reachable states...
+
+Reachability (BFS): 121 iterations in 0.00 seconds (average 0.000000, setup 0.00)
+
+Time for model construction: 0.124 seconds.
+
+Warning: Deadlocks detected and fixed in 3 states
+
+Type:        CTMC
+States:      5151 (1 initial)
+Transitions: 14853
+
+Rate matrix: 44090 nodes (3611 terminal), 14853 minterms, vars: 14r/14c
+
+Diagonals vector: 7997 nodes (2482 terminal), 5151 minterms
+Embedded Markov chain: 72269 nodes (13625 terminal), 14853 minterms
+
+Prob0: 100 iterations in 0.03 seconds (average 0.000310, setup 0.00)
+
+Prob1: 99 iterations in 0.06 seconds (average 0.000626, setup 0.00)
+
+yes = 200, no = 100, maybe = 4851
+
+Computing remaining probabilities...
+Engine: Hybrid
+
+Building hybrid MTBDD matrix... [levels=14, nodes=72180] [3.3 MB]
+Adding explicit sparse matrices... [levels=14, num=1, compact] [168.3 KB]
+Creating vector for diagonals... [dist=1, compact] [10.1 KB]
+Creating vector for RHS... [dist=2, compact] [10.1 KB]
+Allocating iteration vectors... [2 x 40.2 KB]
+TOTAL: [3.6 MB]
+
+Starting iterations...
+
+Jacobi: 5067 iterations in 4.03 seconds (average 0.000043, setup 3.81)
+
+Value in the initial state: 0.1412982989479114
+
+Time for model checking: 5.41 seconds.
+
+Result: 0.1412982989479114 (+/- 1.4120125376176834E-6 estimated; rel err 9.993131892820674E-6)
+
+---------------------------------------------------------------------
+
+Model checking: P=? [ F s=0 ]
+
+Diagonals vector: 7997 nodes (2482 terminal), 5151 minterms
+Embedded Markov chain: 72269 nodes (13625 terminal), 14853 minterms
+
+Prob0: 100 iterations in 0.06 seconds (average 0.000620, setup 0.00)
+
+Prob1: 99 iterations in 0.02 seconds (average 0.000162, setup 0.00)
+
+yes = 200, no = 100, maybe = 4851
+
+Computing remaining probabilities...
+Engine: Hybrid
+
+Building hybrid MTBDD matrix... [levels=14, nodes=72180] [3.3 MB]
+Adding explicit sparse matrices... [levels=14, num=1, compact] [168.3 KB]
+Creating vector for diagonals... [dist=1, compact] [10.1 KB]
+Creating vector for RHS... [dist=2, compact] [10.1 KB]
+Allocating iteration vectors... [2 x 40.2 KB]
+TOTAL: [3.6 MB]
+
+Starting iterations...
+
+Jacobi: 5098 iterations in 2.55 seconds (average 0.000022, setup 2.44)
+
+Value in the initial state: 0.9829185886675442
+
+Time for model checking: 5.287 seconds.
+
+Result: 0.9829185886675442 (+/- 9.824397199114573E-6 estimated; rel err 9.995128093398498E-6)
+
+---------------------------------------------------------------------
+
+Model checking: P=? [ F (MAX-r-s)=0 ]
+
+Diagonals vector: 7997 nodes (2482 terminal), 5151 minterms
+Embedded Markov chain: 72269 nodes (13625 terminal), 14853 minterms
+
+Prob0: 100 iterations in 0.08 seconds (average 0.000780, setup 0.00)
+
+Prob1: 99 iterations in 0.00 seconds (average 0.000000, setup 0.00)
+
+yes = 200, no = 100, maybe = 4851
+
+Computing remaining probabilities...
+Engine: Hybrid
+
+Building hybrid MTBDD matrix... [levels=14, nodes=72180] [3.3 MB]
+Adding explicit sparse matrices... [levels=14, num=1, compact] [168.3 KB]
+Creating vector for diagonals... [dist=1, compact] [10.1 KB]
+Creating vector for RHS... [dist=2, compact] [10.1 KB]
+Allocating iteration vectors... [2 x 40.2 KB]
+TOTAL: [3.6 MB]
+
+Starting iterations...
+
+Jacobi: 5108 iterations in 2.09 seconds (average 0.000028, setup 1.95)
+
+Value in the initial state: 0.8745308920684021
+
+Time for model checking: 5.281 seconds.
+
+Result: 0.8745308920684021 (+/- 8.735542417834342E-6 estimated; rel err 9.988832295190192E-6)
+
+---------------------------------------------------------------------
+
+Model checking: P=? [ F (r=70&(F r=0)) ]
+
+Building deterministic automaton (for F ("L0"&(F "L1")))...
+DFA has 3 states, 1 goal states.
+Time for deterministic automaton translation: 0.03 seconds.
+
+Constructing MC-DFA product...
+
+Reachability (BFS): 181 iterations in 0.05 seconds (average 0.000260, setup 0.00)
+
+States:      9806 (1 initial)
+Transitions: 28340
+
+Transition matrix: 44164 nodes (3611 terminal), 28340 minterms, vars: 16r/16c
+
+Skipping BSCC computation since acceptance is defined via goal states...
+
+Computing reachability probabilities...
+
+Diagonals vector: 8037 nodes (2485 terminal), 9806 minterms
+Embedded Markov chain: 72343 nodes (13625 terminal), 28340 minterms
+
+Prob0: 208 iterations in 0.06 seconds (average 0.000303, setup 0.00)
+
+Prob1: 99 iterations in 0.11 seconds (average 0.001101, setup 0.00)
+
+yes = 200, no = 339, maybe = 9267
+
+Computing remaining probabilities...
+Engine: Hybrid
+
+Building hybrid MTBDD matrix... [levels=16, nodes=72279] [3.3 MB]
+Adding explicit sparse matrices... [levels=16, num=1, compact] [224.6 KB]
+Creating vector for diagonals... [dist=1, compact] [19.2 KB]
+Creating vector for RHS... [dist=2, compact] [19.2 KB]
+Allocating iteration vectors... [2 x 76.6 KB]
+TOTAL: [3.7 MB]
+
+Starting iterations...
+
+Jacobi: 5067 iterations in 4.00 seconds (average 0.000117, setup 3.41)
+
+Value in the initial state: 0.1412860009175909
+
+Time for model checking: 5.828 seconds.
+
+Result: 0.1412860009175909
+
+---------------------------------------------------------------------
+
+Model checking: P=? [ F (s=70&(F s=0)) ]
+
+Building deterministic automaton (for F ("L0"&(F "L1")))...
+DFA has 3 states, 1 goal states.
+Time for deterministic automaton translation: 0.0 seconds.
+
+Constructing MC-DFA product...
+
+Reachability (BFS): 231 iterations in 0.08 seconds (average 0.000338, setup 0.00)
+
+States:      9806 (1 initial)
+Transitions: 28340
+
+Transition matrix: 51284 nodes (3611 terminal), 28340 minterms, vars: 16r/16c
+
+Skipping BSCC computation since acceptance is defined via goal states...
+
+Computing reachability probabilities...
+
+Diagonals vector: 9513 nodes (2483 terminal), 9806 minterms
+Embedded Markov chain: 78314 nodes (13625 terminal), 28340 minterms
+
+Prob0: 208 iterations in 0.05 seconds (average 0.000226, setup 0.00)
+
+Prob1: 99 iterations in 0.02 seconds (average 0.000162, setup 0.00)
+
+yes = 200, no = 339, maybe = 9267
+
+Computing remaining probabilities...
+Engine: Hybrid
+
+Building hybrid MTBDD matrix... [levels=16, nodes=83010] [3.8 MB]
+Adding explicit sparse matrices... [levels=16, num=1, compact] [224.6 KB]
+Creating vector for diagonals... [dist=1, compact] [19.2 KB]
+Creating vector for RHS... [dist=2, compact] [19.2 KB]
+Allocating iteration vectors... [2 x 76.6 KB]
+TOTAL: [4.2 MB]
+
+Starting iterations...
+
+Jacobi: 5289 iterations in 3.28 seconds (average 0.000098, setup 2.77)
+
+Value in the initial state: 0.6506808914402584
+
+Time for model checking: 6.768 seconds.
+
+Result: 0.6506808914402584
+
+---------------------------------------------------------------------
+
+Model checking: P=? [ F ((MAX-r-s)=70&(F (MAX-r-s)=0)) ]
+
+Building deterministic automaton (for F ("L0"&(F "L1")))...
+DFA has 3 states, 1 goal states.
+Time for deterministic automaton translation: 0.008 seconds.
+
+Constructing MC-DFA product...
+
+Reachability (BFS): 221 iterations in 0.03 seconds (average 0.000140, setup 0.00)
+
+States:      9806 (1 initial)
+Transitions: 28340
+
+Transition matrix: 50473 nodes (3611 terminal), 28340 minterms, vars: 16r/16c
+
+Skipping BSCC computation since acceptance is defined via goal states...
+
+Computing reachability probabilities...
+
+Diagonals vector: 9522 nodes (2485 terminal), 9806 minterms
+Embedded Markov chain: 78216 nodes (13625 terminal), 28340 minterms
+
+Prob0: 208 iterations in 0.05 seconds (average 0.000226, setup 0.00)
+
+Prob1: 99 iterations in 0.05 seconds (average 0.000475, setup 0.00)
+
+yes = 200, no = 339, maybe = 9267
+
+Computing remaining probabilities...
+Engine: Hybrid
+
+Building hybrid MTBDD matrix... [levels=16, nodes=81568] [3.7 MB]
+Adding explicit sparse matrices... [levels=16, num=1, compact] [224.6 KB]
+Creating vector for diagonals... [dist=1, compact] [19.2 KB]
+Creating vector for RHS... [dist=2, compact] [19.2 KB]
+Allocating iteration vectors... [2 x 76.6 KB]
+TOTAL: [4.1 MB]
+
+Starting iterations...
+
+Jacobi: 5386 iterations in 2.36 seconds (average 0.000038, setup 2.16)
+
+Value in the initial state: 0.28962347433238994
+
+Time for model checking: 6.576 seconds.
+
+Result: 0.28962347433238994
+
+---------------------------------------------------------------------
+
+Model checking: P=? [ F s=0&r=0 ]
+
+Diagonals vector: 7997 nodes (2482 terminal), 5151 minterms
+Embedded Markov chain: 72269 nodes (13625 terminal), 14853 minterms
+
+Prob0: 198 iterations in 0.05 seconds (average 0.000237, setup 0.00)
+
+Prob1: 50 iterations in 0.01 seconds (average 0.000300, setup 0.00)
+
+yes = 100, no = 200, maybe = 4851
+
+Computing remaining probabilities...
+Engine: Hybrid
+
+Building hybrid MTBDD matrix... [levels=14, nodes=72180] [3.3 MB]
+Adding explicit sparse matrices... [levels=14, num=1, compact] [168.3 KB]
+Creating vector for diagonals... [dist=1, compact] [10.1 KB]
+Creating vector for RHS... [dist=2, compact] [10.1 KB]
+Allocating iteration vectors... [2 x 40.2 KB]
+TOTAL: [3.6 MB]
+
+Starting iterations...
+
+Jacobi: 5060 iterations in 2.31 seconds (average 0.000015, setup 2.23)
+
+Value in the initial state: 0.12484498983774625
+
+Time for model checking: 5.309 seconds.
+
+Result: 0.12484498983774625 (+/- 1.2472498654345966E-6 estimated; rel err 9.990387816568165E-6)
+
+---------------------------------------------------------------------
+
+Model checking: P=? [ F r=0&(MAX-r-s)=0 ]
+
+Diagonals vector: 7997 nodes (2482 terminal), 5151 minterms
+Embedded Markov chain: 72269 nodes (13625 terminal), 14853 minterms
+
+Prob0: 198 iterations in 0.00 seconds (average 0.000000, setup 0.00)
+
+Prob1: 50 iterations in 0.01 seconds (average 0.000300, setup 0.00)
+
+yes = 100, no = 200, maybe = 4851
+
+Computing remaining probabilities...
+Engine: Hybrid
+
+Building hybrid MTBDD matrix... [levels=14, nodes=72180] [3.3 MB]
+Adding explicit sparse matrices... [levels=14, num=1, compact] [168.3 KB]
+Creating vector for diagonals... [dist=1, compact] [10.1 KB]
+Creating vector for RHS... [dist=2, compact] [10.1 KB]
+Allocating iteration vectors... [2 x 40.2 KB]
+TOTAL: [3.6 MB]
+
+Starting iterations...
+
+Jacobi: 5141 iterations in 2.62 seconds (average 0.000030, setup 2.47)
+
+Value in the initial state: 0.01645373692597371
+
+Time for model checking: 5.285 seconds.
+
+Result: 0.01645373692597371 (+/- 1.6439874796782045E-7 estimated; rel err 9.991575087620501E-6)
+
+---------------------------------------------------------------------
+
+Model checking: P=? [ F (MAX-r-s)=0&s=0 ]
+
+Diagonals vector: 7997 nodes (2482 terminal), 5151 minterms
+Embedded Markov chain: 72269 nodes (13625 terminal), 14853 minterms
+
+Prob0: 198 iterations in 0.05 seconds (average 0.000237, setup 0.00)
+
+Prob1: 50 iterations in 0.00 seconds (average 0.000000, setup 0.00)
+
+yes = 100, no = 200, maybe = 4851
+
+Computing remaining probabilities...
+Engine: Hybrid
+
+Building hybrid MTBDD matrix... [levels=14, nodes=72180] [3.3 MB]
+Adding explicit sparse matrices... [levels=14, num=1, compact] [168.3 KB]
+Creating vector for diagonals... [dist=1, compact] [10.1 KB]
+Creating vector for RHS... [dist=2, compact] [10.1 KB]
+Allocating iteration vectors... [2 x 40.2 KB]
+TOTAL: [3.6 MB]
+
+Starting iterations...
+
+Jacobi: 5107 iterations in 1.92 seconds (average 0.000006, setup 1.89)
+
+Value in the initial state: 0.8580768529067467
+
+Time for model checking: 5.346 seconds.
+
+Result: 0.8580768529067467 (+/- 8.574549754478324E-6 estimated; rel err 9.992752660128196E-6)
