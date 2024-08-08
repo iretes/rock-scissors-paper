@@ -1,18 +1,15 @@
 import mesa
-from rock_scissors_paper.model_simultaneous_act import RockScissorsPaperSimultaneousActivation
-from rock_scissors_paper.portrayal import portraySquarePatch
-from mesa.visualization import ChartModule, Slider, CanvasGrid, ModularServer, Choice
+from lattice_models.model_rand_act import RSPRandAct
+from lattice_models.portrayal import portraySquarePatch
+from mesa.visualization import Choice, ChartModule, Slider, CanvasGrid, ModularServer
 
-
-color_map_simultaneous = {
+color_map = {
     0: 'red',
     1: 'purple',
-    2: 'yellow',
-    3: 'green',
-    4: 'blue'
+    2: 'yellow'
 }
 
-model_params_simultaneous = {
+model_params = {
     "n_species": Choice(
         "Number of species",
         value=3,
@@ -59,20 +56,54 @@ model_params_simultaneous = {
         0.01,
         description="Initial weight of species 5",
     ),
-    "color_map": color_map_simultaneous,
-    "hex_grid": False,
+    "invrate0": Slider(
+        "Invasion rate of species 1",
+        0.33,
+        0,
+        1,
+        0.01,
+        description="Invasion rate of species 1",
+    ),
+    "invrate1": Slider(
+        "Invasion rate of species species 2",
+        0.33,
+        0,
+        1,
+        0.01,
+        description="Invasion rate of species 2",
+    ),
+    "invrate2": Slider(
+        "Invasion rate of species of species 3",
+        0.33,
+        0,
+        1,
+        0.01,
+        description="Invasion rate of species 3",
+    ),
+    "invrate3": Slider(
+        "Invasion rate of species of species 4",
+        0,
+        0,
+        1,
+        0.01,
+        description="Invasion rate of species 4",
+    ),
+    "invrate4": Slider(
+        "Invasion rate of species of species 5",
+        0,
+        0,
+        1,
+        0.01,
+        description="Invasion rate of species 5",
+    ),
+    "color_map": color_map,
     "height": 100,
-    "width": 100,
+    "width": 100
 }
 
 chart = []
-for i in range(5):
-    chart.append({'Label': i, 'Color': color_map_simultaneous[i]})
-chart_element_simultaneous = ChartModule(chart, canvas_height=15, canvas_width=50)
-
-chart = []
-for i in range(5):
-    chart.append({'Label': i, 'Color': color_map_simultaneous[i]})
+for i in range(3):
+    chart.append({'Label': i, 'Color': color_map[i]})
 chart_element = ChartModule(chart, canvas_height=15, canvas_width=50)
 
 canvas_element = CanvasGrid(
@@ -84,9 +115,9 @@ canvas_element = CanvasGrid(
 )
 
 server = ModularServer(
-     RockScissorsPaperSimultaneousActivation,
+     RSPRandAct,
      [canvas_element, chart_element],
-     "Rock Scissors Paper (simultaneaous activation of agents)",
-     model_params_simultaneous
+     "Rock Scissors Paper (random activation of agents)",
+     model_params
 )
 server.launch(open_browser=True)

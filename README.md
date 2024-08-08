@@ -1,33 +1,40 @@
 # Rock, Scissors, Paper: the survival of the weakest 🪨✂️📄
 
-A simulation of an agent-based model built with the [Mesa](https://mesa.readthedocs.io/en/stable/) framework.
-It models a system with three species in a competitive loop: a rock beats (and replicates into) a pair of scissors, scissors beat a sheet of paper and paper beats a rock.
+Analysis of a dynamical system with three species in a competitive loop: a rock beats (and replicates into) a pair of scissors, scissors beat a sheet of paper and paper beats a rock.
 
-## How to install
+## Long range dispersal model
 
-To install the dependencies, execute the following command:
+The notebook `long_range_simulations.ipynb` analyzes simulations of the long-range dispersal model.
+
+The model is examined under both discrete and continuous time frameworks. For the continuous time approach, the differential equation system defining the model is solved using the [`scipy.integrate`](https://docs.scipy.org/doc/scipy/reference/integrate.html#module-scipy.integrate) package. Additionally, the model is reframed in terms of chemical reactions for stochastic simulations, which are conducted using the [`StochPy`](https://stochpy.sourceforge.net) package. It is further examined as a continuous-time Markov chain with the [`PRISM`](https://www.prismmodelchecker.org) stochastic model checker.
+
+## Lattice model
+
+The notebook `lattice_simulations.ipynb` analyzes simulations of the local range dispersal model, where individuals are situated on a lattice and interact solely with their neighbors. This lattice-based model was developed using the [Mesa](https://mesa.readthedocs.io/en/stable/) framework.
+
+### How to run
+
+First, install the dependencies executing the following command:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## How to run
-
 To interactively run the model with agents activating simultaneously, execute the following command:
 
 ```bash
-python ./run_simultaneous_act.py
+python ./run_lattice_simact.py
 ```
 
 To interactively run the model with agents activating sequentially, execute the following command:
 
 ```bash
-python ./run_random_act.py
+python ./run_lattice_randact.py
 ```
 
 Then open your browser to http://127.0.0.1:8521/.
 
-## Demo
+### Demo
 
 https://github.com/iretes/rock-scissors-paper/assets/46034276/2a1055cc-fee6-4a60-b513-3b3d7210b7ad
 

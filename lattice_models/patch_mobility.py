@@ -1,6 +1,6 @@
 import mesa
 
-class PatchSSR(mesa.Agent):
+class PatchMobility(mesa.Agent):
     """Represents a single patch in the simulation."""
 
     def __init__(self, pos, model, init_state):
@@ -24,10 +24,7 @@ class PatchSSR(mesa.Agent):
         to calculate their next state.
         """
         # Get the neighbors
-        if self.model.hex_grid:
-            neighbors = self.model.grid.get_neighbors((self.x, self.y), include_center=False)
-        else:
-            neighbors = self.model.grid.get_neighbors((self.x, self.y), moore=False) # TODO: 4 neighbors
+        neighbors = self.model.grid.get_neighbors((self.x, self.y), moore=False) # TODO: 4 neighbors
 
         # swap, select, reproduce
         action = self.random.choice(['swap', 'select', 'reproduce'])

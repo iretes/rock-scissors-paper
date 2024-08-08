@@ -1,50 +1,54 @@
 import mesa
-from .patch_random_act import Patch
+from .patch_sim_act import PatchSimAct
 from mesa.datacollection import DataCollector
 
-class RockScissorsPaper(mesa.Model):
+class RSPSimAct(mesa.Model):
     """
     A system with three species in a competitive loop: a rock beats a pair of scissors,
     scissors beat a sheet of paper and paper beats a rock.
     """
 
-    # ROCK (0) beats SCISSOR (1), SCISSOR (1) beats PAPER (2), PAPER (2) beats ROCK (0)
-    rules = {0: [1], 1: [2], 2: [0]}
+    rules3 = {0: [1], 1: [2], 2: [0]}
+    rules4 = {0: [1], 1: [2], 2: [3], 3: [0]}
+    rules5 = {0: [1,2], 1: [2,3], 2: [3,4], 3: [4,0], 4: [0,1]}
 
-    def __init__(self,
-                 r0, s0, p0,
-                 Pr, Ps, Pp,
-                 color_map={0: "red", 1: "purple", 2: "yellow"}, 
-                 increase_r_rate=False,
-                 hex_grid=False,
-                 width=50, height=50):
+    def __init__(self, init0, init1, init2, init3, init4, n_species, color_map, width=50, height=50):
         """
         Create a new playing area of (width, height) patches.
         """
         super().__init__()
 
-        self.hex_grid = hex_grid
-        self.n_species = 3
+        self.n_species = n_species
         self.color_map = color_map
-        self.increase_r_rate = increase_r_rate
-        self.init_probabilities = [r0, s0, p0]
-        self.invasion_rates = [Pr, Ps, Pp]
-        self.rules = self.rules
+
+        if self.n_species == 3:
+            self.probabilities = [init0, init1, init2]
+            self.threshold = 3
+            self.rules = self.rules3
+        elif self.n_species == 4:
+            self.probabilities = [init0, init1, init2, init3]
+            self.threshold = 2
+            self.rules = self.rules4
+        else: # n_species == 5
+            self.probabilities = [init0, init1, init2, init3, init4]
+            self.threshold = 3
+            self.rules = self.rules5
 
         # Set up the grid and schedule.
 
-        self.schedule = mesa.time.RandomActivation(self)
+        # Use SimultaneousActivation which simulates all the patches
+        # computing their next state simultaneously.  This needs to
+        # be done because each patch's next state depends on the current
+        # state of all its neighbors -- before they've changed.
+        self.schedule = mesa.time.SimultaneousActivation(self)
 
         # Use a simple grid, where edges wrap around.
-        if self.hex_grid:
-            self.grid = mesa.space.HexSingleGrid(width, height, torus=True)
-        else:
-            self.grid = mesa.space.SingleGrid(width, height, torus=True)
+        self.grid = mesa.space.SingleGrid(width, height, torus=True)
 
         # Place a patch at each location, initializing it as ROCK, SCISSOR, or PAPER
         for _, (x, y) in self.grid.coord_iter():
-            patch_init_state = self.random.choices(range(self.n_species), weights=self.init_probabilities, k=1)[0]
-            patch = Patch(pos=(x, y), model=self, init_state=patch_init_state)
+            patch_init_state = self.random.choices(range(self.n_species), weights=self.probabilities, k=1)[0]
+            patch = PatchSimAct(pos=(x, y), model=self, init_state=patch_init_state)
             self.grid.place_agent(patch, (x, y))
             self.schedule.add(patch)
 
@@ -53,8 +57,6 @@ class RockScissorsPaper(mesa.Model):
         model_reporter = {}
         for i in range(self.n_species):
             model_reporter[i] = lambda model, species=i: model.count_patches(species)
-        if self.increase_r_rate:
-            model_reporter['Pr'] = lambda model: model.invasion_rates[0]
         self.datacollector = DataCollector(
             model_reporter
         )

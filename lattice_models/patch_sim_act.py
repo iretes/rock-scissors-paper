@@ -1,7 +1,7 @@
 import mesa
 import numpy as np
 
-class PatchSimultaneosActivation(mesa.Agent):
+class PatchSimAct(mesa.Agent):
     """Represents a single patch in the simulation."""
 
     def __init__(self, pos, model, init_state):
@@ -29,10 +29,7 @@ class PatchSimultaneosActivation(mesa.Agent):
         # Assume nextState is unchanged, unless changed below.
         self._nextState = self.state
         # Get the neighbors
-        if self.model.hex_grid:
-            neighbors = self.model.grid.get_neighbors((self.x, self.y), include_center=False)
-        else:
-            neighbors = self.model.grid.get_neighbors((self.x, self.y), moore=True)
+        neighbors = self.model.grid.get_neighbors((self.x, self.y), moore=True)
 
         # Count the number defeats of each type
         defeat_counts = np.zeros(self.n_species)

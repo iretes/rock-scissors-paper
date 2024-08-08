@@ -1,6 +1,6 @@
 import mesa
 
-class Patch(mesa.Agent):
+class PatchRandAct(mesa.Agent):
     """Represents a single patch in the simulation."""
 
     def __init__(self, pos, model, init_state):
@@ -24,17 +24,14 @@ class Patch(mesa.Agent):
         to calculate their next state.
         """
         # Get the neighbors
-        if self.model.hex_grid:
-            neighbors = self.model.grid.get_neighbors((self.x, self.y), include_center=False)
-        else:
-            neighbors = self.model.grid.get_neighbors((self.x, self.y), moore=True)
+        neighbors = self.model.grid.get_neighbors((self.x, self.y), moore=True)
 
         # select a random neighbor
         neighbor = self.random.choice(neighbors)
-
-        # TODO: doppia azione?
-            
+        
+        # if the neighbor can be defeated
         if neighbor.state in self.rules[self.state]:
+            # change the neighbor state according to the invasion rate
             win_rate = self.model.invasion_rates[self.state]
             new_neigh_state = self.random.choices(
                 [self.state, neighbor.state],
@@ -42,10 +39,10 @@ class Patch(mesa.Agent):
                 k=1)[0]
             neighbor.state = new_neigh_state
             
-            # TODO: sposta in altro metodo
-            if (self.model.increase_r_rate and self.state==0 and \
-                new_neigh_state==self.state and self.model.schedule.steps>500):
-                rand = self.random.uniform(0, 1e-5)
+            # increase species 0 invasion rate if needed
+            if (self.model.increase_rate and self.state==0 and \
+                new_neigh_state==self.state and self.model.schedule.steps>100):
+                rand = self.random.uniform(0, 1e-4)
                 new_rate = self.model.invasion_rates[self.state] + rand
                 if 0 < new_rate < 1:
                     self.model.invasion_rates[self.state] = new_rate
