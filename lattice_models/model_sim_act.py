@@ -34,18 +34,13 @@ class RSPSimAct(mesa.Model):
             self.threshold = 3
             self.rules = self.rules5
 
-        # Set up the grid and schedule.
-
-        # Use SimultaneousActivation which simulates all the patches
-        # computing their next state simultaneously.  This needs to
-        # be done because each patch's next state depends on the current
-        # state of all its neighbors -- before they've changed.
+        # set up agent scheduler
         self.schedule = mesa.time.SimultaneousActivation(self)
 
-        # Use a simple grid, where edges wrap around.
+        # use a simple grid, where edges wrap around.
         self.grid = mesa.space.SingleGrid(width, height, torus=True)
 
-        # Place a patch at each location, initializing it as ROCK, SCISSOR, or PAPER
+        # place a patch at each location, initializing it as ROCK, SCISSOR, or PAPER
         for _, (x, y) in self.grid.coord_iter():
             patch_init_state = self.random.choices(range(self.n_species), weights=self.probabilities, k=1)[0]
             patch = PatchSimAct(pos=(x, y), model=self, init_state=patch_init_state)
@@ -54,6 +49,7 @@ class RSPSimAct(mesa.Model):
 
         self.running = True
         
+        # collect data
         model_reporter = {}
         for i in range(self.n_species):
             model_reporter[i] = lambda model, species=i: model.count_patches(species)
@@ -70,7 +66,7 @@ class RSPSimAct(mesa.Model):
 
     def step(self):
         """
-        Have the scheduler advance each patch by one step
+        Have the scheduler advance each patch by one step.
         """
         self.schedule.step()
         self.datacollector.collect(self)

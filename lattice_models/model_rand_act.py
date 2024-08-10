@@ -42,13 +42,13 @@ class RSPRandAct(mesa.Model):
             self.invasion_rates = [invrate0, invrate1, invrate2, invrate3, invrate4]
             self.rules = self.rules5
 
-        # Set up agent scheduler
+        # set up agent scheduler
         self.schedule = mesa.time.RandomActivation(self)
 
-        # Use a simple grid, where edges wrap around.
+        # use a simple grid, where edges wrap around.
         self.grid = mesa.space.SingleGrid(width, height, torus=True)
 
-        # Place a patch at each location, randomly initializing it according to the given initial proportions
+        # place a patch at each location, randomly initializing it according to the given initial proportions
         for _, (x, y) in self.grid.coord_iter():
             patch_init_state = self.random.choices(range(self.n_species), weights=self.init_probabilities, k=1)[0]
             patch = PatchRandAct(pos=(x, y), model=self, init_state=patch_init_state)
@@ -57,30 +57,30 @@ class RSPRandAct(mesa.Model):
 
         self.running = True
         
+        # collect data
         model_reporter = {}
         for i in range(self.n_species):
             model_reporter[i] = lambda model, species=i: model.count_patches(species)
         if self.increase_rate:
-            model_reporter['increased_rate'] = lambda model: model.invasion_rates[0]
+           model_reporter['increased_rate'] = lambda model: model.invasion_rates[0] # TODO: lambda model: model.compute_average_invrate0()=
         self.datacollector = DataCollector(
             model_reporter
         )
         self.datacollector.collect(self)
-
-    def get_grid_data(self):
-        # Method to return the grid data
-        grid_data = [[self.grid.get_cell_list_contents((x, y)) for x in range(self.grid.width)] for y in range(self.grid.height)]
-        return grid_data
 
     def count_patches(self, species):
         """
         Helper method to count the number of patches in the given state.
         """
         return sum([1 for patch in self.schedule.agents if patch.state == species])
+    
+    def compute_average_invrate0(self): # TODO: delete?
+        rates = [patch.invasion_rate for patch in self.schedule.agents if patch.state == 0]
+        return sum(rates) / len(rates)
 
     def step(self):
         """
-        Have the scheduler advance each patch by one step
+        Have the scheduler advance each patch by one step.
         """
         self.schedule.step()
         self.datacollector.collect(self)
