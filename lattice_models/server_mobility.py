@@ -65,6 +65,30 @@ model_params_mobility = {
         0.01,
         description="Initial weight of species 5",
     ),
+    "swap_exp": Slider(
+        "Swap rate",
+        0,
+        -1,
+        1,
+        0.01,
+        description="Swap exponent",
+    ),
+    "reproduce_exp": Slider(
+        "Reproduce rate",
+        0,
+        -1,
+        1,
+        0.01,
+        description="Reproduce exponent",
+    ),
+    "select_exp": Slider(
+        "Select rate",
+        0,
+        -1,
+        1,
+        0.01,
+        description="Select exponent",
+    ),
     "color_map": color_map_mobility
 }
 

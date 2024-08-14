@@ -1,4 +1,5 @@
 import mesa
+import numpy as np
 from .patch_mobility import PatchMobility
 from mesa.datacollection import DataCollector
 
@@ -11,13 +12,23 @@ class RSPMobility(mesa.Model):
     rules4 = {1: [2], 2: [3], 3: [4], 4: [1]}
     rules5 = {1: [2,3], 2: [3,4], 3: [4,5], 4: [5,1], 5: [1,2]}
 
-    def __init__(self, init0, init1, init2, init3, init4, init5, n_species, color_map, width=50, height=50):
+    def __init__(
+            self,
+            init0, init1, init2, init3, init4, init5,
+            swap_exp, reproduce_exp, select_exp,
+            n_species, color_map, width=50, height=50
+        ):
         """
         Create a new playing area of (width, height) patches.
         """
         super().__init__()
 
         self.n_species = n_species
+
+        event_repetitions = (width * height) // 3
+        self.expected_swap = (10**swap_exp)*event_repetitions
+        self.expected_reproduce = (10**reproduce_exp)*event_repetitions
+        self.expected_select = (10**select_exp)*event_repetitions
 
         self.color_map = color_map
 
@@ -50,6 +61,9 @@ class RSPMobility(mesa.Model):
         model_reporter = {}
         for i in range(self.n_species+1):
             model_reporter[i] = lambda model, species=i: model.count_patches(species)
+
+        model_reporter['mean_explored_area'] = lambda model: model.compute_mean_explored_area()
+        
         self.datacollector = DataCollector(
             model_reporter
         )
@@ -60,11 +74,29 @@ class RSPMobility(mesa.Model):
         Helper method to count the number of patches in the given state.
         """
         return sum([1 for patch in self.schedule.agents if patch.state == species])
+    
+    def compute_mean_explored_area(self):
+        explored_areas = [patch.explored_area for patch in self.schedule.agents if patch.state != 0]
+        return sum(explored_areas) / len(explored_areas)
 
     def step(self):
         """
-        Have the scheduler advance each patch by one step
+        Compute the number of global events and have the scheduler advance each
+        patch by one step.
         """
+
+        for patch in self.schedule.agents:
+            patch.explored_area = 0
+
+        # create a list of events with random Poisson distribution
+        self.events = []
+        self.events.extend(['swap'] * int(np.random.poisson(self.expected_swap)))
+        self.events.extend(['reproduce'] * int(np.random.poisson(self.expected_reproduce)))
+        self.events.extend(['select'] * int(np.random.poisson(self.expected_select)))
+        
+        # shuffle events
+        self.random.shuffle(self.events)
+
         self.schedule.step()
         self.datacollector.collect(self)
 

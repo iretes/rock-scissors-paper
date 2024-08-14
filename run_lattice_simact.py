@@ -3,7 +3,7 @@ from lattice_models.model_sim_act import RSPSimAct
 from lattice_models.portrayal import portraySquarePatch
 from mesa.visualization import ChartModule, Slider, CanvasGrid, ModularServer, Choice, StaticText
 
-color_map_simultaneous = {
+color_map = {
     0: 'red',
     1: 'purple',
     2: 'yellow',
@@ -11,7 +11,7 @@ color_map_simultaneous = {
     4: 'blue'
 }
 
-model_params_simultaneous = {
+model_params = {
     "n_species": Choice(
         "Number of species",
         value=3,
@@ -58,19 +58,14 @@ model_params_simultaneous = {
         0.01,
         description="Initial weight of species 5",
     ),
-    "color_map": color_map_simultaneous,
+    "color_map": color_map,
     "height": 100,
     "width": 100,
 }
 
 chart = []
 for i in range(5):
-    chart.append({'Label': i, 'Color': color_map_simultaneous[i]})
-chart_element_simultaneous = ChartModule(chart, canvas_height=15, canvas_width=50)
-
-chart = []
-for i in range(5):
-    chart.append({'Label': i, 'Color': color_map_simultaneous[i]})
+    chart.append({'Label': i, 'Color': color_map[i]})
 chart_element = ChartModule(chart, canvas_height=15, canvas_width=50)
 
 canvas_element = CanvasGrid(
@@ -92,12 +87,12 @@ rules_descr += '<b>Rules with 5 species:</b><br />'
 for key, val in RSPSimAct.rules5.items():
     rules_descr += f'{key} > {val[0]}, {val[1]}<br />'
 
-model_params_simultaneous['rules_descr'] = StaticText(rules_descr)
+model_params['rules_descr'] = StaticText(rules_descr)
 
 server = ModularServer(
      RSPSimAct,
      [canvas_element, chart_element],
      "Rock Scissors Paper (simultaneaous activation of agents)",
-     model_params_simultaneous
+     model_params
 )
 server.launch(open_browser=True)

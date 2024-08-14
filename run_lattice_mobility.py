@@ -1,14 +1,15 @@
 import mesa
-from lattice_models.model_rand_act import RSPRandAct
+from lattice_models.model_mobility import RSPMobility
 from lattice_models.portrayal import portraySquarePatch
-from mesa.visualization import Choice, ChartModule, Slider, CanvasGrid, ModularServer, StaticText
+from mesa.visualization import ChartModule, Slider, CanvasGrid, ModularServer, Choice, StaticText
 
 color_map = {
-    0: 'red',
-    1: 'purple',
-    2: 'yellow',
-    3: 'green',
-    4: 'blue'
+    0: 'black',
+    1: 'red',
+    2: 'purple',
+    3: 'yellow',
+    4: 'green',
+    5: 'blue'
 }
 
 model_params = {
@@ -19,30 +20,38 @@ model_params = {
         description="Number of species"
     ),
     "init0": Slider(
+        "Initial weight of empty cells",
+        0.25,
+        0,
+        1,
+        0.01,
+        description="Initial weight of empty cells",
+    ),
+    "init1": Slider(
         "Initial weight of species 1",
-        0.33,
+        0.25,
         0,
         1,
         0.01,
         description="Initial weight of species 1",
     ),
-    "init1": Slider(
+    "init2": Slider(
         "Initial weight of species 2",
-        0.33,
+        0.25,
         0,
         1,
         0.01,
         description="Initial weight of species 2",
     ),
-    "init2": Slider(
+    "init3": Slider(
         "Initial weight of species 3",
-        0.33,
+        0.25,
         0,
         1,
         0.01,
         description="Initial weight of species 3",
     ),
-    "init3": Slider(
+    "init4": Slider(
         "Initial weight of species 4",
         0,
         0,
@@ -50,7 +59,7 @@ model_params = {
         0.01,
         description="Initial weight of species 4",
     ),
-    "init4": Slider(
+    "init5": Slider(
         "Initial weight of species 5",
         0,
         0,
@@ -58,55 +67,39 @@ model_params = {
         0.01,
         description="Initial weight of species 5",
     ),
-    "invrate0": Slider(
-        "Invasion rate of species 1",
-        0.33,
+    "swap_exp": Slider(
+        "Swap rate",
         0,
+        -1,
         1,
         0.01,
-        description="Invasion rate of species 1",
+        description="Swap exponent",
     ),
-    "invrate1": Slider(
-        "Invasion rate of species species 2",
-        0.33,
+    "reproduce_exp": Slider(
+        "Reproduce rate",
         0,
+        -1,
         1,
         0.01,
-        description="Invasion rate of species 2",
+        description="Reproduce exponent",
     ),
-    "invrate2": Slider(
-        "Invasion rate of species of species 3",
-        0.33,
+    "select_exp": Slider(
+        "Select rate",
         0,
+        -1,
         1,
         0.01,
-        description="Invasion rate of species 3",
-    ),
-    "invrate3": Slider(
-        "Invasion rate of species of species 4",
-        0,
-        0,
-        1,
-        0.01,
-        description="Invasion rate of species 4",
-    ),
-    "invrate4": Slider(
-        "Invasion rate of species of species 5",
-        0,
-        0,
-        1,
-        0.01,
-        description="Invasion rate of species 5",
+        description="Select exponent",
     ),
     "color_map": color_map,
     "height": 100,
     "width": 100
 }
 
-chart = []
-for i in range(5):
-    chart.append({'Label': i, 'Color': color_map[i]})
-chart_element = ChartModule(chart, canvas_height=15, canvas_width=50)
+chart_mobility = []
+for i in range(1, 6):
+    chart_mobility.append({'Label': i, 'Color': color_map[i]})
+chart_element_mobility = ChartModule(chart_mobility, canvas_height=15, canvas_width=50)
 
 canvas_element = CanvasGrid(
     portraySquarePatch,
@@ -117,22 +110,22 @@ canvas_element = CanvasGrid(
 )
 
 rules_descr = '<b>Rules with 3 species:</b><br />'
-for key, val in RSPRandAct.rules3.items():
+for key, val in RSPMobility.rules3.items():
     rules_descr += f'{key} > {val[0]}<br />'
 rules_descr += '<b>Rules with 4 species:</b><br />'
-for key, val in RSPRandAct.rules4.items():
+for key, val in RSPMobility.rules4.items():
     rules_descr += f'{key} > {val[0]}<br />'
 rules_descr += '(<0,2> and <1,3> do not compete)<br />'
 rules_descr += '<b>Rules with 5 species:</b><br />'
-for key, val in RSPRandAct.rules5.items():
+for key, val in RSPMobility.rules5.items():
     rules_descr += f'{key} > {val[0]}, {val[1]}<br />'
 
 model_params['rules_descr'] = StaticText(rules_descr)
 
 server = ModularServer(
-     RSPRandAct,
-     [canvas_element, chart_element],
-     "Rock Scissors Paper (random activation of agents)",
+     RSPMobility,
+     [canvas_element, chart_element_mobility],
+     "Rock Scissors Paper (mobility)",
      model_params
 )
 server.launch(open_browser=True)

@@ -24,11 +24,12 @@ while True:
     else:
         print("Invalid input")
 
-SIMULTANEOUS_ACTIVATIONS = "1"
-SWAP_FIGHT_REPRODUCE = "2"
-RANDOM_ACTIVATIONS = "3"
+RANDOM_ACTIVATIONS = "1"
+SIMULTANEOUS_ACTIVATIONS = "2"
+MOBILITY = "3"
+
 while True:
-    model_type = input("Enter '1' for simultaneous activations; '2' for mobility model; '3' for random activations: ")
+    model_type = input("Enter '1' for random activations; '2' for simultaneous activations; '3' for mobilty model: ")
     if model_type in ["1", "2", "3"]:
         break
     else:
@@ -53,15 +54,27 @@ rules_descr += '<b>Rules with 5 species:</b><br />'
 for key, val in RSPMobility.rules5.items():
     rules_descr += f'{key} > {val[0]}, {val[1]}<br />'
 
-model_params_randact = model_params_simact if model_type == SIMULTANEOUS_ACTIVATIONS else model_params_mobility if model_type == SWAP_FIGHT_REPRODUCE else model_params_randact
-model_params_randact['height'] = grid_height
-model_params_randact['width'] = grid_width
-model_params_randact['rules_descr'] = StaticText(rules_descr)
-model = RSPSimAct if model_type == SIMULTANEOUS_ACTIVATIONS else RSPMobility if model_type == SWAP_FIGHT_REPRODUCE else RSPRandAct
-chart_element_randact = chart_element_simact if model_type == SIMULTANEOUS_ACTIVATIONS else chart_element_mobility if model_type == SWAP_FIGHT_REPRODUCE else chart_element_randact
-model_descr = "Rock Scissors Paper: Simultaneous Activations" if model_type == SIMULTANEOUS_ACTIVATIONS else "Rock Scissors Paper: Mobility model" if model_type == SWAP_FIGHT_REPRODUCE else "Rock Scissors Paper: Random activations"
+if model_type == RANDOM_ACTIVATIONS:
+    model_params = model_params_randact
+    model = RSPRandAct
+    chart_element = chart_element_randact
+    model_descr = "Rock Scissors Paper: Random activations"
+elif model_type == SIMULTANEOUS_ACTIVATIONS:
+    model_params = model_params_simact
+    model = RSPSimAct
+    chart_element = chart_element_simact
+    model_descr = "Rock Scissors Paper: Simultaneous Activations"
+else:
+    model_params = model_params_mobility
+    model = RSPMobility
+    chart_element = chart_element_mobility
+    model_descr = "Rock Scissors Paper: Mobility model"
+
+model_params['height'] = grid_height
+model_params['width'] = grid_width
+model_params['rules_descr'] = StaticText(rules_descr)
 
 server = ModularServer(
-    model, [canvas_element, chart_element_randact], model_descr, model_params_randact
+    model, [canvas_element, chart_element], model_descr, model_params
 )
 server.launch(open_browser=True)
