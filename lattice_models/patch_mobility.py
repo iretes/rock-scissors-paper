@@ -14,7 +14,6 @@ class PatchMobility(mesa.Agent):
         self.x, self.y = pos
         self.state = init_state
         self._nextState = None
-        self.explored_area = 0
 
     def step(self):
         """
@@ -37,17 +36,11 @@ class PatchMobility(mesa.Agent):
             self._nextState = neighbor.state
             neighbor.state = self.state
             self.state = self._nextState
-            if self.state != 0:
-                self.explored_area += 1
-            if neighbor.state != 0:
-                neighbor.explored_area += 1
         elif action == 'select':
             if neighbor.state != 0 and self.state in self.rules[neighbor.state]:
                 self.state = 0
-                self.explored_area = 0
             if self.state != 0 and neighbor.state in self.rules[self.state]:
                 neighbor.state = 0
-                neighbor.explored_area = 0
         else:
             if neighbor.state == 0:
                 neighbor.state = self.state

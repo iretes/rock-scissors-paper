@@ -61,8 +61,6 @@ class RSPMobility(mesa.Model):
         model_reporter = {}
         for i in range(self.n_species+1):
             model_reporter[i] = lambda model, species=i: model.count_patches(species)
-
-        model_reporter['mean_explored_area'] = lambda model: model.compute_mean_explored_area()
         
         self.datacollector = DataCollector(
             model_reporter
@@ -74,19 +72,12 @@ class RSPMobility(mesa.Model):
         Helper method to count the number of patches in the given state.
         """
         return sum([1 for patch in self.schedule.agents if patch.state == species])
-    
-    def compute_mean_explored_area(self):
-        explored_areas = [patch.explored_area for patch in self.schedule.agents if patch.state != 0]
-        return sum(explored_areas) / len(explored_areas)
 
     def step(self):
         """
         Compute the number of global events and have the scheduler advance each
         patch by one step.
         """
-
-        for patch in self.schedule.agents:
-            patch.explored_area = 0
 
         # create a list of events with random Poisson distribution
         self.events = []

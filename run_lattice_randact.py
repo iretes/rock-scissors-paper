@@ -122,7 +122,7 @@ for key, val in RSPRandAct.rules3.items():
 rules_descr += '<b>Rules with 4 species:</b><br />'
 for key, val in RSPRandAct.rules4.items():
     rules_descr += f'{key} > {val[0]}<br />'
-rules_descr += '(<0,2> and <1,3> do not compete)<br />'
+rules_descr += '(<2,4> and <1,3> do not compete)<br />'
 rules_descr += '<b>Rules with 5 species:</b><br />'
 for key, val in RSPRandAct.rules5.items():
     rules_descr += f'{key} > {val[0]}, {val[1]}<br />'

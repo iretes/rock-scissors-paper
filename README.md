@@ -20,16 +20,22 @@ First, install the dependencies executing the following command:
 pip install -r requirements.txt
 ```
 
-To interactively run the model with agents activating simultaneously, execute the following command:
+To interactively run the model based on [1], where agents activating simultaneously, execute the following command:
 
 ```bash
 python ./run_lattice_simact.py
 ```
 
-To interactively run the model with agents activating sequentially, execute the following command:
+To interactively run the model based on [1], where agents activating sequentially, execute the following command:
 
 ```bash
 python ./run_lattice_randact.py
+```
+
+To interactively run the model based on [2], execute the following command:
+
+```bash
+python ./run_lattice_mobility.py
 ```
 
 Then open your browser to http://127.0.0.1:8521/.
@@ -39,4 +45,5 @@ Then open your browser to http://127.0.0.1:8521/.
 https://github.com/iretes/rock-scissors-paper/assets/46034276/2a1055cc-fee6-4a60-b513-3b3d7210b7ad
 
 ## References
-- Frean, Marcus, and Edward R. Abraham. "Rock–scissors–paper and the survival of the weakest." Proceedings of the Royal Society of London. Series B: Biological Sciences 268.1474 (2001): 1323-1327.
+- [1] Frean, Marcus, and Edward R. Abraham. "Rock–scissors–paper and the survival of the weakest." Proceedings of the Royal Society of London. Series B: Biological Sciences 268.1474 (2001): 1323-1327.
+- [2] Reichenbach, Tobias, Mauro Mobilia, and Erwin Frey. "Mobility promotes and jeopardizes biodiversity in rock–paper–scissors games." Nature 448.7157 (2007): 1046-1049.
