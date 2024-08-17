@@ -24,6 +24,8 @@ P=? [ F<time s=0 ]
 
 P=? [ F<time (MAX-r-s)=0 ]
 
+P=? [F<time (r=0 | r=MAX | s=0) & (s=0 | s=MAX | (MAX-r-s)=0) & ((MAX-r-s)=0 | (MAX-r-s)=MAX | r=0)]
+
 const int x;
 
 P=? [ F=1 r>=x & r<x+10 ]
@@ -31,5 +33,3 @@ P=? [ F=1 r>=x & r<x+10 ]
 P=? [ F=1 s>=x & s<x+10 ]
 
 P=? [ F=1 (MAX-r-s)>=x & (MAX-r-s)<x+10 ]
-
-P=? [F<time (r=0 | r=MAX | s=0) & (s=0 | s=MAX | (MAX-r-s)=0) & ((MAX-r-s)=0 | (MAX-r-s)=MAX | r=0)]
