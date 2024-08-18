@@ -1,0 +1,7 @@
+placeNames = {P R S };
+transitionNames = {Pp Pr Ps };
+C=[
+1 0 -1 ;
+-1 1 0 ;
+0 -1 1 ;
+];

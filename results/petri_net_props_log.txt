@@ -1,0 +1,190 @@
+
+starts analysis with following options:
+charlie.analyzer.structural.StructuralOptionSet
+
+number of places: 3
+number of transitions: 3
+number of arcs: 9
+
+input places:
+no input places
+output places:
+no output places
+input transitions:
+no input transitions
+output transitions:
+no output transitions
+
+Structural coupled conflict sets: 
+
+1	|0.Pp	:1,
+	|1.Pr	:1,
+	|2.Ps	:1
+ 
+Structural equal conflict sets: 
+
+1	|0.Pp	:1
+2	|1.Pr	:1
+3	|2.Ps	:1
+ 
+time:  0 m 0 s
+
+
+
+Applying rule:
+CSV => k-B
+
+
+Applying rule:
+CSV => SB
+
+
+Applying rule:
+SC => CON
+
+
+Applying rule:
+CSV => CPI
+
+
+Applying rule:
+CPI => k-B
+
+
+Applying rule:
+SB => k-B
+
+
+Applying rule:
+CPI => SB
+
+Analyzer: Rank of Matrix Analyzer
+start time: 18/08/24, 21:56
+starts analysis with following options:
+charlie.analyzer.invariant.RankIncidenceMatrixOptionSet
+Rank of the incidence matrix: 2
+time: 00:00:00:000
+
+
+
+Applying rule:
+rank(IM) != |SCCS| - 1 => !RKTH
+
+Analyzer: Trap Analyzer
+start time: 18/08/24, 21:57
+starts analysis with following options:
+TrapOptions:
+compute: true
+export: false
+exportFile:  not set!
+properSets: false
+Trap Analyzer: 
+computed minimal traps
+	
+minimal traps:
+1 minimal traps computed in 00:00:00:002
+time: 00:00:00:002
+
+Analyzer: Siphon Analyzer
+start time: 18/08/24, 21:57
+starts analysis with following options:
+siphon options
+Siphon Analyzer:
+ computing siphons
+
+STP is not valid
+ counter examples:
+    siphon:
+	|0.P	:1
+	is a bad siphon
+1 siphons computed 00:00:00:000
+time: 00:00:00:014
+
+Analyzer: RGraph Simple Construction
+start time: 18/08/24, 21:57
+starts analysis with following options:
+used construction options:
+firing rule: single
+boundedness check: no
+maximal construction depth: none
+reduction: none
+initial marking:(P: 20 | R: 50 | S: 30)
+reachability graph analyzer:
+computing rechability graph using simple  firing rule
+transition not live:
+	|0.Pp	:1,
+	|1.Pr	:1,
+	|2.Ps	:1
+transition dead at m0:
+	empty set
+the net is not live
+is not persistent
+the net is not safe
+number of dead states: 3
+filter for dead states: 
+dead state 1: P== 100
+dead state 2: R== 100
+dead state 3: S== 100
+-- reachability graph constructed in 00:01:00:444--
+used construction options:
+firing rule: single
+boundedness check: no
+maximal construction depth: none
+reduction: none
+initial marking:(P: 20 | R: 50 | S: 30)
+states: 5151
+bound: 100
+edges: 14850
+#scc: 301
+#terminal scc: 3
+time: 00:01:00:444
+
+
+
+Applying rule:
+DSt => !LIV
+
+Analyzer: InvariantAnalyzer
+start time: 18/08/24, 22:00
+starts analysis with following options:
+Invariant Options:
+compute: T-Invariants
+delete Trivial Invariants: no
+check coverage: yes
+check extended coverage: no
+enable MCSC: no
+Invariant Analyzer: computing T-Invariants
+check coverage:
+net is covered by T-Invariants
+minimal semipositive transition invariants:
+1
+time: 00:00:00:011
+
+
+
+Applying rule:
+!LIV & SC & CTI & rank(IM) < |SEQS| => !k-B
+
+Analyzer: Dependend Set Analyzer
+start time: 18/08/24, 22:01
+starts analysis with following options:
+dependent set options
+strong dependent sets: false
+sdsFile : null
+abstract dependent sets: true
+ads file : null
+connected ads file : null
+nodes to ignoreno
+decomposefalse
+computing AbstractDependendSets
+1 ADT-setsset computed.
+time: 00:00:00:001
+
+
+Results:
+PUR   ORD   HOM   NBM   CSV   SCF   FT0   TF0   FP0   PF0   CON   SC    NC  
+   N     N     Y     Y     Y     N     Y     Y     Y     Y     Y     Y    nES 
+ RKTH   STP   CPI   CTI    SB   k-B   1-B   DCF   DSt   DTr   LIV   REV   SSI 
+   N     N     Y     Y     Y    100    N     N      3    Y     N     N     Y  
+  RNK  SCCS  SEQS                                                             
+    2     1     3
