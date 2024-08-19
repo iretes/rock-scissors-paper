@@ -4,7 +4,7 @@ Analysis of a dynamical system with three species in a competitive loop: a rock 
 
 ## Long range dispersal model
 
-Click [here](./long_range_simulations.html) to view the notebook `long_range_simulations.ipynb`, which analyzes simulations of the long-range dispersal model. The model is examined under both discrete and continuous time frameworks. For the continuous time approach, the differential equation system defining the model is solved using the [`scipy.integrate`](https://docs.scipy.org/doc/scipy/reference/integrate.html#module-scipy.integrate) package. Additionally, the model is reframed in terms of chemical reactions for stochastic simulations, which are conducted using the [`StochPy`](https://stochpy.sourceforge.net) package. It is further examined as a continuous-time Markov chain with the [`PRISM`](https://www.prismmodelchecker.org) stochastic model checker.
+Click [here](./long_range_simulations.html) to view the notebook `long_range_simulations.ipynb`, which analyzes simulations of the long-range dispersal model. The model is examined under both discrete and continuous time frameworks. For the continuous time approach, the differential equation system defining the model is solved using the [`scipy.integrate`](https://docs.scipy.org/doc/scipy/reference/integrate.html#module-scipy.integrate) package. Additionally, the model is reframed in terms of chemical reactions for stochastic simulations, which are conducted using the [`StochPy`](https://stochpy.sourceforge.net) package. It is further examined as a continuous-time Markov chain with the [`PRISM`](https://www.prismmodelchecker.org) stochastic model checker and as a Petri net with the tool [`Charlie`](https://www-dssz.informatik.tu-cottbus.de/DSSZ/Software/Charlie).
 
 ## Lattice model
 

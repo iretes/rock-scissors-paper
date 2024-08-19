@@ -7517,6 +7517,19 @@ a.anchor-link {
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h1 id="Long-range-dispersal-model">Long range dispersal model<a class="anchor-link" href="#Long-range-dispersal-model">¶</a></h1><p>This notebook simulates the evolution of a three-species system  with long-range dispersal.</p>
+<p><strong>Outline</strong></p>
+<ul>
+<li><a href="#1.-Discrete-time-model">1. Discrete-time model</a><ul>
+<li><a href="#1.1.-Finite-population-size">1.1. Finite population size</a></li>
+<li><a href="#1.2.-Large-population-size">1.2. Large population size</a></li>
+</ul>
+</li>
+<li><a href="#2.-Continuous-time-model">2. Continuous-time model</a></li>
+<li><a href="#3.-Stochastic-simulation-of-chemical-reactions">3. Stochastic simulation of chemical reactions</a></li>
+<li><a href="#4.-Stochastic-model-checking">4. Stochastic model checking</a></li>
+<li><a href="#5.-Petri-net-analysis">5. Petri net analysis</a></li>
+<li><a href="#6.-References">6. References</a></li>
+</ul>
 <p>Importing the necessary libraries:</p>
 </div>
 </div>
@@ -7537,6 +7550,7 @@ a.anchor-link {
 <span class="kn">import</span> <span class="nn">plotly.graph_objects</span> <span class="k">as</span> <span class="nn">go</span>
 <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">colormaps</span>
 <span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="kn">import</span> <span class="n">odeint</span>
+<span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="n">symbols</span><span class="p">,</span> <span class="n">Matrix</span><span class="p">,</span> <span class="n">Eq</span><span class="p">,</span> <span class="n">solve</span>
 <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -7550,7 +7564,7 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Discrete-time-model">Discrete-time model<a class="anchor-link" href="#Discrete-time-model">¶</a></h2><h3 id="Finite-population">Finite population<a class="anchor-link" href="#Finite-population">¶</a></h3><p>We consider a model world that has $N$ available sites. The sites are occupied by three species, namely species $r$ (rock), $s$ (scissors) and $p$ (paper), which occur in the proportions $n_r$ , $n_s$ and $n_p$ (with $n_r + n_s + n_p = 1$). Two sites are chosen at each time-step. The occupant of the first replicates into the second with a given probability - individual of species $r$ can invade a species $s$ with probability $P_r$, a species $s$ invades a species $p$ with probability $P_s$, a species $p$ invades a species $r$ with probability $P_p$ and all other invasion probabilities are zero.</p>
+<h2 id="1.-Discrete-time-model">1. Discrete-time model<a class="anchor-link" href="#1.-Discrete-time-model">¶</a></h2><h3 id="1.1.-Finite-population-size">1.1. Finite population size<a class="anchor-link" href="#1.1.-Finite-population-size">¶</a></h3><p>We consider a model world that has $N$ available sites. The sites are occupied by three species, namely species $r$ (rock), $s$ (scissors) and $p$ (paper), which occur in the proportions $n_r$ , $n_s$ and $n_p$ (with $n_r + n_s + n_p = 1$). Two sites are chosen at each time-step. The occupant of the first replicates into the second with a given probability - individual of species $r$ can invade a species $s$ with probability $P_r$, a species $s$ invades a species $p$ with probability $P_s$, a species $p$ invades a species $r$ with probability $P_p$ and all other invasion probabilities are zero.</p>
 <p>Defining a function to simulate the evolution of the system for a world with $N$ sites:</p>
 </div>
 </div>
@@ -8125,7 +8139,7 @@ a.anchor-link {
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p>The weakest competitor is most likely to survive.</p>
-<h3 id="Large-population-size">Large population size<a class="anchor-link" href="#Large-population-size">¶</a></h3><p>In the limit of large $N$, the rate of change of species population density is given by the mean-field equations:</p>
+<h3 id="1.2.-Large-population-size">1.2. Large population size<a class="anchor-link" href="#1.2.-Large-population-size">¶</a></h3><p>In the limit of large $N$, the rate of change of species population density is given by the mean-field equations:</p>
 <p>\begin{cases}
 \frac{\partial n_r}{\partial t}=n_r\cdot (n_s\cdot P_r - n_p \cdot P_p)\\
 \frac{\partial n_s}{\partial t}=n_s\cdot (n_p\cdot P_s - n_r \cdot P_r)\\
@@ -8530,7 +8544,7 @@ n_r=\frac{n_p\cdot P_s}{P_r}=\frac{\cancel{P_r}\cdot P_s}{\cancel{P_r}\cdot (P_p
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p>In the limit that the total number of sites is large the populations move along a periodic orbit around the fixed point.</p>
-<h2 id="Continuous-time-model">Continuous-time model<a class="anchor-link" href="#Continuous-time-model">¶</a></h2><p>To enhance accuracy, we simulate the system's evolution by solving the differential equations that define it.</p>
+<h2 id="2.-Continuous-time-model">2. Continuous-time model<a class="anchor-link" href="#2.-Continuous-time-model">¶</a></h2><p>To enhance accuracy, we simulate the system's evolution by solving the differential equations that define it.</p>
 <p>The <code>odeint</code> method from <code>scipy.integrate</code> solves a system of ordinary differential equations using lsoda from the FORTRAN library odepack. This library uses the Adams/BDF method with automatic stiffness detection and switching.</p>
 </div>
 </div>
@@ -8940,7 +8954,7 @@ n_r=\frac{n_p\cdot P_s}{P_r}=\frac{\cancel{P_r}\cdot P_s}{\cancel{P_r}\cdot (P_p
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Stochastic-Simulation-of-Chemical-Reactions">Stochastic Simulation of Chemical Reactions<a class="anchor-link" href="#Stochastic-Simulation-of-Chemical-Reactions">¶</a></h2><p>While ODEs are deterministic and do not account for fluctuations in population densities, stochastic simulation methods offer greater accuracy, particularly when analyzing reaction systems with small quantities of molecules.</p>
+<h2 id="3.-Stochastic-simulation-of-chemical-reactions">3. Stochastic simulation of chemical reactions<a class="anchor-link" href="#3.-Stochastic-simulation-of-chemical-reactions">¶</a></h2><p>While ODEs are deterministic and do not account for fluctuations in population densities, stochastic simulation methods offer greater accuracy, particularly when analyzing reaction systems with small quantities of molecules.</p>
 <p>To perform stochastic simulations, we need to translate the ODE system</p>
 <p>\begin{cases}
 \frac{\partial n_r}{\partial t}=\textcolor{violet}{n_r\cdot n_s\cdot P_r} - \textcolor{gold}{n_r \cdot n_p \cdot P_p}\\
@@ -10022,79 +10036,6 @@ Info: Simulation time 0.01039
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p>Oscillations are more frequent and regular than in the stochastic simulation.</p>
-<h2 id="Voters-model">Voters model<a class="anchor-link" href="#Voters-model">¶</a></h2><p>TODO:</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">smod</span> <span class="o">=</span> <span class="n">stochpy</span><span class="o">.</span><span class="n">SSA</span><span class="p">(</span><span class="n">IsQuiet</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">smod</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">model_file</span><span class="o">=</span><span class="s2">"voters_model.psc"</span><span class="p">,</span><span class="nb">dir</span><span class="o">=</span><span class="s2">"./long_range_models/"</span><span class="p">)</span>
-<span class="n">smod</span><span class="o">.</span><span class="n">ShowSpecies</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Info: Direct method is selected to perform stochastic simulations.
-Parsing file: /Users/irenetesta/Stochpy/pscmodels/ImmigrationDeath.psc
-Info: No reagents have been fixed
-Parsing file: ./long_range_models/voters_model.psc
-Info: No reagents have been fixed
-['R', 'S', 'P']
-</pre>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="n">smod</span><span class="o">.</span><span class="n">DoStochSim</span><span class="p">(</span><span class="n">end</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">trajectories</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
-<span class="n">smod</span><span class="o">.</span><span class="n">PlotAverageSpeciesTimeSeries</span><span class="p">(</span>
-    <span class="n">colors</span><span class="o">=</span><span class="p">[</span><span class="s2">"tab:red"</span><span class="p">,</span> <span class="s2">"purple"</span><span class="p">,</span> <span class="s2">"gold"</span><span class="p">],</span> <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Steps"</span><span class="p">,</span>
-    <span class="n">title</span><span class="o">=</span><span class="s2">"Average species in 100 stochastic simulations, direct method</span><span class="se">\n</span><span class="s2">$P_r=0.5$, $P_s=0.5$, $P_p=0.5$, $R=33$, $S=33$, $P=33$"</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-<div class="jp-OutputArea jp-Cell-outputArea">
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
-<pre>Info: 1000 trajectories are generated
-Info: Time simulation output of the trajectories is stored at voters_model(trajectory).dat in directory: /Users/irenetesta/Stochpy/temp
-Info: Simulation time: 18.548667907714844                                                   *** WARNING ***: No regular grid is created yet. Use GetRegularGrid(n_samples) if averaged results are unsatisfactory (e.g. more or less 'samples')
-</pre>
-</div>
-</div>
-<div class="jp-OutputArea-child">
-<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-<div class="jp-RenderedImage jp-OutputArea-output" tabindex="0">
-<img alt="No description has been provided for this image" class="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjoAAAHdCAYAAAAU4dNnAAAAOXRFWHRTb2Z0d2FyZQBNYXRwbG90bGliIHZlcnNpb24zLjkuMSwgaHR0cHM6Ly9tYXRwbG90bGliLm9yZy/TGe4hAAAACXBIWXMAAA9hAAAPYQGoP6dpAACDKUlEQVR4nO3dd3xT1fsH8E+6C51AJ3RAy94bZJRRlmwKgoKAIPLTAiriAMECoggooFiGfpGt7K1sAVGmTAFFQJbQJdABlM7z+yMkNDRtb9qb5Cb5vF+vUHpzc++5pxlPznmee1VCCAEiIiIiK2Rn7gYQERERGQsDHSIiIrJaDHSIiIjIajHQISIiIqvFQIeIiIisFgMdIiIisloMdIiIiMhqMdAhIiIiq8VAh4iIiKwWAx1SjAMHDkClUuHAgQMm2+fSpUuhUqlw/fp1k+3TlrVp0wa1atUydzO02rRpgzZt2phsfyqVCpMnTzbZ/vIaOnQoQkNDZd2mNb1+QkNDMXToUO3v5ng/slTXr1+HSqXC559/bvR9TZ48GSqVyqDHWG2gM3/+fKhUKjRt2tTcTSEbs2bNGgwaNAiVK1eGSqUq9IM0IyMD77//PgIDA+Hq6oqmTZtiz549etc9fPgwWrZsiVKlSsHf3x9jxozBgwcPZGnz4cOHMXnyZCQnJ8uyPSW5ePEiJk+ebBUfxuby6aefYvPmzeZuhs2YP38+li5dau5m5PPTTz+ZLVAvEWGlnnvuOREaGioAiMuXL5u7OSRBTk6OSE9PFzk5OSbbZ3Z2tkhPTxe5ubmybTMiIkK4ubmJtm3bCm9vbxEREVHgugMGDBAODg5i3LhxYtGiRaJ58+bCwcFBHDp0SGe906dPCxcXF1G/fn2xYMEC8eGHHwpnZ2fRuXNnWdo8a9YsAUBcu3ZNlu0VJCIiQtSsWdOo+3jWunXrBACxf//+fPdlZGSIjIwMk7UlPT1dZGVlmWx/eQ0ZMkSEhIQU67GlS5cWQ4YMybfcGK8fcwkJCdE5RnO8H2nUrFmz0PcNc4mOjhb6woZr164JAGLWrFlGb0NMTIzeNhTGwZxBlrFcu3YNhw8fxsaNGzFy5EisWrUKMTExJm1Dbm4uMjMz4eLiYtL9WjI7OzuT95e9vT3s7e1l3eaKFStQvnx52NnZFTpNc/z4caxevRqzZs3CuHHjAACDBw9GrVq18N577+Hw4cPadSdMmABvb28cOHAAHh4eANRD7SNGjMDu3bvRsWNHWY/BVjg5OZl0f9b2fmCM149SSH0/evToEUqVKmWCFlFxWeXU1apVq+Dt7Y2uXbuib9++WLVqlfa+rKwslClTBq+88kq+x6WmpsLFxUX7oQOopxZiYmIQHh4OZ2dnBAUF4b333kNGRobOY1UqFUaNGoVVq1ahZs2acHZ2xs6dOwEAn3/+OZ577jmULVsWrq6uaNiwIdavX59v/+np6RgzZgzKlSsHd3d39OjRA7dv39Y7r3/79m0MGzYMfn5+cHZ2Rs2aNfHdd99J6p89e/agZcuW8PLygpubG6pWrYoJEyZo79fMTa9ZswYTJkyAv78/SpcujR49euDWrVv5tnfs2DF07twZnp6eKFWqFCIiIvDbb7/lW+/27dsYPnw4AgMD4ezsjIoVK+L1119HZmamzn6fnROXsv20tDS89dZbCA0NhbOzM3x9fdGhQwecOnWq0L7Ql2MQGhqKbt264ddff0WTJk3g4uKCSpUqYfny5UV1LQAgKCgIdnZFv7TWr18Pe3t7vPbaa9plLi4uGD58OI4cOaLt69TUVOzZsweDBg3SBjmAOihyc3PD2rVri9zXvHnzULNmTZQqVQre3t5o1KgRvv/+ewDqOe93330XAFCxYkWoVCqdPsnOzsbHH3+MsLAwODs7IzQ0FBMmTMj3GgCAHTt2ICIiAu7u7vDw8EDjxo21+8nr4sWLaNu2LUqVKoXy5ctj5syZOvdnZmbio48+QsOGDeHp6YnSpUujVatW2L9/f75trV69Gg0bNtTus3bt2vjyyy8BqP++/fr1AwC0bdtWe2ya55i+HJ3Hjx9j8uTJqFKlClxcXBAQEIA+ffrg6tWrhfbx77//jk6dOqFcuXJwdXVFxYoVMWzYMJ11nn0ta/IN/v77bwwaNAienp7w8fHBpEmTIITArVu30LNnT3h4eMDf3x9ffPGFzvYKypGRml8i5b1JpVLh4cOHWLZsmbb/NLksBe1//vz52vfBwMBAREdH55sW1eRrFfVcAAp//hpKCIFp06ahQoUKKFWqFNq2bYsLFy7kW09fH2rafPLkSbRu3RqlSpXSvndK/awAgJUrV6JJkyba42ndujV2794NQP3+c+HCBRw8eFDb34VNf+fNj4mNjUWlSpVQqlQpdOzYEbdu3YIQAh9//DEqVKgAV1dX9OzZE/fu3cu3nR07dqBVq1YoXbo03N3d0bVrV51+GTp0KGJjYwFA2y59uTLffPON9r2icePGOHHiRL51fv75Z+2+vLy80LNnT/z555/51vv111/RuHFjuLi4ICwsDIsWLSqwHwpljKElc6tWrZoYPny4EEKIX375RQAQx48f194/bNgw4eXllW/IetmyZQKAOHHihBBCPXTZsWNHUapUKfHWW2+JRYsWiVGjRgkHBwfRs2dPnccCENWrVxc+Pj5iypQpIjY2Vpw+fVoIIUSFChXEG2+8Ib7++msxe/Zs0aRJEwFAbN++XWcbL7zwggAgXn75ZREbGyteeOEFUbduXQFAxMTEaNeLj48XFSpUEEFBQWLq1KliwYIFokePHgKAmDNnTqF9c/78eeHk5CQaNWokvvzyS7Fw4UIxbtw40bp1a+06+/fvFwBE7dq1RZ06dcTs2bPFBx98IFxcXESVKlXEo0ePtOvu27dPODk5iebNm4svvvhCzJkzR9SpU0c4OTmJY8eOade7ffu2CAwM1PblwoULxaRJk0T16tXF/fv3dfabd4pB6vZfeukl4eTkJMaOHSv+97//iRkzZoju3buLlStXFtofS5YsyTdlExISIqpWrSr8/PzEhAkTxNdffy0aNGggVCqVOH/+fKHbe1ZhQ9CRkZGievXq+Zbv3btXABBbt24VQgjx66+/CgBizZo1+dZt2bKlaNCgQaFt+OabbwQA0bdvX7Fo0SLx5ZdfiuHDh4sxY8YIIYQ4e/asePHFF7XPnxUrVogVK1aIBw8eCCHUUx6ax8fGxorBgwcLAKJXr146+1myZIlQqVSiVq1a4pNPPhGxsbHi1VdfFS+//LJ2nYiICBEYGCiCgoLEm2++KebPny/atWsnAIiffvpJu15SUpIICAgQY8eOFQsWLBAzZ84UVatWFY6OjtrXlRBC7N69WwAQ7du3F7GxsSI2NlaMGjVK9OvXTwghxNWrV8WYMWMEADFhwgTtscXHx2vbk/fvk52dLdq3by8AiAEDBoivv/5aTJ8+XbRr105s3ry5wD5OSEgQ3t7eokqVKmLWrFni22+/FR9++GG+v++zr2XNMHy9evXEiy++KObPny+6du0qAIjZs2eLqlWritdff13Mnz9ftGjRQgAQBw8e1OnzZ5+/Quh/LembupLy3rRixQrh7OwsWrVqpe2/w4cPF7h/zTFFRkaKefPmiVGjRgl7e3vRuHFjkZmZqV1P6nOhqOevoSZOnCgAiOeff158/fXXYtiwYSIwMFCUK1dOZ+pKXx9GREQIf39/4ePjI0aPHi0WLVokNm/ebNBnxeTJkwUA8dxzz4lZs2aJL7/8Urz00kvi/fffF0IIsWnTJlGhQgVRrVo1bX/v3r27wOPRTBvVq1dP1KhRQ8yePVtMnDhRODk5iWbNmokJEyaI5557Tnz11VdizJgxQqVSiVdeeUVnG8uXLxcqlUp07txZzJs3T8yYMUOEhoYKLy8v7d/28OHDokOHDgKAtl0rVqzQaUP9+vVFeHi4mDFjhpg5c6YoV66cqFChgs7ffc+ePcLBwUFUqVJFzJw5U0yZMkWUK1dOeHt76zyPzp07J1xdXUVwcLCYPn26+Pjjj4Wfn5+oU6eOwVNXVhfo/P777wKA2LNnjxBCiNzcXFGhQgXx5ptvatfZtWuXACC2bdum89jnn39eVKpUSfv7ihUrhJ2dXb58iYULFwoA4rffftMuAyDs7OzEhQsX8rUpb2AghBCZmZmiVq1aol27dtplJ0+eFADEW2+9pbPu0KFD8705Dh8+XAQEBIj//vtPZ90BAwYIT0/PfPvLa86cOQKASEpKKnAdzQu8fPnyIjU1Vbt87dq1AoD48ssvhRDqvq1cubLo1KmTzhz9o0ePRMWKFUWHDh20ywYPHizs7Oy0QWRemsc++8ZiyPY9PT1FdHR0gcdUkIICHQDil19+0S5LTEwUzs7O4p133jFo+4UFOjVr1tR5DmhcuHBBABALFy4UQjzNMcnbHo1+/foJf3//QtvQs2fPIvNiCsrROXPmjAAgXn31VZ3l48aNEwDEzz//LIQQIjk5Wbi7u4umTZuK9PR0nXXz/u0iIiIEALF8+XLtsoyMDOHv7y+ioqK0y7Kzs/N9Ebl//77w8/MTw4YN0y578803hYeHh8jOzi7w2ArL0Xk20Pnuu++0QcazCstD2bRpk86XpIIUFOi89tpr2mXZ2dmiQoUKQqVSic8++0y7/P79+8LV1VXnw7ikgY6U9yYhCs7ReXb/iYmJwsnJSXTs2FEnt+Xrr78WAMR3332nXSb1uSDl+SuVpn1du3bV+XtOmDBBAJAU6OR9bWpI/ay4fPmysLOzE717986X+5O3PYbk6GiCDB8fH5GcnKxdPn78eAFA1K1bVycv7MUXXxROTk7i8ePHQggh0tLShJeXlxgxYoTOduPj44Wnp6fO8qJydMqWLSvu3bunXb5ly5Z8n7X16tUTvr6+4u7du9plZ8+eFXZ2dmLw4MHaZb169RIuLi7ixo0b2mUXL14U9vb2Bgc6Vjd1tWrVKvj5+aFt27YA1ENs/fv3x+rVq5GTkwMAaNeuHcqVK4c1a9ZoH3f//n3s2bMH/fv31y5bt24dqlevjmrVquG///7T3tq1awcA+YbRIyIiUKNGjXxtcnV11dlPSkoKWrVqpTOtopnmeuONN3QeO3r0aJ3fhRDYsGEDunfvDiGETrs6deqElJSUQqdrvLy8AABbtmxBbm5ugesB6qkRd3d37e99+/ZFQEAAfvrpJwDAmTNncPnyZbz00ku4e/euth0PHz5E+/bt8csvvyA3Nxe5ubnYvHkzunfvjkaNGuXbT0GlglK3rzmuY8eO4c6dO4Uek1Q1atRAq1attL/7+PigatWq+Oeff2TZPqCeqnR2ds63XJMXkJ6ervOzoHU19xfEy8sL//77r94h5KJo/tZjx47VWf7OO+8AAH788UcA6unQtLQ0fPDBB/nyGp79+7q5uWHQoEHa352cnNCkSROdvrW3t9fmz+Tm5uLevXvIzs5Go0aNdJ7fXl5eePjwYYGVaobasGEDypUrl+91p+848tK8rrZv346srCyD9/vqq69q/29vb49GjRpBCIHhw4fr7EPu56CU9yZD7N27F5mZmXjrrbd0pm9HjBgBDw8P7fNFQ8pzoSTP34LaN3r0aJ2/51tvvSV5G87OzvlSH6R+VmzevBm5ubn46KOP8k1vG1oy/ax+/frB09NT+7um4njQoEFwcHDQWZ6ZmYnbt28DUL92k5OT8eKLL+q03d7eHk2bNtU7XVyQ/v37w9vbW/u75j1U8/eMi4vDmTNnMHToUJQpU0a7Xp06ddChQwft+01OTg527dqFXr16ITg4WLte9erV0alTJ8nt0bCqQCcnJwerV69G27Ztce3aNVy5cgVXrlxB06ZNkZCQgH379gEAHBwcEBUVhS1btmjnTzdu3IisrCydQOfy5cu4cOECfHx8dG5VqlQBACQmJursv2LFinrbtX37djRr1gwuLi4oU6YMfHx8sGDBAqSkpGjXuXHjBuzs7PJtIzw8XOf3pKQkJCcn45tvvsnXLs2L79l25dW/f3+0aNECr776Kvz8/DBgwACsXbtWb9BTuXJlnd9VKhXCw8O18/GXL18GAAwZMiRfW/73v/8hIyMDKSkpSEpKQmpqqsHnT5G6fQCYOXMmzp8/j6CgIDRp0gSTJ08u0QdC3heXhre3N+7fv1/sbT7L1dVV7/z948ePtffn/VnQunk/rPR5//334ebmhiZNmqBy5cqIjo7Wm0Olj+Z5+ezz0N/fH15eXrhx4wYAaPNXpPyNK1SokO9NXV/fLlu2DHXq1IGLiwvKli0LHx8f/PjjjzqvmzfeeANVqlRBly5dUKFCBQwbNkz7paE4rl69iqpVq+p8MEgRERGBqKgoTJkyBeXKlUPPnj2xZMkSvX8zfZ59vnl6esLFxQXlypXLt1zO56CU9yZDaJ4PVatW1Vnu5OSESpUqae/XkPJcKMnzt6D2Pfve5uPjo/MBXZjy5cvnS2KX+llx9epV2NnZ6f1CXFL6nkOAOmdQ33JNH2veZ9u1a5ev/bt37y7086SoNmj6VLOvgp4fgDqI0XyRTUpKQnp6er6/U0GPLYpVVV39/PPPiIuLw+rVq7F69ep8969atUpbnTJgwAAsWrQIO3bsQK9evbB27VpUq1YNdevW1a6fm5uL2rVrY/bs2Xr39+wTSN8HzqFDh9CjRw+0bt0a8+fPR0BAABwdHbFkyZJiJdNpApJBgwZhyJAhetepU6dOgY93dXXFL7/8gv379+PHH3/Ezp07sWbNGrRr1w67d+82qIJC05ZZs2ahXr16etdxc3PTm/gm5/YB4IUXXkCrVq2wadMm7N69G7NmzcKMGTOwceNGdOnSxeB9F9QPQgiDt1WQgIAA7beqvOLi4gAAgYGB2vXyLn92Xc16BalevTouXbqE7du3Y+fOndiwYQPmz5+Pjz76CFOmTJHU1pJ+28xLSt+uXLkSQ4cORa9evfDuu+/C19cX9vb2mD59uk5SsK+vL86cOYNdu3Zhx44d2LFjB5YsWYLBgwdj2bJlsrW5KCqVCuvXr8fRo0exbds27Nq1C8OGDcMXX3yBo0ePap+nBdHXJ1L6qaC/i2b0ujByvzcVh5RjlOP5Kyd97/OGflYYQ0F9WVQfa95nV6xYAX9//3zrGRL0m+J9szisKtBZtWoVfH19tZnheW3cuBGbNm3CwoUL4erqitatWyMgIABr1qxBy5Yt8fPPP+PDDz/UeUxYWBjOnj2L9u3bF/uNfsOGDXBxccGuXbt0ph6WLFmis15ISAhyc3Nx7do1nSj2ypUrOuv5+PjA3d0dOTk5iIyMLFab7Ozs0L59e7Rv3x6zZ8/Gp59+ig8//BD79+/X2aYm0tcQQuDKlSvaQCosLAwA4OHhUWhbfHx84OHhgfPnzxvUTqnb1wgICMAbb7yBN954A4mJiWjQoAE++eSTYgU6plCvXj3s378fqampOtVUx44d094PqEdJHBwc8Pvvv+OFF17QrpeZmYkzZ87oLCtI6dKl0b9/f/Tv3x+ZmZno06cPPvnkE4wfPx4uLi4FPr81z8vLly+jevXq2uUJCQlITk5GSEgIgKd/q/Pnz+cb/SmO9evXo1KlSti4caNO2/SdJsLJyQndu3dH9+7dkZubizfeeAOLFi3CpEmTEB4ebtBrNywsDMeOHUNWVhYcHR0NbnezZs3QrFkzfPLJJ/j+++8xcOBArF69WmdqSk6ab8zPVjQ9O3Kij9T3JkB6oKt5Ply6dAmVKlXSLs/MzMS1a9eK/Z5V1PNXKk37Ll++rNO+pKSkEo2USf2sCAsLQ25uLi5evFjglzdA3i8WRdG8dn19fYv8+5S0XXmfH8/666+/UK5cOZQuXRouLi5wdXXN9xlU0GOLYjVTV+np6di4cSO6deuGvn375ruNGjUKaWlp2Lp1KwD1h33fvn2xbds2rFixAtnZ2TrTVoB6lOD27dv49ttv9e7v4cOHRbbL3t4eKpVK5xvW9evX851lVDPvOH/+fJ3l8+bNy7e9qKgobNiwQW/gkJSUVGh79I2uaF5wzw6zL1++HGlpadrf169fj7i4OG3g0LBhQ4SFheHzzz/Xe4ZeTVvs7OzQq1cvbNu2Db///nu+9QqK9qVuPycnJ99Qu6+vLwIDAyVPHZhD3759kZOTg2+++Ua7LCMjA0uWLEHTpk213wI9PT0RGRmJlStX6vw9VqxYgQcPHmjLpwty9+5dnd+dnJxQo0YNCCG0+SSlS5cGkP8D8/nnnwcAzJ07V2e55ptr165dAQAdO3aEu7s7pk+frp160yjOtznNN8O8jz127BiOHDmis96zx2ZnZ6cNxDV/+4KOTZ+oqCj8999/+Prrr/PdV9hx3L9/P9/9Bb2u5KT5kPrll1+0y559ThVE6nsToO5DKf0XGRkJJycnfPXVVzr9sXjxYqSkpGifL4aQ8vyVKjIyEo6Ojpg3b55O+559fhtK6mdFr169YGdnh6lTp+ZLF8jbHqn9LYdOnTrBw8MDn376qd7+zPuZYshrSZ+AgADUq1cPy5Yt09nG+fPnsXv3bu37jb29PTp16oTNmzfj5s2b2vX+/PNP7Nq1y+D9Ws2IztatW5GWloYePXrovb9Zs2bw8fHBqlWrtAFN//79MW/ePMTExKB27do631gB4OWXX8batWvxf//3f9i/fz9atGiBnJwc/PXXX1i7di127dqlN7k2r65du2L27Nno3LkzXnrpJSQmJiI2Nhbh4eE4d+6cdr2GDRsiKioKc+fOxd27d9GsWTMcPHgQf//9NwDdSPqzzz7D/v370bRpU4wYMQI1atTAvXv3cOrUKezdu7fQqaKpU6fil19+QdeuXRESEoLExETMnz8fFSpUQMuWLXXWLVOmDFq2bIlXXnkFCQkJmDt3LsLDwzFixAgA6g+V//3vf+jSpQtq1qyJV155BeXLl8ft27exf/9+eHh4YNu2bQDUp5DfvXs3IiIi8Nprr6F69eqIi4vDunXr8Ouvv2qTOfOSuv20tDRUqFABffv2Rd26deHm5oa9e/fixIkT+c47Ygq//PKL9oMnKSkJDx8+xLRp0wAArVu3RuvWrQGokwL79euH8ePHIzExEeHh4Vi2bBmuX7+OxYsX62zzk08+wXPPPaftv3///RdffPEFOnbsiM6dOxfano4dO8Lf3x8tWrSAn58f/vzzT3z99dfo2rWrNtm8YcOGAIAPP/wQAwYMgKOjI7p37466detiyJAh+Oabb5CcnIyIiAgcP34cy5YtQ69evbRJ/x4eHpgzZw5effVVNG7cGC+99BK8vb1x9uxZPHr0yOBppG7dumHjxo3o3bs3unbtimvXrmHhwoWoUaOGTtD76quv4t69e2jXrh0qVKiAGzduYN68eahXr5729VyvXj3Y29tjxowZSElJgbOzM9q1awdfX998+x08eDCWL1+OsWPH4vjx42jVqhUePnyIvXv34o033kDPnj31tnfZsmWYP38+evfujbCwMKSlpeHbb7+Fh4eH9s3bGGrWrIlmzZph/PjxuHfvHsqUKYPVq1cjOzu7yMdKfW8C1M+PvXv3Yvbs2QgMDETFihX1Xl7Hx8cH48ePx5QpU9C5c2f06NEDly5dwvz589G4cWOdxGOppDx/AfV7ZERERKHnDvLx8cG4ceMwffp0dOvWDc8//zxOnz6NHTt25MuHMoTUz4rw8HB8+OGH+Pjjj9GqVSv06dMHzs7OOHHiBAIDAzF9+nQA6v5esGABpk2bhvDwcPj6+moTm+Xm4eGBBQsW4OWXX0aDBg0wYMAA+Pj44ObNm/jxxx/RokULbeCveZ8YM2YMOnXqBHt7ewwYMMCg/c2aNQtdunRB8+bNMXz4cKSnp2PevHnw9PTUOcfUlClTsHPnTrRq1QpvvPEGsrOztedTevb5WSSDarQUrHv37sLFxUU8fPiwwHWGDh0qHB0dtWXZubm5IigoSAAQ06ZN0/uYzMxMMWPGDFGzZk3h7OwsvL29RcOGDcWUKVNESkqKdj0ABZY3L168WFSuXFk4OzuLatWqiSVLlug9jfXDhw9FdHS0KFOmjHBzcxO9evUSly5dEgB0ykyFUJ+3Izo6WgQFBQlHR0fh7+8v2rdvL7755ptC+2nfvn2iZ8+eIjAwUDg5OYnAwEDx4osvir///lu7jqas8ocffhDjx48Xvr6+wtXVVXTt2lWn1E/j9OnTok+fPqJs2bLC2dlZhISEiBdeeEHs27dPZ70bN26IwYMHCx8fH+Hs7CwqVaokoqOjtWXE+so5pWw/IyNDvPvuu6Ju3brC3d1dlC5dWtStW1fMnz+/0L4QouDy8q5du+Zb99lS5IJo/rb6bnlLi4VQXxJg3Lhxwt/fXzg7O4vGjRuLnTt36t3uoUOHxHPPPSdcXFyEj4+PiI6O1in/L8iiRYtE69attf0XFhYm3n33XZ3nrxBCfPzxx6J8+fLCzs5Op0+ysrLElClTRMWKFYWjo6MICgoS48eP15an5rV161bx3HPPCVdXV+Hh4SGaNGkifvjhB+39BV0C4tnS59zcXPHpp5+KkJAQ4ezsLOrXry+2b9+eb73169eLjh07Cl9fX+Hk5CSCg4PFyJEjRVxcnM72v/32W1GpUiVtaarmOabvb/ro0SPx4Ycfao/X399f9O3bV1y9erXAPj516pR48cUXRXBwsHB2dha+vr6iW7du4vfff9dZ79nngOa58uzpHoYMGSJKly6dbz/6+u/q1asiMjJSODs7a8/9tGfPHknl5VLfm/766y/RunVr4erqqlOGXVB5+9dffy2qVasmHB0dhZ+fn3j99de158sq7Fj0tVPK8zctLU177qOi5OTkiClTpoiAgADh6uoq2rRpI86fP5/vEhAFlZcXVOou9bNCCPVpDOrXr69dLyIiQntKFCHUpd1du3YV7u7uAkCh7zsFXX5B0/5169bpLNf8zZ49FcL+/ftFp06dhKenp3BxcRFhYWFi6NChOs/h7OxsMXr0aOHj4yNUKpX2eVLYJSD0ve/t3btXtGjRQvs+0b17d3Hx4sV8jz148KBo2LChcHJyEpUqVRILFy4s1iUgVE8aQgp15swZ1K9fHytXrsTAgQNNss8DBw6gbdu2WLduHfr27WuSfRIRFddPP/2Ebt264ezZs6hdu7a5m0MKYzU5OtZA3/lQ5s6dCzs7O+10BxER6dq/fz8GDBjAIIf0spocHWswc+ZMnDx5Em3btoWDg4O2XPa1114zSXkiEZElmjVrlrmbQArGQEdBnnvuOezZswcff/wxHjx4gODgYEyePDlf2TsRERFJwxwdIiIislrM0SEiIiKrxUCHiIiIrBYDHSIiIrJaDHQszK5du6BSqbQ3e3t7hIaG4u2339Z7mQRjysjIwPvvv4/AwEC4urqiadOm2LNnj6THHjhwQOc48t6OHj1a7DYpqX802E+GKW5/GauvgPz95ejoiPDwcEyePBmZmZkl2nZRLly4gH79+qFSpUooVaoUypUrh9atW2vPOm7oesVx7tw5DBw4UHvlbn9/f7Rs2dKoF9U05HiMdezmeJ0o4bitDauuLMzZs2cBAHPmzEG5cuXw+PFjbNq0CXPnzsWjR4+waNEik7Vl6NChWL9+Pd566y1UrlwZS5cuxfPPP4/9+/fnu5xEQcaMGYPGjRvrLCvJRSGV1D8a7CfDlLS/5O4r4Gl/zZ49Gz4+Pnj06BHWrVuHKVOmICMjQ3vqfmO4ceMG0tLSMGTIEAQGBuLRo0fYsGEDevTogUWLFuG1114zaD1Dbdy4ES+++CKCg4MxcuRIBAYG4ubNm9i7dy9Wrlyp90KrcjDkeIx17OZ4nSjhuK2OQedRJrMbOHCgKF26tMjJydEuy87OFiEhIcLPz89k7Th27Fi+U36np6eLsLAw0bx58yIfX9DpyUtKKf2jwX4yTEn6y1h9JYS6v1xcXER2drZ2WUZGhvD39xcVK1aUfX9Fyc7OFnXr1hVVq1aVZb2C3Lt3T3h6eooWLVpoL9WS1+3bt4u13eIy5HhKeuxCKOd1YurjtjacurIwZ8+eRZ06dWBn9/RPZ29vD19fX50rWxvb+vXrYW9vr/ONwcXFBcOHD8eRI0dw69YtydtKS0uTdBFCKZTSPxrsJ8PI1V9y9hWg7q+aNWtqr6oOqK+iHRgYiJSUFNn2I5W9vT2CgoKKvIq01PUKsnfvXqSkpGD48OFwcnLKd39gYGCxtltchhxPSY8dUM7rxNTHbW04dWVBMjMzcenSJe3VwzUSEhJw4cIFNGjQQNJ2srKyJL85lylTRudFrnH69GlUqVIFHh4eOsubNGkCQH2NLilnc37llVfw4MED2Nvbo1WrVpg1a1aRV4QviFz9o8F+kk6OvgLk6S85+wp42l8vv/yyzvI7d+7g4sWLiIiI0Ps4ufpE4+HDh0hPT0dKSgq2bt2KHTt2oH///sVeT4qHDx8CgMFXi5bz2A05HjmPvTivE2s4bqtk7iElku706dMCgPjiiy9EUlKSuH37tti9e7do1KiRsLe317n6bWE0Q/xSbs9elVijZs2aol27dvmWX7hwQQAQCxcuLLQNv/32m4iKihKLFy8WW7ZsEdOnTxdly5YVLi4u4tSpU5KO41ly9Y8G+0k6OfpKiJL1lzH6Soin/fXxxx+LpKQkcefOHbFz505Rt25dUbp06XxXgdaQq080Ro4cqV3fzs5O9O3bV9y7d6/Y60lx/fp1UapUKQFAVK5cWbz33nvi559/1pnCM/axG3I8ch57cV4n1nDc1ohnRrYgy5cvx5AhQ/Itr1q1KmbPno3nn39e0nbu37+PkydPSlq3ZcuWcHFxybc8LCwMVatWxU8//aSz/J9//kFYWBjmzJmDt956S9I+NK5cuYI6deqgdevW2Llzp0GPBeTrHw32k3Ry9BUgf3+VtK+AgvurTZs2mDNnDurVq6f3cXL1icZff/2Ff//9F3fu3MHatWvh5OSEBQsWwM/Pr1jrSXXu3Dl88skn+PHHH7UjPMHBwVi8eDEiIyP1PkbOYzfkeOQ89uK8TqzhuK2SuSMtkm7s2LHCwcFB7N69W+zZs0ccPHhQ/PPPP2ZpS0lHKgoyYMAA4eTkVOQ3Rn2U1D8a7CfDGKO/StJXQqj7C4D48ccfxZ49e8TKlStFzZo1hbu7u1n7rUOHDqJx48YiNzdXlvWKkpGRIfbv3y9eeeUVoVKpRNmyZcXDhw9LtM3iMOR4SnLsSnudmOq4rRFzdCzIuXPnEB4ejg4dOhj0uJycHJ0kyszMTNy7d0/SY318fHQeqxEQEIDbt2/nWx4XFweg+EmKQUFByMzMxMOHD/PlaRSluP1TEPaTdHL0FWCc/ipJXwHq/goJCdH5Bt+gQQPUqFED8+fPL/DK2XL1SUH69u2LkSNH4u+//0bVqlVLvF5RnJyc0KZNG7Rp0wZJSUnYvn07Ll26hPr16+db15jHbsjxlOTYi/M6sYbjtkYMdCzIuXPn0KpVqyLX+/LLL3HgwAE4ODhgx44dWLduHbp06aK9//Dhw2jbtq2kfV67dg2hoaH5lterVw/79+9HamqqzofHsWPHtPcXxz///AMXFxe4ubkZ/Fip/fPXX39h1KhROHXqFIQQePnll/HVV1/lW8/W+2n+/PnYvHkznJyccPToUQQEBGDdunWoVq1avnXl6CvAOP1Vkr4C1P2lSYbWqF69Oho1aoQNGzYUGOjI1ScFSU9PB4Aik1+lrmcIZ2dnAICnp6fe+4157IYcT0mOXerrJC9rOG5rxEDHQsTHxyMxMRE1atQoct1z587ht99+w/r167FmzRrk5OTo3F+3bl3JZ+b19/fXu7xv3774/PPP8c0332DcuHEA1Ge0XbJkCZo2bapTGfPo0SPcvHkT5cqVQ7ly5QAASUlJ8PHx0dnm2bNnsXXrVnTp0qXICpRnGdI/AwcOxPvvv49+/fohLS0Nly9f1ruerffT+fPncfz4cWzZsgUtWrTAa6+9ho8++ghr167Nt64cfQVI7y9T9BXwtL9q1aqV775OnTrhk08+wZ9//onq1avnu1+uPklMTISvr6/OsqysLCxfvhyurq7av6XU9aT69ddf0bBhQ7i6uuosP3fuHHbu3In69eujUqVKeh8rx7EbcjxyH7shr5O8LP24rRUDHQuhOUNnzZo1i1z33LlziImJQevWrQEg3xu8t7d3gUmEUjVt2hT9+vXD+PHjkZiYiPDwcCxbtgzXr1/H4sWLddY9fvw42rZti5iYGEyePBkA0L9/f7i6uuK5556Dr68vLl68iG+++QalSpXCZ599lm9/KpUKEREROHDggN72GNI/V69eRWZmJnJzc+Hh4YGGDRvqXc/W++nChQv46KOPtOXTL774It59912968rRV4D0/jJFXwFP+6t27dr57uvYsaM2SVdfoCNXn4wcORKpqalo3bo1ypcvj/j4eKxatQp//fUXvvjiC+1IldT1NIo6/g8++AB///03+vXrh7p16yI7OxtnzpzBihUr4OnpiRUrVhTYZjmO3ZDjMWRdQ/7uUl4neSn5uG2auZOESJqZM2cKAOLcuXOFrpeTkyNKlSplkjOWpqeni3Hjxgl/f3/h7OwsGjduLHbu3JlvPU3JZUxMjHbZl19+KZo0aSLKlCkjHBwcREBAgBg0aJC4fPlyvsenpaUJAGLAgAEFtkVq/wghxE8//SRatGgh/Pz8xLvvviuysrKkHXAxWWo/lS1bVly9elX7+4oVK0T79u2LfFxJSekvU/SVEE/76+zZs/nuy8zMFO7u7qJt27bFO1CJfvjhBxEZGSn8/PyEg4OD8Pb2FpGRkWLLli3FWk8Iace/ceNG8eKLL4rw8HBRunRp4eLiIqpXry7effddkZiYKPtxPsuQ45G6rqF/dymvE7kZ47htHQMdK3Pp0iWznsLfGH788UehUqlkf9O5fv26CA4OFrt27ZJ1u+YiZz/FxcUJACI1NVW7rE+fPuLzzz8v8baVwFjPKUthq8dvq8dt63gJCCtz7tw51K1b19zNkNX+/fsxYMAAvdMHhtqwYQOuXbsGQH3Oi8zMTL3JtZZIzn46f/487O3tsWbNGmRlZeF///sfTp8+ne8ssZZKzr6yRLZ6/LZ63LaOJwy0MjExMXj06FGBlSC2bsyYMVi7di0ePHiAsLAwfPrpp+jatau5m6U4c+fOxcWLF/HPP//g2LFjaNKkCb755huEhYWZu2lERAZhoENE+YwYMQKNGjXCyJEjzd0UIqIS4dQVEeVz/vx5q5nSIyLbxhEdIsrH09MTf//9N6+VQ0QWj4EOERERWS1OXREREZHVsvozI+fm5uLOnTtwd3eHSqUyd3OIiIhIAiEE0tLSEBgYWKxLuGhYfaBz584dnesJERERkeW4desWKlSoUOzHW32g4+7uDkDdUXmvhkxERETKlZqaiqCgIO3neHFZfaCjma7y8PBgoENERGRhSpp2wmRkIiIisloMdIiIiMhqMdAhIiIiq2X1OTpERESWKCcnB1lZWeZuhtE4OjrC3t7e6PthoENERKQgQgjEx8cjOTnZ3E0xOi8vL/j7+xv1PHcMdIiIiBREE+T4+vqiVKlSVnmyWyEEHj16hMTERABAQECA0fbFQIeIiEghcnJytEFO2bJlzd0co3J1dQUAJCYmwtfX12jTWExGJiIiUghNTk6pUqXM3BLT0BynMXORGOgQEREpjDVOV+ljiuNkoENERGSlshITkTTva2Q9yYWxRQx0iIiIrFR2UhL+i41FdlKSuZtiNgx0iIiIqMSGDh0KlUoFlUoFR0dHVKxYEe+99x4eP35s1nYx0CEiIrJCmdev4/7KVQCA+ytXIfP6daPvs3PnzoiLi8M///yDOXPmYNGiRYiJiTH6fgvDQIeIiMjKJG/YiKvPd0XKli0AgJQtW3D1+a5I3rjJqPt1dnaGv78/goKC0KtXL0RGRmLPnj1G3WdRGOgQERFZiNysLGQlJCK3kHLsx1euIG7SJCA3V30DtP+PmzgRmTduSNqOlHUKc/78eRw+fBhOTk7FerxcGOgQEREpQFZiIu6tXAmRk1PwStnZyE5KBLKzC1wlZcPGgh+vUiF5/QZJ25GyzrPB0Pbt2+Hm5gYXFxfUrl0biYmJePfddwvehwkw0CEiIjIyKWXe2UlJuL/q+6ejMMXd1507gBD67xQCWbdvl2j7Op4Jhtq2bYszZ87g2LFjGDJkCF555RVERUXJt79iYKBDRERUAlKDGFOVeTsGBgIFnYhPpYJj+fJG23fp0qURHh6OunXr4rvvvsOxY8ewePFio+1PCgY6REREJaC0c9V49uxZ6IiOV1/TjLDY2dlhwoQJmDhxItLT002yT73tMNueiYiIFM4SzyzsFBKMsm+8DtjZqW+A9v8B06bBKSTEZG3p168f7O3tERsba7J9PouBDhERUQGUNlojlXvbtqi4aaN6dAfqUZ6wHT/Bq09vk7bDwcEBo0aNwsyZM/Hw4UOT7luDgQ4REdkkSxytMYRTcDC8Bw0EAHgPGmj0kZylS5di8+bN+ZZ/8MEHSExMROnSpY26/4Iw0CEiIptkqaM1ZBizBjo5OTmYNGkSKlasCFdXV4SFheHjjz+GyJNEJYTARx99hICAALi6uiIyMhKXL182Y6uJiIgsg4OPD8pFR8PBx8fcTTEbswY6M2bMwIIFC/D111/jzz//xIwZMzBz5kzMmzdPu87MmTPx1VdfYeHChTh27BhKly6NTp06mf0iYUREpFzWPi0llaOvL3xGj4Kjr6+5m2I2Zg10Dh8+jJ49e6Jr164IDQ1F37590bFjRxw/fhyAejRn7ty5mDhxInr27Ik6depg+fLluHPnjt55QCIiIoDTUvSUWQOd5557Dvv27cPff/8NADh79ix+/fVXdOnSBQBw7do1xMfHIzIyUvsYT09PNG3aFEeOHNG7zYyMDKSmpurciIjIenC0hgzhYM6df/DBB0hNTUW1atVgb2+PnJwcfPLJJxg4UJ0lHh8fDwDw8/PTeZyfn5/2vmdNnz4dU6ZMMW7DiYjIbDSjNW7t2tr0lAxJY9YRnbVr12LVqlX4/vvvcerUKSxbtgyff/45li1bVuxtjh8/HikpKdrbrVu3ZGwxERERWRKzjui8++67+OCDDzBgwAAAQO3atXHjxg1Mnz4dQ4YMgb+/PwAgISEBAQEB2sclJCSgXr16erfp7OwMZ2dno7ediIjkl5WYiOQ1a+HV/wWO1pAszDqi8+jRI9jZ6TbB3t4euU+u3FqxYkX4+/tj37592vtTU1Nx7NgxNG/e3KRtJSIi42MSsbzS4tJwYPIBpMWlmbspZmPWEZ3u3bvjk08+QXBwMGrWrInTp09j9uzZGDZsGABApVLhrbfewrRp01C5cmVUrFgRkyZNQmBgIHr16mXOphMRESneg7gHODjlIKr2qAr3AHdzN8cszDqiM2/ePPTt2xdvvPEGqlevjnHjxmHkyJH4+OOPteu89957GD16NF577TU0btwYDx48wM6dO+Hi4mLGlhMREdGzkpKS8PrrryM4OBjOzs7w9/dHp06d8Ntvv5mtTWYd0XF3d8fcuXMxd+7cAtdRqVSYOnUqpk6darqGERGR7Jh/Y1p3r9zD8Xm/AwCOzzuOlhNaomzlskbdZ1RUFDIzM7Fs2TJUqlQJCQkJ2LdvH+7evWvU/RbGrIEOERHZDpaFm84fm65j5+SNgEr9+9kVZ3F2+Vn0WNwD9YbWM8o+k5OTcejQIRw4cAAREREAgJCQEDRp0sQo+5OKF/UkIiKyInev3MPOySchcgVEjvrakSJHQOQKbB2+Ffeu3DPKft3c3ODm5obNmzcjIyPDKPsoDgY6REREVuTM8j8AlUr/nSrg1OJTRtmvg4MDli5dimXLlsHLywstWrTAhAkTcO7cOaPsTyoGOkREVGK8LINypNxIAYTQf6cAUq6nGG3fUVFRuHPnDrZu3YrOnTvjwIEDaNCgAZYuXWq0fRaFgQ4REZUYz3+jHJ4hnoWO6HiGehp1/y4uLujQoQMmTZqEw4cPY+jQoYiJiTHqPgvDQIeIiMiK1Btcu9ARnQbDG5i0PTVq1MDDhw9Nus+8GOgQERFZkbLhZdB5SkOo7FRQ2atHdlT2KqjsVOixuAfKhJcxyn7v3r2Ldu3aYeXKlTh37hyuXbuGdevWYebMmejZs6dR9ikFy8uJiKhQPP+N5andKxSVejXAb1+cwJmlZ1D35bpo9WErowU5gLrqqmnTppgzZw6uXr2KrKwsBAUFYcSIEZgwYYLR9lsUBjpERFQonv/GMpUJ80aT0U1wZukZNBndxKhBDqC+qPb06dMxffp0o+7HUJy6IiIiIqvFQIeIiMhKuQW4ISImAm4BbuZuitkw0CEismE8/411cw9wR5vJbWz2yuUAAx0iIpvG89+QtWOgQ0RERFaLgQ4RERFZLQY6RERWivk3RAx0iIisFvNviBjoEBERWa/sOCBpsvqnjWKgQ0REZK2y44C7UxjoEBEREZXE0KFDoVKpoFKp4OTkhPDwcEydOhXZ2dlmbRcDHSIiImuUdQW4P0/9//vzgMzLRt9l586dERcXh8uXL+Odd97B5MmTMWvWLKPvtzAMdIiILBArqqgw9qpNUN2pB6SsUC9IWQH8Uw1IXmrU/To7O8Pf3x8hISF4/fXXERkZia1btxp1n0VhoENEZIFYUUUFyroCR7vJUCEXQM6ThTkAcoH44UDmFZM1xdXVFZmZmSbbnz4MdIiIiKyI6sFyAKqC7gWSFxu9DUII7N27F7t27UK7du2Mvr/COJh170RERCSv7BsARAF3CiDrutF2vX37dri5uSErKwu5ubl46aWXMHnyZKPtTwoGOkRERNbEIQSFjug4hhpt123btsWCBQvg5OSEwMBAODiYP8zg1BURkcIw0ZhKQrgNBiAKGNMRgNdwo+27dOnSCA8PR3BwsCKCHICBDhGR4jDRmErEMRxZuVOg/oi3f7LQXv27/2LAKdx8bTMDBjpERERWJkf0ggg8C3i+rF7g+TJQ6RLgNdSs7TIHZYwrERERkbwcwwDv0UDKUvVPI4/kLF261KjbLy6zjuiEhoZqTxed9xYdHQ0AePz4MaKjo1G2bFm4ubkhKioKCQkJ5mwyERERWRCzBjonTpxAXFyc9rZnzx4AQL9+/QAAb7/9NrZt24Z169bh4MGDuHPnDvr06WPOJhMRlQgTjcmkHAKAsjHqnzbKrFNXPj4+Or9/9tlnCAsLQ0REBFJSUrB48WJ8//332pMNLVmyBNWrV8fRo0fRrFkzczSZiKhENInGbu3awtHX19zNIWvnEAD4TDZ3K8xKMcnImZmZWLlyJYYNGwaVSoWTJ08iKysLkZGR2nWqVauG4OBgHDlypMDtZGRkIDU1VedGREREtkkxgc7mzZuRnJyMoUOHAgDi4+Ph5OQELy8vnfX8/PwQHx9f4HamT58OT09P7S0oKMiIrSYiIpKREIAQEKKgMxtbF1Mcp2ICncWLF6NLly4IDAws0XbGjx+PlJQU7e3WrVsytZCIiMi4VCkpEELg0aNH5m6KSWiO09HR0Wj7UER5+Y0bN7B3715s3LhRu8zf3x+ZmZlITk7WGdVJSEiAv79/gdtydnaGs7OzMZtLREQ2IPP6ddxfuQoAcH/lKtiPfA1OoaEGr2MIVXo63FQqJD5JVi9VqhRUqqeXc8jNyEBmbi5ERgbsVPov86C0dfTRBHOJiYnw8vKCvb190Q8qJkUEOkuWLIGvry+6du2qXdawYUM4Ojpi3759iIqKAgBcunQJN2/eRPPmzc3VVCKiAmUlJiJ5zVp49X+BicZmJEeAkrxhI+ImTdL+nrJlC1K2bEHAtGnw6tNb8jpS25NXOXt7OHp5aYOdvERWFrKTkuAAQFXAKIjS1imMl5dXoYMXcjB7oJObm4slS5ZgyJAhOtfF8PT0xPDhwzF27FiUKVMGHh4eGD16NJo3b86KKyJSJFZUGZ8pApTM69fV9+fmPt3xk//HTZyIUg0bAEIUuY5TSEixgqHkVd+j3MjX4FulCrKysnSO//Hly7g97RMEfvUlXCpW1NtHSlunII6OjkYdydEwe6Czd+9e3Lx5E8OGDct335w5c2BnZ4eoqChkZGSgU6dOmD9/vhlaSURExlbSIEauACV5w0agoGkYlQrJ6zdo/1/YOl5RfWQNhgBA2NnBLi4OznZ2cHFx0bt7pa1jbmZPRu7YsSOEEKhSpUq++1xcXBAbG4t79+7h4cOH2Lhxo9GHuIiIyPSSN2zE1ee7ImXLFgDqD/urz3dF8sZNAKAbxGgChyf/j5s4EZk3bkgKUKSsk3X7trr6SR8hkHX7tqR1pOxLynFpPBsIZl6/rn/bpMPsgQ4REdk2uYIYuQIUx/LlC92XY/nyktaRKxgCig4ENRgM5cdAh4iIjK6wD2C5ghi5AhSvqD6F7surb5SkdeQKhqSO+kgNhmwNAx0iIgl4jariK+oDWK4gRq4AxSk0FAHTpgF2duoboP1/wLRpcAoJkbSOXMGQ3FNgtoaBDhGRBJqKquykJHM3xaJI+QCWK4iRK0ABAK8+vRG24yd49uwJAPDs2RNhO37SSQ4uah25giE5p8AA25veYqBDREQlUtJpKbmCGECeAEXDKSQE3oMGAgC8Bw3U7sOQdeQIhuSaAgNsc3qLgQ4RERWbHNNScgYxgDwBipxKGgzJNQVmqxVeDHSIiKhAhX3gyTUtBcgbxFiiwo5LrikwuSu8LAUDHSIi0quoDzy5pqU0rDWIkYMcU2ByVnhZEgY6RGTzWFGVn5QPPDmnpahoJZ0Ck6vCS8NSprcY6BCRzWNFVX5SPvDknpaikissGJKrwguwrOktBjpERDaqsG/kUj7wOC1lWeSq8LK06S0GOkRENqiob+RSPvA4LWV55KjwMmR6SwkY6BAR2Rgp38iljtZwWsrylLTCS+r0llIw0CEiskIlPYmfIaM1nJayLnIkNSsJAx0ismq2WFElx0n8AI7W2LKSJjUrCQMdIrJqtlZRJedJ/ACO1lB+lpabxUCHiMiKyH0SPyJ9LGm0j4EOEZEV4Un8yFQsZbSPgQ4RkYUpLNGYJ/Ej0sVAh4jIghSVaMyT+BHpYqBDRGQhpCQac1qKSBcDHSKyWLZWOi71jLScliJ6ioEOEVksaywdL+n1pzQ4LUWkxkCHiEgh5Lj+FBHpYqBDRKQAcl5/ioieYqBDRKQAcl9/iojUGOgQESkArz9FZBwMdIiITESOE/0BTDQmMgQDHSJSJGsrHZfzRH9EJB0DHSJSJGsqHeeJ/ojMh4EOEZGR8UR/ROZj9kDn9u3bGDRoEMqWLQtXV1fUrl0bv//+u/Z+IQQ++ugjBAQEwNXVFZGRkbh8+bIZW0xEZBie6I/IfMwa6Ny/fx8tWrSAo6MjduzYgYsXL+KLL76At7e3dp2ZM2fiq6++wsKFC3Hs2DGULl0anTp1wuPHj83YciIiXXIlGhORvMwa6MyYMQNBQUFYsmQJmjRpgooVK6Jjx44ICwsDoB7NmTt3LiZOnIiePXuiTp06WL58Oe7cuYPNmzebs+lERFpMNCZSLrMGOlu3bkWjRo3Qr18/+Pr6on79+vj222+191+7dg3x8fGIjIzULvP09ETTpk1x5MgRvdvMyMhAamqqzo2IyFiYaEykbGYNdP755x8sWLAAlStXxq5du/D6669jzJgxWLZsGQAgPj4eAODn56fzOD8/P+19z5o+fTo8PT21t6CgIOMeBBEZzJpKx5loTKRsZg10cnNz0aBBA3z66aeoX78+XnvtNYwYMQILFy4s9jbHjx+PlJQU7e3WrVsytpiI5GBNpeNMNCZSNrMGOgEBAahRo4bOsurVq+PmzZsAAH9/fwBAQkKCzjoJCQna+57l7OwMDw8PnRsRUUkw0ZjIcpk10GnRogUuXbqks+zvv/9GyJNvORUrVoS/vz/27dunvT81NRXHjh1D8+bNTdpWIrJNTDQmsmxmDXTefvttHD16FJ9++imuXLmC77//Ht988w2io6MBACqVCm+99RamTZuGrVu34o8//sDgwYMRGBiIXr16mbPpRGQDmGhMZPnMGug0btwYmzZtwg8//IBatWrh448/xty5czFw4EDtOu+99x5Gjx6N1157DY0bN8aDBw+wc+dOuLi4mLHlRGQLmGhMZPkczN2Abt26oVu3bgXer1KpMHXqVEydOtWErSIiKl6iccqmTUw0JlIQs18CgoisizWVjjPRmMjyMdAhIllZWul4YRVVTDQmsnwMdIjIZhVVUcVEYyLLx0CHiGySlIoqgInGRJaOgQ4R2SSpFVUAz2hMZMkY6BCRTTKkooqILBcDHSKySayoIrINDHSISDJLKx1nRRURMdAhIsksqXScFVVEBDDQISIrxIoqy+Xg44Ny0dFw8PEx+jpkGxjoEJHVYUWVMkkJPhx9feEzehQcfX2Nvg7ZBrNf64qISG6sqDI9Q4IYpeCoj21goENEVocVVaantCBGCiltZjBk+Th1RUQWiRVVpmPLH/acArN8DHSIyOKwosq0+GFfOFsOBC0BAx0iI0iLS8OByQeQFpdm7qZIZinnyGFFlbz4IV1yDASVjYEOUR5SAhQp6zyIe4CDUw7iQdwDYzTTKCzlHDmsqJIXP6TJ2jHQIcpDSoAiVxBjiaM+SsCKKrJEHDkzHwY6ZDOUFlhICZiU1mYlYEUVWSKOnJmPQYFOVlYWwsLC8OeffxqrPUTFYq3TSZbYZjmwokoeHEUgMjDQcXR0xOPHj43VFqJis9WAwBqxoko+HEUgKsbUVXR0NGbMmIHs7GxjtIeIbBgrqsiWcQTOOAw+M/KJEyewb98+7N69G7Vr10bp0qV17t+4caNsjSOioqXFpeHkopNoOLIh3APc9a6TlZiI5DVr4dX/BUV/u5dSUeX7zlgATyuqUjZtssmKKn4oWh9LPLu0JTA40PHy8kJUFOfAyXSkfJDbMs20XdUeVQvsH03puFu7tooOdFhRJR0/FImkMTjQWbJkiTHaQVQgKR/kZB1YUUVUOI7kGa5Y5eXZ2dnYu3cvFi1ahLQ0dZXLnTt38OABE0GJqPhYUUVUOCaYG87gQOfGjRuoXbs2evbsiejoaCQ9OYvqjBkzMG7cONkbSEQl9yApHef/q4UHSenmbkqhpeOsqFLjt3Yi+Rgc6Lz55pto1KgR7t+/D1dXV+3y3r17Y9++fbI2jqwfT4hnGg+SHuPi3Vp4kGTe00MUVToOsKIK4Ld2IjkZHOgcOnQIEydOhJOTk87y0NBQ3GaiIBmI57+xHVJLxwFeo4qoJDgiqMvgQCc3Nxc5OTn5lv/7779wd2eiKJGpZd+7p/OzuIw9vWXIxTitGT+EyNg4IqjL4ECnY8eOmDt3rvZ3lUqFBw8eICYmBs8//7xB25o8eTJUKpXOrVq1atr7Hz9+jOjoaJQtWxZubm6IiopCQkKCoU0msmrZ9+/r/CwuY09vsXRcjR9CRKZlcKDzxRdf4LfffkONGjXw+PFjvPTSS9ppqxkzZhjcgJo1ayIuLk57+/XXX7X3vf3229i2bRvWrVuHgwcP4s6dO+jTp4/B+yAi82PpOBGZg8Hn0alQoQLOnj2L1atX49y5c3jw4AGGDx+OgQMH6iQnS26AgwP8/f3zLU9JScHixYvx/fffo127dgDU5/CpXr06jh49imbNmhm8LzItnuiP8vKK6oO7ixfrv5Ol40RkJAYHOoA6OBk0aJAsDbh8+TICAwPh4uKC5s2bY/r06QgODsbJkyeRlZWFyMhI7brVqlVDcHAwjhw5UmCgk5GRgYyMDO3vqampsrSTDMcT/dmeZ0vH7Ue+BqfQUABPS8fjJk5Ur5ybqy0ht6XScSIlsKVcsWKdMPDSpUsYNWoU2rdvj/bt22PUqFH466+/DN5O06ZNsXTpUuzcuRMLFizAtWvX0KpVK6SlpSE+Ph5OTk7w8vLSeYyfnx/i4+ML3Ob06dPh6empvQUFBRncLiLSr7CEZZaO29aHB1k2W8oVMzjQ2bBhA2rVqoWTJ0+ibt26qFu3Lk6dOoXatWtjwwbDqia6dOmCfv36oU6dOujUqRN++uknJCcnY+3atYY2S2v8+PFISUnR3m7dulXsbRGRroISllk6rmZLHx5ElsLgqav33nsP48ePx9SpU3WWx8TE4L333ivRBT+9vLxQpUoVXLlyBR06dEBmZiaSk5N1RnUSEhL05vRoODs7w9nZudhtIFIS3dLxAPM2phCGXHWciMiUDB7RiYuLw+DBg/MtHzRoEOLi4krUmAcPHuDq1asICAhAw4YN4ejoqHO25UuXLuHmzZto3rx5ifZDJcczGpuGXKXjxsbScSLrYy1TsQYHOm3atMGhQ4fyLf/111/RqlUrg7Y1btw4HDx4ENevX8fhw4fRu3dv2Nvb48UXX4SnpyeGDx+OsWPHYv/+/Th58iReeeUVNG/enBVXCsAzGlNeLB0nsj7WMhUraepq69at2v/36NED77//Pk6ePKkNOI4ePYp169ZhypQpBu3833//xYsvvoi7d+/Cx8cHLVu2xNGjR+HzJHqcM2cO7OzsEBUVhYyMDHTq1Anz5883aB9EJI/M69eRtXsjmgVcQNbuFGQ2rqCtqLKF0nFr+XZLZGskBTq9evXKt2z+/Pn5go7o6Gj83//9n+Sdr169utD7XVxcEBsbi9jYWMnbJCquu5fv4vi84wCA4/OOo+WElihbuazB61ij5A0b1cnGAqjgnoucX//F1ed3IWDaNHj16Z2vdDw3R8DOTgWorKd0XPPtlogsi6Spq9zcXEk3fdfAIjK2Z4OPu5fvGrzO6SWnEVstFmdXnAUAnF1xFrHVYnFm6RmD1rFGOhVVIhd2KgAif0WVpnTcvkUn/JsWBPuWnayqdJyILFOxzqNDpBRyBCh3L9/Ftle3QeQKiBx1Qq3IERC5AluHb8W9K/ckraMhJfCyJIZcjNMpJASOHfvgaNxzcOzYxypGcojIshXrzMgnTpzA/v37kZiYiFzNOTOemD17tiwNI/OxlEs35A0+NDRByNbhWxHcMhhCiCLXOf3daaCAz3GogFOLT2n/X9g6kdMjcXrJaWx7dZt23bMrzuLs8rPosbgH6g2tp/MwSykdN0ZFlebEg+WS0mH4hWOISCksIXfN4EDn008/xcSJE1G1alX4+flBleebnqqgb31kUZR06YbCcmLkClBSrqcABXyOQ0B9/5P/F7aOlMCrTHiZp8cVe0J9XLEnUCrEX7G5PsaoqNKceLBR0mMo4e3REt6siZTIEnLXDA50vvzyS3z33XcYOnSoEZpD9FRRoyNyBSieoZ6FBkOeoZ7a/xe2jpTAS2fU54kLW2/iwtZYvaM+SmALFVWW8GZNRMVjcI6OnZ0dWrRoYYy2kI0pLJdFSk6MlABFyjr1h9UvNBhqMLyBpHWkBF46x/Vk5Efzf325Pqe+vwIAOPX9FaPm+jwtHT+MrN0bkXn9uvY+TUUV7OwAOzvkChWgUv/fWiqqiMh6GRzovP322yz3phIrKkFYyuiIXAFK2cpl0WNxD6jsVFDZq3eqsldBZadCj8U9UCa8jKR1pARVUqfbNP1zYetNAOpRH2NVeGkuxpnz6y5UcL+JnF93FXgxTlZUEZGlMTjQGTduHC5duoSwsDB0794dffr00bkRFUXKaI2U0RG5AhQAqDe0HkZdGoW6L9cFANR9uS5GXRqlM5VU1DrmGPUpKaml4wArqojIMhkc6IwZMwb79+9HlSpVULZsWXh6eurciIoiZVRDat6MHAGKRpnwMmgyugkAoMnoJtogSOo6OkGV3ZOgys54oz5yMKR03NQ0lVkPktLN1gYisnwGBzrLli3Dhg0bsGPHDixduhRLlizRuZGymepinIXl30gZ1ZAyOqJR0gBFTpqgqmaPYABAzR7BRhn10ShpHo+SL8apqcx6kPS4RNthRRWRbTM40ClTpgzCwsKM0RYyAVNcjLOo/BspoxpSp5yUqEx4GTR4KRwA0OClcAmjPjB41AeQJ4/HFi7GaS0XJiSi4jE40Jk8eTJiYmLw6NEjY7SHLJyU/BupozVSp5wsTf5RnxCDR30MyeMprKLKK6pPoSM61lA6TkS2zeBA56uvvsKOHTvg5+eH2rVro0GDBjo3sm1S8ksMGa0x1ZSTqZV01EdqHk9RFVUsHScia2fwCQP1XcmcSENqfkm9ofUQ3DIYhz45hDNLz6Duy3XR6sNWVhPIlJSmf/a/uxXnN99AzR4haDvraRAopZ91KqqApxVVAoibOBGlGjaAU0gIvPr0RqmGDXB92pe4+eMFVOxaE6ET37SIIIeXkiCiohgc6MTExBijHWRBCrssg+SzDOPpaM2ZpWcsarTGVNeo0oz6nN98I9+oj5R+1lRUpWW64VpKJTzMKo3Sjg9R0fMfuLumI3n9Bvi+MxZAntLx/3miSsf2FhHkAMDjbFdcvFsLzbIZ5hCRfrx6ORmkqERjQ6qlLFX2/fs6P81BSj9n3b6Na/dDsONaV1y6Vw230oJw6V417LjWFdfuh5i1okouDmXK6PwkInpWsS4BYW9vX+CNrJeURGNLrpayJFLyeB46BeBEXGMAKgjYAbB78hM4EdcYj5yVe8V0IiK5GDx1tWnTJp3fs7KycPr0aSxbtgxTpkyRrWFkuLS4NJxcdBINRzY0ylXHpV60kvk3plFvaD34h9rhl7d+QOKlNPhWdUfruS/Cv00dAMD11IpQ4RxEvj+aCirk4lpKJVQ2fbOJiEzK4ECnZ8+e+Zb17dsXNWvWxJo1azB8+HBZGkaG05wjp2qPqkYJdAw5kZ2l5t9YkuQNG3F/0iTUFkBucC7sMuxw/42tcJk2DV59eiPtPtTDPPr+ZnZ2SLv/9I5nTzzoUa+6Nu/K0hn7CwARKZtsOTrNmjXDvn375NocmUlhZzQ2JNGYjEvKNao8Qz2flFrpoVLJeuJBJTPFSTKJSLlkCXTS09Px1VdfobwVnEXVljHR2HJIuUaV3CceNDUHb2+dn0RExWFwoOPt7Y0yZcpob97e3nB3d8d3332HWbNmGaONZAJMNFbTLR1XLinXqJLzxIPmwIoqIpKDwTk6c+fO1fndzs4OPj4+aNq0Kbz5zctiMdFYTQml41JIvUaVHCceJCKyZAYHOkOGDDFGO8jMmGisPE+vUXUBWbtTkNm4ApxCQwGor1F1d/Fi/Q985hpVJT3xoIY1JywTkfUyONABgOTkZBw/fhyJiYnIfXJ6eY3BgwfL0jAyLSYaK0vyho3qZGMBVHDPRc6v/+Lq87sQ8KSiSnONqriJEwEAuTkCdnYqQAWDrlFVf1h9HJ55WP+defKuTi85jW2vbtPedWHrTVzYGosei3tY/EVWAVZmEVkzgwOdbdu2YeDAgXjw4AE8PDygyjN8rlKpGOgoWGGXbpD6gUfGZ8prVGnyeLYO3wpAnYissgOAp3k8efO3NDT/3zp8K4JbBlv8qJ6xT81AROZjcDLyO++8g2HDhuHBgwdITk7G/fv3tbd7Ck/gtGVFVVTZQqKxpZBSUaWhvUZV3HNw7NinWNeoqje0HkZdGoWaPYIBADV7hGDUpVHakRpjJCyzooqITMXgQOf27dsYM2YMSpUqZYz2UAHS4tJwYPIBpMWlGfxYKRVVwNMPvLov1wUA1H25rs4HnqWzpooquWnyeADky+MxRsIyK6qIyFQMDnQ6deqE33//3RhtoUKU5KRnhnwj1yQaA7C6RGNrq6gylZIkLOc94SQRkTkYnKPTtWtXvPvuu7h48SJq164NR0dHnft79OghW+NIHiwhVh65KqpMgQnLRGTJDA50RowYAQCYOnVqvvtUKhVycnJK3iqSlS1UVLkFuCEiJgJuAW4Fr+Pjghplz8PNp2uJ1ikpU1VUyYUJy2qszCKyTAZPXeXm5hZ4K0mQ89lnn0GlUuGtt97SLnv8+DGio6NRtmxZuLm5ISoqCgkJCcXehzUr7BpVln7pBilBjHuAO9pMblPoB5CbjytqlTsPNx/XEq1TElKuUQUAXn16I2zHT7Bv0Qn/pgXBvmUnhO34CV59ehulXUUxR8Ky0vCaWUSWSbaLepbEiRMnsGjRItSpU0dn+dtvv41t27Zh3bp1OHjwIO7cuYM+ffqYqZXKZe0VVVKCmKzERCTN+xpZiYlGb8/TUR8Xgx9r6ooqOZk6YZmISA5mD3QePHiAgQMH4ttvv9W5hERKSgoWL16M2bNno127dmjYsCGWLFmCw4cP4+jRo2ZssbJYekWVlNEaKbKTkvBfbCyyk5JkalnBSjLqY46KKlOwhelRIrJMZg90oqOj0bVrV0RGRuosP3nyJLKysnSWV6tWDcHBwThy5EiB28vIyEBqaqrOzZpZekWVlNEaS/M00fgwsnZvROb169r7lFZRJRdDpkcLm2YlIpKbWQOd1atX49SpU5g+fXq+++Lj4+Hk5AQvLy+d5X5+foiPjy9wm9OnT4enp6f2FhQUJHezFYVTBsqSvGEjrj7fFTm/7UKQ+03k/LYLV5/viuSNmwCoK6oKG9ExdUWVXKROjxY1zUpEJDezBTq3bt3Cm2++iVWrVsHFxfBch4KMHz8eKSkp2tutW7dk27YSKXnKQK5pKVPm35SETqJxbq564CZXN9FYU1EFOzvAzg65QgWo1P83R0WVnIqaHpU6zWrJSnJiTyIyDoMDnYiICCxfvhzp6ekl2vHJkyeRmJiIBg0awMHBAQ4ODjh48CC++uorODg4wM/PD5mZmUhOTtZ5XEJCAvz9/QvcrrOzMzw8PHRuSlbSN0YlV1TJNS1lyvybkpCaaKy0iipDFHXphsKmR1mZRUTmYHCgU79+fYwbNw7+/v4YMWJEsROD27dvjz/++ANnzpzR3ho1aoSBAwdq/+/o6Ih9+/ZpH3Pp0iXcvHkTzZs3L9Y+lUjKG2NhOQ2WXlFlTQxJNHYKCYH3wJeQmukB74EvWcxITkku3cBpViIyB4MDnblz5+LOnTtYsmQJEhMT0bp1a9SoUQOff/65Qee4cXd3R61atXRupUuXRtmyZVGrVi14enpi+PDhGDt2LPbv34+TJ0/ilVdeQfPmzdGsWTNDm22xpOQ0KLWiyhplXr+O+ytXAQDur1xVokRjY5+zR2kMvZQEE5aJSA7FytFxcHBAnz59sGXLFvz777946aWXMGnSJAQFBaFXr174+eefZWncnDlz0K1bN0RFRaF169bw9/fHxo0bZdm2JTAkp8HUFVVy5d9YEk2iccqWLQCAlC1bbCLRWC5Sp1mZsExEcipRMvLx48cRExODL774Ar6+vhg/fjzKlSuHbt26Ydy4cQZv78CBA5g7d672dxcXF8TGxuLevXt4+PAhNm7cWGh+jrVRck6DXPk3lppoDKDIRGMA2v8XN9G4JCcnVBop06xMWCYiuRkc6CQmJuKLL75ArVq10KpVKyQlJeGHH37A9evXMWXKFPzvf//D7t27sXDhQmO016bYQk6DtSYae/bsCQDw7NmzRInG1ja9VdQ0q5KDe7kwYZnItAy+qGeFChUQFhaGYcOGYejQofDx8cm3Tp06ddC4cWNZGmjLzFU6bovTUkUxONF40ECkbNoE70EDLSfRuIiKKrloplnPLD2Tb5rVFoJ7IjItg0d09u3bhz///BPvvvuu3iAHADw8PLB///4SN87Wmat03NampTTkTDS2RCWpqJKLks8LRUSWyeBAp1WrVgDUU1iHDh3CoUOHkGghH2RKU1RliaWXjlvKtBTARGOl4KUkiEhuBgc6aWlpePnll1G+fHlEREQgIiIC5cuXx6BBg5CSwmFlqaRWlrB03PjMlWgsF1tLWAZYmUVE0hkc6Lz66qs4duwYtm/fjuTkZCQnJ2P79u34/fffMXLkSGO00eoYWlmixItxWtq0VGHMlWgsF1tLWGZlFhEZwuBAZ/v27fjuu+/QqVMn7SUWOnXqhG+//Rbbtm0zRhstVkFvVuasLJEr0diSpqWAwvNvipNoDMCiEo0tDS8lwcosIrkYHOiULVsWnp75EwI9PT3hbeRqDUtT0JuVOStL5Eo0tiRF5d/YRKKxiSqqTIGVWURkCIMDnYkTJ2Ls2LGIj4/XLouPj8e7776LSZMmydo4a6X0yhJrmpaSkn9jC4nGSqiokovSXz9EpCwGBzoLFizA0aNHERwcjPDwcISHhyM4OBiHDx/GokWL0KBBA+2N9FPyFccBy5uWKoyU/BslJxrLxZrOjcTKLCIyhMEnDOzVq5cRmmFbNJUlW4dvBVTqREqVvQoQKFHZuDV9mBni2fwb+5GvwSk0FID0/BuvPr1RqmED/LdwEVI2bYJnz54o938jrSLIAZ5OWVoDqa+f00tOY9ur27SjP2dXnMXZ5WfRY3EPVi0S2RCDA52YmBhjtMPqPPtNsuWElihbuaz2/npD6yG4ZTAOfXIIZ5aeQd2X66LVh61KVFEl5cMsKzERyWvWwqv/C3D09S32vpQiecNG9dTUEylbtiBlyxYETJsGrz69Dcq/sdQzGtuiol4/eSuzNDQVWluHb0Vwy2BFVC+WRFpcGk4uOomGIxvaVM4dkaGKfVHPkydPYuXKlVi5ciVOnz4tZ5ssntRzfJijbNyapqWYf6Pm4OODctHRcCjgTOXWipVZrMwikqJYF/Vs164dGjdujDFjxmDMmDFo2LAh2rdvjyQr+PAsKXOe48OakoilYP6NmqOvL3xGj7KKETq5sDKLiDQMDnRGjx6NtLQ0XLhwAffu3cO9e/dw/vx5pKamYsyYMcZoo0Ux1jfJ7Hv3dH7qXceKRms05Dj/jVJP9Kc01pTjZUhlFhOWiaybwYHOzp07MX/+fFSvXl27rEaNGoiNjcWOHTtkbZwlMvSbpJQABgBcHNJRo+x5uDiky9FMiyDn+W94or+iWdM5lqRWZvFSEkTWz+BAJzc3F46OjvmWOzo6IleTJ2HDDD3HR/b9+zo/C2Jtp/kvCvNvqCSkXDOLl5Igsg0GBzrt2rXDm2++iTt37miX3b59G2+//Tbat28va+MskdLPkaMkhU1LMf9GzVYTjeVQ1DWzmLBMZBsMDnS+/vprpKamIjQ0FGFhYQgLC0PFihWRmpqKefPmGaONipP0yzZc/rINrn1TE5e/bIOkX55e40vnm6QdAFUuVHbId/VlW1fUtBTzb9SYaFwyhVVmMWGZyDYYfB6doKAgnDp1Cnv37sVff/0FAKhevToiIyNlb5wSXf76FYS1XYay7aH+Nij+BFS/4PLXQ1F51HcAnp7j45cPliIn/TDsXZ9D68+G2lSQU9hJ/HSmpTSe/D9u4kSUatiA579RKFtNWCYiy1Ws8+ioVCp06NABo0ePxujRo20myEn6ZRvC2i6Dnb2AnYPQ/lTZCYS1XYqkX3/UruvmkIraPmfRLPAIavuchZtDqt5tuvm4oEbZ83DzcTHVYRhdUaM1UqalmH+jTLaYsAywMovIkkkOdH7++WfUqFEDqan5P7BTUlJQs2ZNHDp0SNbGKU3y6S/0vjGqVAAEkHxylnq9Jx/0mQdPIPVXd2QePKHzQZ+Xm88DtBm1H24+ljOHXlhujZQkYinTUraQf0PmJSVhGbD+yiwmLJO1kxzozJ07FyNGjICHh0e++zw9PTFy5EjMnj1b1sYpjYNrUqFD3Q6uSc980AtAqNQ/83zQa6gDhu+RedtZ/TNPwGAuhQUxgDyjNVKnpaw9/4aJxuZXVMKyLVRmMWGZrJ3kQOfs2bPo3Llzgfd37NgRJ0+elKVRSpWd7lPoUHd2uo/2g94xIBM+gxIROPY2fAYlwjEgU/tBD+QNGH5F6q/uSNnya4GjPkUFH3KtU1QQI9dojSHTUtZ8/hsmGiuDrV9KgsjaSQ50EhIS9J4/R8PBwcHqLwHhVf8d9dWSn/mMFgKACvBq+C6ybt+GZ9v7CIv9B2V734NHizSU7X0PYbH/wLPNfWTdvm3QqI9u8CHyBR/518kfoEhZR0oQI9doDaelyFKwMovI8kkOdMqXL4/z588XeP+5c+cQEBAgS6OUyqd1d1zdPxQiV4XcbBVyc9Q/Ra4KV/cPhU/LrnCp7ISAN+6oS8rtn96gAgKi78ClsrOkgAHQF3yo8gUfUgIUuYIYOUdrrH1aypaxMouIlERyoPP8889j0qRJePz4cb770tPTERMTg27dusnaOCWqPOo73L2/DVf3tcaN36rj6r7WuHt/m7a03CtS/zdATcKyV4dkyeeIkRJ8yLWOlDbJPVpjzdNStpx/w8os66vMYsIyWTLJ59GZOHEiNm7ciCpVqmDUqFGoWrUqAOCvv/5CbGwscnJy8OGHHxqtoUri07IrfFp21Xuffan7ENlPoppn2dnB3vU+HMuHS0rGlRoQybGOlCDGK6oP7i5eXOB28o7WlGrYAP8tXISUTZvg2bMnyv3fSKsKZIqiyb8hy6apzNo6fKt62jpHqCu0BPJVZm17dZt29OfsirM4u/wseizuoU1stmSahOWqPapaRQBLMsqOA+4vArxHAg7KnNWRPKLj5+eHw4cPo1atWhg/fjx69+6N3r17Y8KECahVqxZ+/fVX+Pn5GbOtlsExFCqV/m5VqVSAY6jk6R0pwYdc60hpE0dryBaxMouoENlxwN0p6p8KZdAJA0NCQvDTTz/hv//+w7Fjx3D06FH8999/+Omnn1CxYkVjtdGyeA1DoWPdXsO1AYNj+Sz4vJyEwHduw+flJDiWz9IJGKQEH3KtIzWIYW4N2SJWZhFZrmKdGdnb2xuNGzdGkyZN4O3tLXebLJtTZcB/MQA7CKHuXvVPO/Vyp3AAgFe7ZITFXnumMusavNo9reLQDT5UgJ148vNp8GH4OiUPYmx9tMaW828oP1ZmqTGPh5SqWIGOXBYsWIA6derAw8MDHh4eaN68OXbs2KG9//Hjx4iOjkbZsmXh5uaGqKgoJCQkmLHFEnkNBSpdQo7oAQDqn5UuqZcDQOZlIP5VqJALlZ14ctFPARVygfjhQOaVp5vSBh8t4dEiDZ49W+YLPgxbh0FMSfH8NyVnq5VZ1pywzBMPklKZNdCpUKECPvvsM5w8eRK///472rVrh549e+LChQsAgLfffhvbtm3DunXrcPDgQdy5cwd9+vQxZ5OlcwqH8IoGAPXPJyM5AIDk71DoO2OybsKvU0gIygzqgPLv3EGZQR30Bh9S12EQQ0pgi5VZ1n4pCbJC2XFA0mRF599IYdZAp3v37nj++edRuXJlVKlSBZ988gnc3Nxw9OhRpKSkYPHixZg9ezbatWuHhg0bYsmSJTh8+DCOHj1qzmZL5limjM5PrazrKPSdMeu6EVtFheG0FBlKyjWzmLBMFskCEo2lMGugk1dOTg5Wr16Nhw8fonnz5jh58iSysrJ0roxerVo1BAcH48iRIwVuJyMjA6mpqTo3xXEMRaEjOo6hRtx5EsoNSAJg3WexLi5OS1FxFFWZxYRlIvMxe6Dzxx9/wM3NDc7Ozvi///s/bNq0CTVq1EB8fDycnJzg5eWls76fnx/i4+ML3N706dPh6empvQUFBRn5CIpBQmWWsaiQBJ8Bd6FioEMkq8Iqs5iwrMaEZTIHswc6VatWxZkzZ3Ds2DG8/vrrGDJkCC5evFjs7Y0fPx4pKSna261bt2RsrYEcAoCyMflPopS3MuvJn0D9U7cySyvzMhxU36s3qfpencxMBuO0FJkLLyWhxoRlMgezBzpOTk4IDw9Hw4YNMX36dNStWxdffvkl/P39kZmZieTkZJ31ExIS4O/vX+D2nJ2dtVVcmpvZOAQAPpP1ny3ySWWWynMwAKh/5q3M0kheAvxTDfaqrQCg/vlPNSB5qTFbbpU4LWVZrKkyi5eSIMWxkkRjKcwe6DwrNzcXGRkZaNiwIRwdHbFv3z7tfZcuXcLNmzfRvHlzM7ZQRk7hgPdo9f+9R+sdyUH8qwByoVKpL8ap/pm/DJ3I2lhTZZaUhGWAlVlkQlaSaCyF5GtdGcP48ePRpUsXBAcHIy0tDd9//z0OHDiAXbt2wdPTE8OHD8fYsWNRpkwZeHh4YPTo0WjevDmaNWtmzmabjpQydN/pRtix5SUsc1qKlK7e0HoIbhmMQ58cwpmlZ1D35bpo9WErbZCTtzJLQ1OhtXX4VgS3DNbJ+7FWaXFpOLnoJBqObGgVQS6Zn1lHdBITEzF48GBUrVoV7du3x4kTJ7Br1y506NABADBnzhx069YNUVFRaN26Nfz9/bFx40ZzNtm0zFSGbokJy5yWIkvAS0kUjXk8JDezjugsLuhK2E+4uLggNjYWsbGxJmqRwpi1DF05OFpDtoCVWUTGobgcHcrDwDJ0+yfXHbO3suuPcbSGbAEvJSEdy9TJEAx0lCxPGTpg/2ShPfSWoWdehqNqFQCofxZQgq60YIijNVQStliZxYRlTm8VyYYqqqRgoKN0T8rQ4fmy+nfPl/OXoT8pQUfKCvXvKSsKLEEv8LIUeUgJhqQEKFLW4WgNlYStVWbxUhIkiQ1VVEnBQMcSFFaGnqcEHch5sjAHJSlBlxIMOZbJgc+A/+BYJqfgdRjEEBmEl5Igkh8DHXMr6OzJUhl4JXTZ8BsDkVHwUhLyYB4PaTDQMbfCzp4sBa+ETmQzmLAsHfN4SIOBjqVjCTqRzWDCsrwsctSHicYGY6Bj6QwpQc+8DNyfp/7//Xm8OCjZBGuqzGLCsrwsctSHaQMGY6Bj6aSWoBtQmSUbfvMgBbCmyiyACcumZpGjPqSDgY41KKoE3QiVWZLwmweRUTBh2XQsctSHdDDQsRaFlaCbqzKLiEyOCctEuhjo2AJWZhHZDCYsm55s01uc7jcKBjq2gJVZRIViwjITlktCtuktTvcbBQMdS1GSEwsaeHFQIlvDhOU8mLBsFExqNh8GOpaiJCcWNPDioCxBJ7J8TFhWFiY1mw8DHVsh88VBZcM5aSKTY8KyMj3876HOT5IHAx1bYuKLg0rCOWkik2PCsunZIQER0fthh4QC13mU9Ejnpz4MhgzHQIfUWIJOZDOYsGx6dqoEtBl1EHaqggMdKRgMGY6BDqmxBJ2oUNZUmQUwYdmayRUMybWOuTHQITWWoBMVytoqswD5EpaZx2N5pARDcq1jbgx0SE3JFwdlwjKRyUlNWGYeDykdAx1SU/rFQZmwTGRSUhKWmcejJiXRmMyHgY41KclJBQHlXhyUiExOSsIy83jU5Eo0JuNgoGNNSnJSQQ1eHJSInigqYZl5PGQJGOiQdKzMIiqUtVVmAYUnLDOPhywBAx2STsmVWUxYJgWwxsqswjCPhywBAx2STumVWUxYJjIpW8jjYaKx5WOgQ9IpuTKLiMzC2vN4mGhs+RjokGFYmUVEz2AeDykZAx0yHCuziIrNGhOWC8M8HjI3swY606dPR+PGjeHu7g5fX1/06tULly5d0lnn8ePHiI6ORtmyZeHm5oaoqCgkJHAIsdhKeq6dorAyi6hQtpawrOQ8Hubf2AazBjoHDx5EdHQ0jh49ij179iArKwsdO3bEw4dPLw729ttvY9u2bVi3bh0OHjyIO3fuoE+fPmZstYWT41w7hWFlFhE9Q6l5PMy/sQ0O5tz5zp07dX5funQpfH19cfLkSbRu3RopKSlYvHgxvv/+e7Rr1w4AsGTJElSvXh1Hjx5Fs2bNzNFsKozXMODezALufKYyy9Q0lVnuPYwX6BGRXpo8njNLz5Qoj2fbq9u0655dcRZnl59Fj8U9tEET0bMUlaOTkqKO2suUUb8ATp48iaysLERGRmrXqVatGoKDg3HkyBG928jIyEBqaqrOjUxIamUWYPoSdCJSJObxkDEpJtDJzc3FW2+9hRYtWqBWrVoAgPj4eDg5OcHLy0tnXT8/P8THx+vdzvTp0+Hp6am9BQUFGbvp9KyiKrMAlqATkZbceTx3L9/FiXn74VM5ASfm7VdEmTqZj2ICnejoaJw/fx6rV68u0XbGjx+PlJQU7e3WrVsytZAMUlhlFkvQiQpla5VZgHx5PJoy9TMrLuO/qz44s+Iyy9SNJfMySjt8BwDqnwodlVdEoDNq1Chs374d+/fvR4UKFbTL/f39kZmZieTkZJ31ExIS4O/vr3dbzs7O8PDw0LmRwii5BJ0Jy6QAtlaZpVHS8/HoTm8BItfuyU9Ob8nuyai8q8N6AFD/VOiovFkDHSEERo0ahU2bNuHnn39GxYoVde5v2LAhHB0dsW/fPu2yS5cu4ebNm2jevLmpm0tyUXIJOi8lQaRIUvJ4DJ3eOjLvJja8E4Uj825yessQeUblVapcAHjyU5mj8mYNdKKjo7Fy5Up8//33cHd3R3x8POLj45Geng4A8PT0xPDhwzF27Fjs378fJ0+exCuvvILmzZuz4sqSGVKCzoRlIsKzeTyAyi73yc+neTwGT28tv4MLO2vizPI7nN56VmHTUkoeldfDrOXlCxYsAAC0adNGZ/mSJUswdOhQAMCcOXNgZ2eHqKgoZGRkoFOnTpg/f76JW2pjjH1SQakl6MlLnnxrePKCSlkBpCxXV2/lTWwmskG2mscT3DIYv366AVkJu+Do1wktJ0Rpp7gMnd5S03zfV09vBbcM1m5PM+qTlRAFR7+baDH+LspWLmvUY1SEJ++9rk8iBPW01Pqn771KHpXXw6yBjhAFddRTLi4uiI2NRWxsrAlaRACenlTQWDQl6PHDoX5XyoG6BF08LUHXSVjWeJK4HD8cKNVSN8GZyMZo8nhsTZnwMmg+Ohg+rhuQlD5CJ4+n/rD6ODzzsP4HPpneOrX4VJHTW5HTI/Ocs0cAoiaguoMzy2Kt/5w9OtNS6kWa6Snte6+STwyrhyKSkckGFVWCruShUSYsExlNSS7LINf0lk0nNUt57/UahkI70ZwnhtWDgQ6ZT2El6EoeGmXCMpHRlPSyDJoy9XqDA1Gz8wXUGxyoU6YuZXrL6pOaC8u/kfLem+fEsEKowwj1Tz0nhlUABjqkTBY2NEpEyqGZ3or6YgOajw7ON71VVPWWVSc1F1UWLvW998mofHp2XwBQ/3z2xLAKwUCHlMmQoVFWZhHppbSEZSVcLVzK9Jbc5+xRzKiPlLJwQ957ncLxMHsYAKh/KmwkR4OBDhWPsSuzpF4zS6mXkmAeDymA0k48qJSrhRc1vSXnOXsUNeojJf/GwqalpGCgQ8Wjqcwy5lXAi0pYVvKlJJjHQ6RohU1vmSOpWbZRn5Lm3wAWNS0lBQMdUrbCEpaVXJklBUd9yIooYVpKTqZMapZt1Eeu/BvAYqalpGCgQ5ZLyZVZUnDUh6yIUqal5GSKpGbZRn3kzr+xIgx0yHLxUhJEJaa0hGVLIVdSsyGjPj90nIoyZZajavu/UKbMcvzQcerTUR8bzb+RgoEOWS6p306UmrBMpABSEpatbVpKLnIkNUsd9bm5fSre2D4Pzw39DTU6XcRzQ3/DG9vn4ca2KepRHxvNv5GCgQ5ZLimVWUpOWJaCeTykANY4LSWXkiY1Sxn1+WvdNnSfugV29gJ2DkL7U2Un0H3qFvy5dhvgGAoh9G9ICN0R7rs3vLF3TiQ2vBOFvXMicfeGt4w9ojwMdMh4jF2CDlj2pSSkYB4PGRuDaaOSOupTJuQu2r+9F30+X4/2b+9FmZC72lGfsr5b9Q7WqFQABFDWdwvuJ/eGyM3Fs5eQFAIQublITokCID3xWUoVmGLOD1QEs17Uk6ycsS8OqqGpzEpZalmXkpBLdhxwfxHgPdK4QSVZJ00w7d6jwOdPKZ9SwIMnP8lghV2ItGzlshi6VaBC6Nfqt6onwctzw3/Dv9cno0x4GWRevl/o9zWv8vdxckkqHv7dE92nbkGueBoEQQVs+6gnSldJRv1h0q7cLuWCppZ00VOO6JB1s4WEZY76UEFkGq0pXa60zk+SUeZlBIdNzT8tZS8QHDYFyLwCz0p1C/2+5lmpLlKup+Ds5vr4+vlROPJdC1zYWROHv2uBr58fhbOb6yPleoqkxGcpVWCWdtFTBjpk3ZiwrMbpCdvEIFgZCjuJXwHT6yrNv8mL4VoxGip7ld5pKZW9Cq4VR2lzfe7fLIt9cyKxcVxf7JsTifs3y2pzfaQkPksJhgy56KkSMNAh62YLCctS8APP+jB4tQxFncRP4tXCVQGLAZUdcnPtkJsL5ObaASo79XKncEkVXlISn6UEQ1IveqoUDHTI+ll7wrJc+MGpHFL+FgoLXjX5O8zjyUPKSfwMuFq4qtIlPM7pCzs74HFOX6jyvI9JqfCSKxiSso6SMNAh8zJFZRZQ+KUkDElYttQ8HikU9sFp0yzwb2GzeTzFmJZSe/IlSsarhRdV4SVXMCRlHSVhoEPmZYqLgxZF6jcqa8/jkYKjPiXHPrQeMk1LyXm24sLO6wPIEwxJWUdJWF5O5DUMuDezgDuffKPSyePReJLPEz8cKNXSak+frkNCKTLL3YsgpQ9J+XSmpdSLNNNT2vcEA6alUKol0i99iFKOa5Ge3Relqn5itPeUwsrdAXUwFNwyGL9+ugFZCbvg6NcJLSdE6awnZR2l4IgOkZSEZebxSCdl2sUSRzWk5s1Y2nGZkMXl8ShoWsrUihoZkrqOEjDQIQKKTlhmHo+85AqGTL2OlDZbWG6NKVlUHo8Cp6WoeBjoEGkUlrDMPB7TkyuwYIBC+hQ2WiNztZStXURTaRjokPKZqjKrMFKGoG3hfDxE1qCo0Rorn5ayNQx0SPmUUJkldx4Pp7eI9DJ6Ho+U0RpOS1kVBjpEUsmVx8PpLaICyZLHU9IkYk5LWRUGOkSGKGkeD6e3iIxLjiRiTktZFQY6RHKR8ubI6S2ikjFFEjGnpawKAx0iuUjJ4+H0FlHxaUZrHJ+M1jgaMYmY01JWg4EOWQclVGYBRefxyD29xVEfsiaFPZ/zjtY8OUO5+qcRk4g5LWUVGOiQdVBCZZZGYXk8ck5vcdSHrElRz2cmEVMxmTXQ+eWXX9C9e3cEBgZCpVJh8+bNOvcLIfDRRx8hICAArq6uiIyMxOXL/MZKFkyu6S2O+pClkThaU+DzmUnEVExmDXQePnyIunXrIjY2Vu/9M2fOxFdffYWFCxfi2LFjKF26NDp16oTHjx+buKVEMpJjeoujPqQkRQXTphqtkfJFgmyOWQOdLl26YNq0aejdu3e++4QQmDt3LiZOnIiePXuiTp06WL58Oe7cuZNv5IfI4pR0eoujPqQURQUxph6tKeqLBNkcxeboXLt2DfHx8YiMjNQu8/T0RNOmTXHkyJECH5eRkYHU1FSdGxEA5SQsF0XKt1KO+pCplHTKyRyjNYV9kcjD4q6mTsWi2EAnPj4eAODn56ez3M/PT3ufPtOnT4enp6f2FhQUZNR2kgVRUsJyUYr6VspRH5KDKaacFDxaY1FXU6diU2ygU1zjx49HSkqK9nbr1i1zN4moeAr7VqrUUR8GQ8pR0iBGriknM43WEGkoNtDx9/cHACQkJOgsT0hI0N6nj7OzMzw8PHRuRFZJaaM+DIZMxxRBjFxTThaeW8PpLcun2ECnYsWK8Pf3x759+7TLUlNTcezYMTRv3tyMLSOrZil5PBpKGfVhMCQfpQQxck05WfhoDae3LJ9ZA50HDx7gzJkzOHPmDAB1AvKZM2dw8+ZNqFQqvPXWW5g2bRq2bt2KP/74A4MHD0ZgYCB69eplzmaTNbOkPB4pTDXqo9RgyNLWUVIQI+eUk0JHa8g2mDXQ+f3331G/fn3Ur18fADB27FjUr18fH330EQDgvffew+jRo/Haa6+hcePGePDgAXbu3AkXFxdzNpvIsphi1EeJwZClraO0IEbuKScFjtbIhdNbymbWQKdNmzYQQuS7LV26FACgUqkwdepUxMfH4/Hjx9i7dy+qVKliziYTWR85Rn2UFgxZ4jpKC2IsfMrJlDi9pWyKzdEhUixLy+ORoqSjPkoLhixxHSUGMZxyIivAQIfIUNaWxyNFUR94SguGLHEdpQYxNj5aIxdOb5kPAx0ikqaoDzwlBUOWuA6DGKvG6S3zYaBDRPJRSjBkieswiLF5HPUxDgY6RMZgjXk8cjFFMGSJ60g5dql9SBaJoz7GwUCHyBhsMY9HTiUNhix1HSnHTjaNoz6GY6BDRJZJSkBgiesQFYKjPoZjoENkLpzeIiIj4KiPLgdzN4DIZmmmt4iIZFS6XGngAUd9NDiiQ0REZGNsadSHgQ6RknF6i4iMQK5cn1zhhwNfRyBX+MnRLKNgoEOkZKzeIiIzkTLqkws/HIxti1woN9Bhjg4RERHlU9o/HLgfg9LeBVcHugW4ISImAm4BbiZsmWEY6BBZOk5vEZExSCiYcA9wR5vJbUzSnOJioENk6Vi9RUSGsqEvSAx0iGyBDb2pEdk8Ka93G/qCxECHyBZIeVNjMESkfAxiDMZAh4jU+OZIpHx8nRqM5eVEJB1HfYiMh68vo+CIDhFJxykwouLhlJPZMNAhInkxGCJbwyBG0RjoEJHpMRgiS8EgxuIx0CEiZWIwRMbGIMYmMNAhIsslVzDEgMn6MIihJxjoEJF1kxoM2WrAJNdxKXEdBjEEQCWEEOZuhDGlpqbC09MTKSkp8PDwMHdziMjWZccB9xcB3iML/qA25TpECiXX5zcDHSIiIlIcuT6/ecJAIiIisloMdIiIiMhqMdAhIiIiq2URgU5sbCxCQ0Ph4uKCpk2b4vjx4+ZuEhEREVkAxQc6a9aswdixYxETE4NTp06hbt266NSpExITE83dNCIiIlI4xQc6s2fPxogRI/DKK6+gRo0aWLhwIUqVKoXvvvvO3E0jIiIihVN0oJOZmYmTJ08iMjJSu8zOzg6RkZE4cuSIGVtGRERElkDRZ0b+77//kJOTAz8/P53lfn5++Ouvv/Q+JiMjAxkZGdrfU1NTjdpGIiIiUi5Fj+gUx/Tp0+Hp6am9BQUFmbtJREREZCaKDnTKlSsHe3t7JCQk6CxPSEiAv7+/3seMHz8eKSkp2tutW7dM0VQiIiJSIEUHOk5OTmjYsCH27dunXZabm4t9+/ahefPmeh/j7OwMDw8PnRsRERHZJkXn6ADA2LFjMWTIEDRq1AhNmjTB3Llz8fDhQ7zyyivmbhoREREpnOIDnf79+yMpKQkfffQR4uPjUa9ePezcuTNfgjIRERHRs3j1ciIiIlIcuT6/FT+iU1KaOI5l5kRERJZD87ld0vEYqw900tLSAIBl5kRERBYoLS0Nnp6exX681U9d5ebm4s6dO3B3d4dKpZJtu6mpqQgKCsKtW7c4JVYM7L/iY98VH/uu+Nh3xce+Kx4hBNLS0hAYGAg7u+IXiVv9iI6dnR0qVKhgtO2zhL1k2H/Fx74rPvZd8bHvio99Z7iSjORoKPo8OkREREQlwUCHiIiIrBYDnWJydnZGTEwMnJ2dzd0Ui8T+Kz72XfGx74qPfVd87DvzsvpkZCIiIrJdHNEhIiIiq8VAh4iIiKwWAx0iIiKyWgx0iIiIyGox0MkjNjYWoaGhcHFxQdOmTXH8+PFC11+3bh2qVasGFxcX1K5dGz/99JPO/UIIfPTRRwgICICrqysiIyNx+fJlYx6C2cjdd0OHDoVKpdK5de7c2ZiHYDaG9N2FCxcQFRWF0NBQqFQqzJ07t8TbtGRy993kyZPzPe+qVatmxCMwH0P67ttvv0WrVq3g7e0Nb29vREZG5luf73f6Sek7W3q/MwtBQgghVq9eLZycnMR3330nLly4IEaMGCG8vLxEQkKC3vV/++03YW9vL2bOnCkuXrwoJk6cKBwdHcUff/yhXeezzz4Tnp6eYvPmzeLs2bOiR48eomLFiiI9Pd1Uh2USxui7IUOGiM6dO4u4uDjt7d69e6Y6JJMxtO+OHz8uxo0bJ3744Qfh7+8v5syZU+JtWipj9F1MTIyoWbOmzvMuKSnJyEdieob23UsvvSRiY2PF6dOnxZ9//imGDh0qPD09xb///qtdh+93xe87W3m/MxcGOk80adJEREdHa3/PyckRgYGBYvr06XrXf+GFF0TXrl11ljVt2lSMHDlSCCFEbm6u8Pf3F7NmzdLen5ycLJydncUPP/xghCMwH7n7Tgj1C79nz55Gaa+SGNp3eYWEhOj9sC7JNi2JMfouJiZG1K1bV8ZWKlNJnyPZ2dnC3d1dLFu2TAjB97uS9J0QtvN+Zy6cugKQmZmJkydPIjIyUrvMzs4OkZGROHLkiN7HHDlyRGd9AOjUqZN2/WvXriE+Pl5nHU9PTzRt2rTAbVoiY/SdxoEDB+Dr64uqVavi9ddfx927d+U/ADMqTt+ZY5tKZMzjvHz5MgIDA1GpUiUMHDgQN2/eLGlzFUWOvnv06BGysrJQpkwZAHy/K0nfaVj7+505MdAB8N9//yEnJwd+fn46y/38/BAfH6/3MfHx8YWur/lpyDYtkTH6DgA6d+6M5cuXY9++fZgxYwYOHjyILl26ICcnR/6DMJPi9J05tqlExjrOpk2bYunSpdi5cycWLFiAa9euoVWrVkhLSytpkxVDjr57//33ERgYqP3A5/td8fsOsI33O3Oy+quXk2UaMGCA9v+1a9dGnTp1EBYWhgMHDqB9+/ZmbBlZsy5dumj/X6dOHTRt2hQhISFYu3Ythg8fbsaWKcdnn32G1atX48CBA3BxcTF3cyxKQX3H9zvj4ogOgHLlysHe3h4JCQk6yxMSEuDv76/3Mf7+/oWur/lpyDYtkTH6Tp9KlSqhXLlyuHLlSskbrRDF6TtzbFOJTHWcXl5eqFKlCp93T3z++ef47LPPsHv3btSpU0e7nO93xe87fazx/c6cGOgAcHJyQsOGDbFv3z7tstzcXOzbtw/NmzfX+5jmzZvrrA8Ae/bs0a5fsWJF+Pv766yTmpqKY8eOFbhNS2SMvtPn33//xd27dxEQECBPwxWgOH1njm0qkamO88GDB7h69SqfdwBmzpyJjz/+GDt37kSjRo107uP7XfH7Th9rfL8zK3NnQyvF6tWrhbOzs1i6dKm4ePGieO2114SXl5eIj48XQgjx8ssviw8++EC7/m+//SYcHBzE559/Lv78808RExOjt7zcy8tLbNmyRZw7d0707NnTasst5ey7tLQ0MW7cOHHkyBFx7do1sXfvXtGgQQNRuXJl8fjxY7Mco7EY2ncZGRni9OnT4vTp0yIgIECMGzdOnD59Wly+fFnyNq2FMfrunXfeEQcOHBDXrl0Tv/32m4iMjBTlypUTiYmJJj8+YzK07z777DPh5OQk1q9fr1MCnZaWprMO3+8M7ztber8zFwY6ecybN08EBwcLJycn0aRJE3H06FHtfREREWLIkCE6669du1ZUqVJFODk5iZo1a4off/xR5/7c3FwxadIk4efnJ5ydnUX79u3FpUuXTHEoJidn3z169Eh07NhR+Pj4CEdHRxESEiJGjBhhdR/UGob03bVr1wSAfLeIiAjJ27Qmcvdd//79RUBAgHBychLly5cX/fv3F1euXDHhEZmOIX0XEhKit+9iYmK06/D9Ts3QvrO19ztzUAkhhGnHkIiIiIhMgzk6REREZLUY6BAREZHVYqBDREREVouBDhEREVktBjpERERktRjoEBERkdVioENERERWi4EOERERWS0GOkRkFklJSXj99dcRHBwMZ2dn+Pv7o1OnTvjtt98AACqVCps3bzZvI4nI4jmYuwFEZJuioqKQmZmJZcuWoVKlSkhISMC+fftw9+5dczeNiKwIR3SIyOSSk5Nx6NAhzJgxA23btkVISAiaNGmC8ePHo0ePHggNDQUA9O7dGyqVSvs7AGzZsgUNGjSAi4sLKlWqhClTpiA7O1t7v0qlwoIFC9ClSxe4urqiUqVKWL9+vfb+zMxMjBo1CgEBAXBxcUFISAimT59uqkMnIhNjoENEJufm5gY3Nzds3rwZGRkZ+e4/ceIEAGDJkiWIi4vT/n7o0CEMHjwYb775Ji5evIhFixZh6dKl+OSTT3QeP2nSJERFReHs2bMYOHAgBgwYgD///BMA8NVXX2Hr1q1Yu3YtLl26hFWrVukEUkRkXXhRTyIyiw0bNmDEiBFIT09HgwYNEBERgQEDBqBOnToA1CMzmzZtQq9evbSPiYyMRPv27TF+/HjtspUrV+K9997DnTt3tI/7v//7PyxYsEC7TrNmzdCgQQPMnz8fY8aMwYULF7B3716oVCrTHCwRmQ1HdIjILKKionDnzh1s3boVnTt3xoEDB9CgQQMsXbq0wMecPXsWU6dO1Y4Iubm5YcSIEYiLi8OjR4+06zVv3lzncc2bN9eO6AwdOhRnzpxB1apVMWbMGOzevdsox0dEysBAh4jMxsXFBR06dMCkSZNw+PBhDB06FDExMQWu/+DBA0yZMgVnzpzR3v744w9cvnwZLi4ukvbZoEEDXLt2DR9//DHS09PxwgsvoG/fvnIdEhEpDAMdIlKMGjVq4OHDhwAAR0dH5OTk6NzfoEEDXLp0CeHh4fludnZP386OHj2q87ijR4+ievXq2t89PDzQv39/fPvtt1izZg02bNiAe/fuGfHIiMhcWF5ORCZ39+5d9OvXD8OGDUOdOnXg7u6O33//HTNnzkTPnj0BAKGhodi3bx9atGgBZ2dneHt746OPPkK3bt0QHByMvn37ws7ODmfPnsX58+cxbdo07fbXrVuHRo0aoWXLlli1ahWOHz+OxYsXAwBmz56NgIAA1K9fH3Z2dli3bh38/f3h5eVljq4gImMTREQm9vjxY/HBBx+IBg0aCE9PT1GqVClRtWpVMXHiRPHo0SMhhBBbt24V4eHhwsHBQYSEhGgfu3PnTvHcc88JV1dX4eHhIZo0aSK++eYb7f0ARGxsrOjQoYNwdnYWoaGhYs2aNdr7v/nmG1GvXj1RunRp4eHhIdq3by9OnTplsmMnItNi1RURWRV91VpEZLuYo0NERERWi4EOERERWS0mIxORVeFsPBHlxREdIiIisloMdIiIiMhqMdAhIiIiq8VAh4iIiKwWAx0iIiKyWgx0iIiIyGox0CEiIiKrxUCHiIiIrBYDHSIiIrJa/w/X7ezZQVMLiwAAAABJRU5ErkJggg=="/>
-</div>
 </div>
 </div>
 </div>
@@ -10105,7 +10046,7 @@ Info: Simulation time: 18.548667907714844                                       
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="Stochastic-Model-Checking">Stochastic Model Checking<a class="anchor-link" href="#Stochastic-Model-Checking">¶</a></h2><p>Stochastic model checking enables the verification of properties in stochastic systems by quantifying their probabilities through systematic exploration of all possible system behaviors. To perform stochastic model checking we need to translate the model into a Continuous Time Markov Chain (CTMC) and specify the properties we want to verify. Dynamical properties of the resulting CTMC could then be analyzed using the stochastic model checker <a href="https://www.prismmodelchecker.org">PRISM</a>. PRISM describes CTMC states through a set of bounded integer variables, hence we need to discretize the state space of the system replacing the continuous variables with bounded integer variables. This leads to the following CTMC specification in PRISM input language, where model parameters are defined by <code>Pr</code>, <code>Ps</code> and <code>Pp</code> constants (initialized with the same values used in the previous simulations), <code>MAX</code> is the discretization constant, <code>r</code>, <code>s</code> and <code>p</code> are the model variables (initialized with the densities of the species at the fixed point) and we have three transitions describing the three possible reactions:</p>
+<h2 id="4.-Stochastic-model-checking">4. Stochastic model checking<a class="anchor-link" href="#4.-Stochastic-model-checking">¶</a></h2><p>Stochastic model checking enables the verification of properties in stochastic systems by quantifying their probabilities through systematic exploration of all possible system behaviors. To perform stochastic model checking we need to translate the model into a Continuous Time Markov Chain (CTMC) and specify the properties we want to verify. Dynamical properties of the resulting CTMC could then be analyzed using the stochastic model checker <a href="https://www.prismmodelchecker.org">PRISM</a>. PRISM describes CTMC states through a set of bounded integer variables, hence we need to discretize the state space of the system replacing the continuous variables with bounded integer variables. This leads to the following CTMC specification in PRISM input language, where model parameters are defined by <code>Pr</code>, <code>Ps</code> and <code>Pp</code> constants (initialized with the same values used in the previous simulations), <code>MAX</code> is the discretization constant, <code>r</code>, <code>s</code> and <code>p</code> are the model variables (initialized with the densities of the species at the fixed point) and we have three transitions describing the three possible reactions:</p>
 </div>
 </div>
 </div>
@@ -10791,6 +10732,904 @@ P=? [ F=1 (MAX-r-s)&gt;=x &amp; (MAX-r-s)&lt;x+10 ]
 </code></pre>
 <img align="center" alt="No description has been provided for this image" src="./results/individuals_fixed.png" width="600px"/>
 <p>After a time step, the probability mass of species $s$ and $p$ is concentrated at lower values, while species $r$ has a more uniform distribution.</p>
+<h2 id="5.-Petri-net-analysis">5. Petri net analysis<a class="anchor-link" href="#5.-Petri-net-analysis">¶</a></h2><p>A graphical representation of a system of chemical reaction can also be given in terms of Petri nets. Several variants of Petri nets exist, here we consider stochastic Petri nets, a variant that allows the modeling of stochastic systems.</p>
+<p>For the rock-scissors-paper model, analyzing the net through property verification is relatively straightforward and doesn't provide substantial insights. However, we will carry out this verification as a tutorial to illustrate the step-by-step approach to modeling and analyzing more complex biochemical networks.</p>
+<p>The Petri net representing the system was created using the <a href="https://www-dssz.informatik.tu-cottbus.de/DSSZ/Software/Snoopy">Snoopy tool</a>, saved as <code>./long_range_models/rsp.spn</code>, and subsequently imported into the <a href="https://www-dssz.informatik.tu-cottbus.de/DSSZ/Software/Charlie">Charlie tool</a> for analysis.</p>
+<p>Let's introduce some definitions, necessary for the analysis of the Petri net.</p>
+<p>A Stochastic Petri net consists of places, transitions with corresponding kinetic functions, arcs and tokens. Places represent the species, transitions represent the reactions, arcs represent the flow of species between reactions and tokens represent the number of molecules of each species.</p>
+<p>More formally, a stochastic Petri net is a quintuple $N = (P, T, f, \nu, m_0)$, where</p>
+<ul>
+<li>$P$ and $T$ are finite, non empty, and disjoint sets. $P$ is the set of places (in the figures represented by circles). $T$ is the set of transitions (in the figures represented by rectangles);</li>
+<li>$f : ((P \times T)\cup (T \times P)) \rightarrow \mathbb{N}_0$ defines the set of directed arcs, weighted by nonnegative integer values;</li>
+<li>$\nu:T \rightarrow \Psi$, with $\Psi=M\rightarrow R\geq 0$, is a function that assigns to each transition a function corresponding to the computation of a kinetic formula to every possible marking $m \in M$;</li>
+<li>$m_0 \in M: P \rightarrow \mathbb{N}_0$ gives the initial marking.</li>
+</ul>
+<p>The stochastic Petri net for the rock-paper-scissor system is shown below, where we set the initial marking $P=20, R=50, S=30$ and made the kinetic functions correspond to the law of mass action with constants equal to the invasion rates $P_r=0.2$, $P_s=0.5$ and $P_p=0.3$:</p>
+<img align="center" alt="No description has been provided for this image" src="./results/petri_net.png" width="200px"/>
+<p>The <strong>preset of a node</strong> $x\in P \cup T$ is defined as $•x:=\{y\in P\cup T |f(y,x) \neq 0\}$, and its post set as $x• :=\{y\in P \cup T| f(x,y) \neq 0\}$. Altogether we get four types of sets:</p>
+<ul>
+<li>$•t$, the <strong>preplaces</strong> of a transition $t$, consisting of the reaction’s precursors</li>
+<li>$t•$, the <strong>postplaces</strong> of a transition $t$, consisting of the reaction’s products</li>
+<li>$•p$, the <strong>pretransitions</strong> of a place $p$, consisting of all reactions producing this species</li>
+<li>$p•$, the <strong>posttransitions</strong> of a place $p$, consisting of all reactions consuming this species</li>
+</ul>
+<p>Given a set of places $S=p_1, p_2, \ldots$, the pre-transition of a set of places $S$ is defined as $•S=•p_1 \cup •p_2 \cup \ldots$, while the post-transition of a set of places $S$ is defined as $S•=p_1• \cup p_2• \cup \ldots$.</p>
+<p>In this particular net, the pretransition and posttransition of the sites are as follows:</p>
+<ul>
+<li>$•P=\{Pp\}$</li>
+<li>$•R=\{Pr\}$</li>
+<li>$•S=\{Ps\}$</li>
+<li>$P•=\{Pp,Ps\}$</li>
+<li>$R•=\{Pr,Pp\}$</li>
+<li>$S•=\{Ps,Pr\}$</li>
+</ul>
+<p>The <strong>incidence matrix</strong> of $\mathcal{N}$ is a matrix $C:P\times T \rightarrow \mathbb{Z}$, indexed by $P$ and $T$, such that $C(p,t)=f(t,p)−f(p,t)$.</p>
+<p>Loading the file containing the incidence matrix produced by Charlie:</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="o">!</span>cat<span class="w"> </span>./results/petri_net_incidence_matrix.txtm
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>placeNames = {P R S };
+transitionNames = {Pp Pr Ps };
+C=[
+1 0 -1 ;
+-1 1 0 ;
+0 -1 1 ;
+];
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>We can easily verify that it is obtained by
+$$C = \begin{bmatrix}
+2 &amp; 0 &amp; 0 \\
+0 &amp; 2 &amp; 0 \\
+0 &amp; 0 &amp; 2
+\end{bmatrix}
+-
+\begin{bmatrix}
+1 &amp; 0 &amp; 1 \\
+1 &amp; 1 &amp; 0 \\
+0 &amp; 1 &amp; 1
+\end{bmatrix}$$</p>
+<p>and we can compute its rank (which is necessary to determine if certain properties of the net hold, as discussed later) as follows:</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">C</span> <span class="o">=</span> <span class="n">Matrix</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+<span class="n">rank</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">rank</span><span class="p">()</span>
+<span class="n">rank</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[ ]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>2</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>A <strong>place vector</strong> (<strong>transition vector</strong>) is a vector $x : P \rightarrow \mathbb{Z}$, indexed by $P$ ($y : T \rightarrow \mathbb{Z}$, indexed by $T$).</p>
+<p>A place vector (transition vector) is called a <strong>P-invariant</strong> (<strong>T-invariant</strong>) if it is a nontrivial nonnegative integer solution of the linear equation system $x \cdot C = 0$ ($C \cdot y = 0$).</p>
+<p>If $p$ is a P-invariant, then the weighted sum of tokens across the places (using the weights specified by the p-invariant) is preserved under the firing of transitions.
+If $t$ is a T-invariant, then if you fire the transitions according to the vector $t$ (where the number of times each transition is fired is given by the corresponding entry in $t$), the net's marking will remain unchanged.</p>
+<p>Computing P-invariants:</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">x3</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">'x1 x2 x3'</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">Matrix</span><span class="p">([</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">x3</span><span class="p">])</span>
+<span class="n">equation</span> <span class="o">=</span> <span class="n">Eq</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">T</span> <span class="o">*</span> <span class="n">C</span><span class="p">,</span> <span class="n">Matrix</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]))</span>
+<span class="n">solution</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">equation</span><span class="p">,</span> <span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">x3</span><span class="p">),</span> <span class="nb">dict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">solution</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[ ]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>[{x1: x3, x2: x3}]</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>Any vector of the form $[x,x,x]$ is a place invariant. In fact it is trivial that the sum of the number of tokens in the places is constant (equal to 100).</p>
+<p>Checking the file containing the P-invariants computed by Charlie:</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="o">!</span>cat<span class="w"> </span>./results/rsp_P.inv
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>minimal semipositive place invariants=
+1	|	0.P		:1,
+	|	1.R		:1,
+	|	2.S		:1
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>Computing T-invariants:</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">y1</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">y3</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">'y1 y2 y3'</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">Matrix</span><span class="p">([</span><span class="n">y1</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">y3</span><span class="p">])</span>
+<span class="n">equation</span> <span class="o">=</span> <span class="n">Eq</span><span class="p">(</span><span class="n">C</span> <span class="o">*</span> <span class="n">y</span><span class="p">,</span> <span class="n">Matrix</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+<span class="n">solution</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="n">equation</span><span class="p">,</span> <span class="p">(</span><span class="n">y1</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">y3</span><span class="p">),</span> <span class="nb">dict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">solution</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[ ]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>[{y1: y3, y2: y3}]</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>Any vector of the form $[y,y,y]$ is a transition invariant. In fact it is trivial that applying the three transitions an equal number of times will not change the marking of the net.</p>
+<p>Checking the file containing the T-invariants computed by Charlie:</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="o">!</span>cat<span class="w"> </span>./results/rsp_T.inv
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>minimal semipositive transition invariants=
+1	|	0.Pp		:1,
+	|	1.Pr		:1,
+	|	2.Ps		:1
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>All markings, which can be reached from a given marking m by any firing sequence of arbitrary length, constitute the set of <strong>reachable markings</strong> $[m⟩$.</p>
+<p>A <strong>transition</strong> t is <strong>dead</strong> in the marking m if it is not enabled in any marking $m^{\prime}$ reachable from m: $\nexists m^{\prime} \in [m⟩ : m^{\prime}[t⟩$. A <strong>transition</strong> t is <strong>live</strong> if it is not dead in any marking reachable from $m_0$.</p>
+<p>A <strong>marking</strong> $m$ is <strong>dead</strong> if there is no transition which is enabled in $m$.</p>
+<p>A nonempty set of places $D \subseteq P$ is called <strong>siphon</strong> if $•D \subseteq D•$ (the set of pretransitions is contained in the set of posttransitions), i.e. every transition which fires tokens onto a place in this structural deadlock set, also has a preplace in this set.</p>
+<p>In this particular net, we have:</p>
+<ul>
+<li>$•\{P\} = \{Pp\} \subseteq \{P\}•=\{Pp, Ps\} \implies \{P\}$ is a siphon</li>
+<li>$•\{R\} = \{Pr\} \subseteq \{R\}•=\{Pr, Pp\} \implies \{R\}$ is a siphon</li>
+<li>$•\{S\} = \{Ps\} \subseteq \{S\}•=\{Ps, Pr\} \implies \{S\}$ is a siphon</li>
+<li>$•\{R,S\}=\{Pr, Ps\} \subseteq \{R,S\}•=\{Pr, Pp, Ps\} \implies \{R,S\}$ is a siphon</li>
+<li>$•\{P, R\} = \{Pp, Pr\} \subseteq \{P, R\}• = \{Pp, Ps, Pr\} \implies \{P, R\}$ is a siphon</li>
+<li>$•\{P, S\} = \{Pp, Ps\} \subseteq \{P, S\}• = \{Pp, Ps, Pr\} \implies \{P, S\}$ is a siphon</li>
+<li>$•\{P, R, S\} = \{Pp, Pr, Ps\} = \{P, R, S\}• = \{Pp, Pr, Ps\} \implies \{P, R, S\}$ is a siphon</li>
+</ul>
+<p>Once a siphon becomes empty (i.e., contains no tokens), it cannot be refilled with tokens by the firing of any transitions (i.e. such part of the system becomes permanently disabled). This means that once a species (or a couple of species) goes extinct, it cannot be reintroduced in the system.</p>
+<p>A siphon is minimal if it does not properly contain a non-empty siphon.</p>
+<p>In this particular net, $\{P\}, \{R\}, \{S\}$ are minimal siphons.</p>
+<p>Checking the file containing the minimal siphons computed by Charlie:</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="o">!</span>cat<span class="w"> </span>./results/rsp_DLS.res
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre> minimal proper siphon ( place )= 
+
+1	|0.P	:1
+2	|1.R	:1
+3	|2.S	:1
+@
+
+1| siphon_1| minimal siphon_1
+2| siphon_2| minimal siphon_2
+3| siphon_3| minimal siphon_3</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>A set of places $Q \subseteq P$ is called <strong>trap</strong> if $Q• \subseteq •Q$ (the set of posttransitions is contained in the set of pretransitions), i.e. every transition which subtracts tokens from a place of the trap set, also has a postplace in this set.</p>
+<p>In this particular net, we have:</p>
+<ul>
+<li>$\{P\}•=\{Pp, Ps\} \nsubseteq •\{P\} = \{Pp\}\implies \{P\}$ is not a trap</li>
+<li>$\{R\}•=\{Pr, Pp\} \nsubseteq •\{R\} = \{Pr\} \implies \{R\}$ is not a trap</li>
+<li>$\{S\}•=\{Ps, Pr\} \nsubseteq •\{S\} = \{Ps\} \implies \{S\}$ is not a trap</li>
+<li>$\{R,S\}•=\{Pr, Pp, Ps\} \nsubseteq •\{R,S\}=\{Pr, Ps\} \implies \{R,S\}$ is not a trap</li>
+<li>$\{P, R\}• = \{Pp, Ps, Pr\} \nsubseteq •\{P, R\} = \{Pp, Pr\} \implies \{P, R\}$ is not a trap</li>
+<li>$\{P, S\}• = \{Pp, Ps, Pr\} \nsubseteq •\{P, S\} = \{Pp, Ps\} \implies \{P, S\}$ is not a trap</li>
+<li>$\{P, R, S\}• = \{Pp, Pr, Ps\} = •\{P, R, S\} = \{Pp, Pr, Ps\} \implies \{P, R, S\}$ is a trap</li>
+</ul>
+<p>A trap is minimal if it does not properly contain a non-empty trap.</p>
+<p>In this particular net, $\{P, R, S\}$ is a minimal trap.</p>
+<p>Checking the file containing the minimal traps computed by Charlie:</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="o">!</span>cat<span class="w"> </span>./results/rsp_TPS.res
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre> minimal traps ( place )= 
+
+1	|0.P	:1,
+	|1.R	:1,
+	|2.S	:1</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>The "Net Properties" dialog in Charlie provides an overview of the key properties of the net. For this particular net, they are shown below:</p>
+<img align="center" alt="No description has been provided for this image" src="./results/petri_net_props.png" width="400px"/>
+<p>The properties are described in the following Table (sourced from [2]).</p>
+<table>
+<thead>
+<tr>
+<th>Abbreviation</th>
+<th>Name</th>
+<th>Description</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PUR</td>
+<td>pure</td>
+<td>$\forall x, y \in P \cup T : f (x, y) \neq 0 \implies f (y, x) = 0$, i.e. there are no two nodes, connected in both directions. This precludes read arcs. Then the net structure is fully represented by the incidence matrix, which is used for the calculation of the P- and T-invariants.</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>ORD</td>
+<td>ordinary</td>
+<td>$\forall x, y \in P \cup T : f (x, y) \neq 0 \implies f (x, y) = 1$, i.e. all arc weights are equal to 1. This includes homogeneity. A non-ordinary Petri net cannot be live and 1-bounded at the same time.</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>HOM</td>
+<td>homogeneous</td>
+<td>$\forall p \in P :t,t^{\prime} \in p• \implies f(p,t)=f(p,t^{\prime})$, i.e. all outgoing arcs of a given place have the same multiplicity.</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>NBM</td>
+<td>non blocking multiplicity</td>
+<td>A net has non-blocking multiplicity if $\forall p \in P :•p \neq 0 \land min\{f(t,p)\vert \forall t \in •p\}\geq max\{f(p,t)\vert \forall t \in p•\}$, i.e. an input place causes blocking multiplicity. Otherwise, it must hold for each place: the minimum of the multiplicities of the incoming arcs is not less than the maximum of the multiplicities of the outgoing arcs.</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>CSV</td>
+<td>conservative</td>
+<td>A Petri net is conservative if $\forall t \in T : \sum_{p \in •t} f(p,t) = \sum_{p \in t•} f(t,p)$ i.e. all transitions add exactly as many tokens to their postplaces as they subtract from their preplaces, or briefly, all transitions fire token-preservingly. A conservative Petri net is structurally bounded.</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>SCF</td>
+<td>structurally conflict free</td>
+<td>A Petri net is static conflict free if $\forall t,t^{\prime} \in T :t \neq t^{\prime} \implies •t \cap •t^{\prime} = \empty$, i.e. there are no two transitions sharing a preplace. Transitions involved in a static conflict compete for the tokens on shared preplaces. Thus, static conflicts indicate situations where dynamic conflicts, i.e. nondeterministic choices, may occur in the system behaviour. However, it depends on the token situation whether a conflict does actually occur dynamically. There is no nondeterminism in SCF nets.</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>FT0</td>
+<td>every transition has a pre-place</td>
+<td>$\forall t: •t \neq \empty$</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>TF0</td>
+<td>every transition has a post-place</td>
+<td>$\forall t: t• \neq \empty$</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>FP0</td>
+<td>every place has a pre-transition</td>
+<td>$\forall p: •p \neq \empty$</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>PF0</td>
+<td>every place has a post-transition</td>
+<td>$\forall p: p• \neq \empty$</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>CON</td>
+<td>connected</td>
+<td>A Petri net is connected if it holds for every two nodes a and b that there is an undirected path between a and b. Disconnected parts of a Petri net cannot influence each other, so they can usually be analysed separately.</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>SC</td>
+<td>strongly connected</td>
+<td>A Petri net is strongly connected if it holds for every two nodes a and b that there is a directed path from a to b. Strong connectedness involves connectedness and the absence of boundary nodes. It is a necessary condition for a Petri net to be live and bounded at the same time.</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>NC</td>
+<td>netclass</td>
+<td>The net structure class: 1) A Petri net is called State Machine (SM) if $\forall t\in T :\vert •t \vert =\vert t•\vert \leq 1$, i.e. there are neither forward branching nor backward branching transitions. 2) A Petri net is called Synchronisation Graph (SG) if $\forall p\in P :\vert •p\vert =\vert p•\vert \leq 1$, i.e. there are neither forward branching nor backward branching places. 3) A Petri net is called Extended Free Choice (EFC) if $\forall p,q\in P:p• ∩q• =\empty \lor p• =q•$, i.e. transitions in conflict have identical sets of preplaces. 4) A Petri net is called Extended Simple (ES) if $\forall p,q\in P:p• \cap q• =\empty \lor p• \subseteq q• \lor q• \subseteq p•$, i.e. every transition is involved in one conflict at most.</td>
+<td>nES (beyond ES)</td>
+</tr>
+<tr>
+<td>RKTH</td>
+<td>rank theorem</td>
+<td>$rank(IM) \neq \vert SCCS\vert - 1 \implies !RKTH$, i.e. if the rank of the incidence matrix is not equal to the number of strongly connected components minus one, then the rank theorem does not hold.</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>STP</td>
+<td>siphon trap property</td>
+<td>The siphon trap property holds if no siphons are bad. A siphon is called bad if it does not include a trap.</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>CPI</td>
+<td>covered by P-invariants</td>
+<td>A net is covered by P-invariants, shortly CPI, if every place belongs to a P-invariant.</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>CTI</td>
+<td>covered by T-invariants</td>
+<td>A net is covered by T-invariants, shortly CTI, if every transition belongs to a T-invariant.</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>SCTI</td>
+<td>strongly covered by T-invariants</td>
+<td>The two transitions modelling the two directions of a reversible reaction always make a minimal T-invariant and they are called trivial T-invariants. A net which is covered by nontrivial T-invariants is said to be strongly covered by T-invariants.</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>SB</td>
+<td>structurally bounded</td>
+<td>A net is structurally bounded if it is bounded for any initial marking</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>k-B</td>
+<td>k-bounded</td>
+<td>A place p is k-bounded (bounded for short) if there exists a positive integer number k, which represents an upper bound for the number of tokens on this place in all reachable markings of the Petri net: $\exists k \in \mathbb{N}_0 :\forall m\in [m_0⟩:m(p)\leq k$. A Petri net is k-bounded (bounded for short) if all its places are k-bounded.</td>
+<td>✅ (100)</td>
+</tr>
+<tr>
+<td>DCF</td>
+<td>dynamically conflict free</td>
+<td>Dynamic conflict is a behavioural property which refers to a marking enabling two transitions, but the firing of one transition disables the other one. The occurrence of dynamic conflicts causes alternative (branching) system behaviour, whereby the decision between these alternatives is taken nondeterministically.</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>DSt</td>
+<td>no dead state(s)</td>
+<td>True if the net does not have dead states (markings).</td>
+<td>❌ (3)</td>
+</tr>
+<tr>
+<td>DTr</td>
+<td>no dead transition(s)</td>
+<td>If the net does not have dead transitions.</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>LIV</td>
+<td>live</td>
+<td>A Petri net is live (strongly live) if each transition is live.</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>REV</td>
+<td>reversible</td>
+<td>A Petri net is reversible if the initial marking can be reached again from each reachable marking: $\forall m \in [m_0⟩ : m_0 \in [m⟩$</td>
+<td>❌</td>
+</tr>
+</tbody>
+</table>
+<p>Charlie checks these properties by applying a set of rules, as shown in the log file generated by the tool:</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="o">!</span>cat<span class="w"> </span>./results/charlie_log.txt
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>
+starts analysis with following options:
+charlie.analyzer.structural.StructuralOptionSet
+
+number of places: 3
+number of transitions: 3
+number of arcs: 9
+
+input places:
+no input places
+output places:
+no output places
+input transitions:
+no input transitions
+output transitions:
+no output transitions
+
+Structural coupled conflict sets: 
+
+1	|0.Pp	:1,
+	|1.Pr	:1,
+	|2.Ps	:1
+ 
+Structural equal conflict sets: 
+
+1	|0.Pp	:1
+2	|1.Pr	:1
+3	|2.Ps	:1
+ 
+time:  0 m 0 s
+
+
+
+Applying rule:
+CSV =&gt; k-B
+
+
+Applying rule:
+CSV =&gt; SB
+
+
+Applying rule:
+SC =&gt; CON
+
+
+Applying rule:
+CSV =&gt; CPI
+
+
+Applying rule:
+CPI =&gt; k-B
+
+
+Applying rule:
+SB =&gt; k-B
+
+
+Applying rule:
+CPI =&gt; SB
+
+Analyzer: Rank of Matrix Analyzer
+start time: 19/08/24, 15:09
+starts analysis with following options:
+charlie.analyzer.invariant.RankIncidenceMatrixOptionSet
+Rank of the incidence matrix: 2
+time: 00:00:00:013
+
+
+
+Applying rule:
+rank(IM) != |SCCS| - 1 =&gt; !RKTH
+
+Analyzer: Structurally Bounded Analyzer
+start time: 19/08/24, 15:09
+starts analysis with following options:
+GUI.app_components.StructurallyBoundedOptionSet
+time: 00:00:00:013
+
+Analyzer: InvariantAnalyzer
+start time: 19/08/24, 15:10
+starts analysis with following options:
+Invariant Options:
+compute: P-Invariants
+delete Trivial Invariants: no
+check coverage: yes
+check extended coverage: no
+enable MCSC: no
+Invariant Analyzer: computing P-Invariants
+minimal semipositive place invariants: 
+1
+time: 00:00:00:014
+
+Analyzer: InvariantAnalyzer
+start time: 19/08/24, 15:10
+starts analysis with following options:
+Invariant Options:
+compute: T-Invariants
+delete Trivial Invariants: no
+check coverage: yes
+check extended coverage: yes
+enable MCSC: no
+Invariant Analyzer: computing T-Invariants
+check coverage:
+net is covered by T-Invariants
+net does is support strong Coverage by T Invariants
+minimal semipositive transition invariants:
+1
+time: 00:00:00:015
+
+Analyzer: Trap Analyzer
+start time: 19/08/24, 15:10
+starts analysis with following options:
+TrapOptions:
+compute: true
+export: false
+exportFile:  not set!
+properSets: false
+Trap Analyzer: 
+computed minimal traps
+	
+minimal traps:
+1 minimal traps computed in 00:00:00:000
+time: 00:00:00:008
+
+Analyzer: Siphon Analyzer
+start time: 19/08/24, 15:10
+starts analysis with following options:
+siphon options
+Siphon Analyzer:
+ computing siphons
+
+STP is not valid
+ counter examples:
+    siphon:
+	|0.P	:1
+	is a bad siphon
+1 siphons computed 00:00:00:000
+time: 00:00:00:000
+
+Analyzer: RGraph Simple Construction
+start time: 19/08/24, 15:14
+starts analysis with following options:
+used construction options:
+firing rule: single
+boundedness check: yes
+maximal construction depth: none
+reduction: none
+initial marking:(P: 20 | R: 50 | S: 30)
+reachability graph analyzer:
+computing rechability graph using simple  firing rule
+transition not live:
+	|0.Pp	:1,
+	|1.Pr	:1,
+	|2.Ps	:1
+transition dead at m0:
+	empty set
+the net is not live
+is not persistent
+the net is not safe
+number of dead states: 3
+filter for dead states: 
+dead state 1: P== 100
+dead state 2: R== 100
+dead state 3: S== 100
+-- reachability graph constructed in 00:00:52:162--
+used construction options:
+firing rule: single
+boundedness check: yes
+maximal construction depth: none
+reduction: none
+initial marking:(P: 20 | R: 50 | S: 30)
+states: 5151
+bound: 100
+edges: 14850
+#scc: 301
+#terminal scc: 3
+time: 00:00:52:162
+
+
+
+Applying rule:
+DSt =&gt; !LIV
+
+
+Applying rule:
+!LIV &amp; SC &amp; CTI &amp; rank(IM) &lt; |SEQS| =&gt; !k-B
+
+
+Results:
+PUR   ORD   HOM   NBM   CSV   SCF   FT0   TF0   FP0   PF0   CON   SC    NC  
+   N     N     Y     Y     Y     N     Y     Y     Y     Y     Y     Y    nES 
+ RKTH   STP   CPI   CTI  SCTI    SB   k-B   1-B   DCF   DSt   DTr   LIV   REV 
+   N     N     Y     Y     Y     Y    100    N     N      3    Y     N     N  
+  SSI   RNK  SCCS  SEQS                                                       
+   Y      2     1     3</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>Since a stochastic Petri net can be translated into a CTMC, Charlie provides the possibility to export the net in the PRISM input language. Let's check whether the PRISM model produced by Charlie corresponds to the one we manually created:</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="o">!</span>cat<span class="w"> </span>./long_range_models/rsp.sm
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain" tabindex="0">
+<pre>//created by Snoopy 2
+//date: Sun Aug 18 14:58:29 2024
+
+ctmc
+
+const int Max;
+const int N;
+module  rsp
+
+S:  [ 0..Max ]  init 30*N;
+R:  [ 0..Max ]  init 50*N;
+P:  [ 0..Max ]  init 20*N;
+
+
+[Pp]
+(P &gt; 0) &amp; (R &gt; 0)
+ -&gt; (0.3) * P * R : 
+(P' = P+1) &amp; (R' = R-1);
+
+
+[Pr]
+(R &gt; 0) &amp; (S &gt; 0)
+ -&gt; (0.2) * R * S : 
+(R' = R+1) &amp; (S' = S-1);
+
+
+[Ps]
+(P &gt; 0) &amp; (S &gt; 0)
+ -&gt; (0.5) * S * P : 
+(P' = P-1) &amp; (S' = S+1);
+
+
+
+
+
+endmodule
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>Aside from the missing constraints on the variables' maximum values, the model is identical to the one we manually created.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="6.-References">6. References<a class="anchor-link" href="#6.-References">¶</a></h2><ul>
+<li>[1] Frean, Marcus, and Edward R. Abraham. "Rock–scissors–paper and the survival of the weakest." Proceedings of the Royal Society of London. Series B: Biological Sciences 268.1474 (2001): 1323-1327.</li>
+<li>[2] Heiner, Monika, David Gilbert, and Robin Donaldson. "Petri nets for systems and synthetic biology." International school on formal methods for the design of computer, communication and software systems. Berlin, Heidelberg: Springer Berlin Heidelberg, 2008. 215-264.</li>
+</ul>
 </div>
 </div>
 </div>
