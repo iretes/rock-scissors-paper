@@ -182,9 +182,6 @@ Applying rule:
 DSt => !LIV
 
 
-Applying rule:
-!LIV & SC & CTI & rank(IM) < |SEQS| => !k-B
-
 
 Results:
 PUR   ORD   HOM   NBM   CSV   SCF   FT0   TF0   FP0   PF0   CON   SC    NC  
