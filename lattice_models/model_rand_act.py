@@ -4,8 +4,11 @@ from mesa.datacollection import DataCollector
 
 class RSPRandAct(mesa.Model):
     """
-    A system with three species in a competitive loop: a rock beats a pair of scissors,
-    scissors beat a sheet of paper and paper beats a rock.
+    This model is based on the Rock-Paper-Scissors model proposed by Frean and Abraham.
+
+    Reference:
+    Frean, Marcus, and Edward R. Abraham. "Rock-scissors-paper and the survival of the weakest." 
+    Proceedings of the Royal Society of London. Series B: Biological Sciences 268.1474 (2001): 1323-1327.
     """
 
     # key: species, value: list of species that the key species can beat

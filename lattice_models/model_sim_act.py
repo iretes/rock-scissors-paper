@@ -4,8 +4,7 @@ from mesa.datacollection import DataCollector
 
 class RSPSimAct(mesa.Model):
     """
-    A system with three species in a competitive loop: a rock beats a pair of scissors,
-    scissors beat a sheet of paper and paper beats a rock.
+    This implementation of the Rock-Paper-Scissors model uses simultaneous activations of agents.
     """
 
     rules3 = {0: [1], 1: [2], 2: [0]}

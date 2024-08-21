@@ -29,7 +29,10 @@ SIMULTANEOUS_ACTIVATIONS = "2"
 MOBILITY = "3"
 
 while True:
-    model_type = input("Enter '1' for random activations; '2' for simultaneous activations; '3' for mobilty model: ")
+    model_type = input(
+        "Enter\n'1' for Frean and Abraham model with random activations of agents;"
+        "\n'2' for the model using simultaneous activations of agents;"
+        "\n'3' for Reichenbach, Mobilia and Frey model\n")
     if model_type in ["1", "2", "3"]:
         break
     else:
@@ -58,17 +61,17 @@ if model_type == RANDOM_ACTIVATIONS:
     model_params = model_params_randact
     model = RSPRandAct
     chart_element = chart_element_randact
-    model_descr = "Rock Scissors Paper: Random activations"
+    model_descr = "Rock Scissors Paper: Frean and Abraham model with random activations of agents"
 elif model_type == SIMULTANEOUS_ACTIVATIONS:
     model_params = model_params_simact
     model = RSPSimAct
     chart_element = chart_element_simact
-    model_descr = "Rock Scissors Paper: Simultaneous Activations"
+    model_descr = "Rock Scissors Paper: model using simultaneous activations of agents"
 else:
     model_params = model_params_mobility
     model = RSPMobility
     chart_element = chart_element_mobility
-    model_descr = "Rock Scissors Paper: Mobility model"
+    model_descr = "Rock Scissors Paper: Reichenbach, Mobilia and Frey model"
 
 model_params['height'] = grid_height
 model_params['width'] = grid_width

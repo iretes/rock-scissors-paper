@@ -5,7 +5,15 @@ from mesa.datacollection import DataCollector
 
 class RSPMobility(mesa.Model):
     """
-    Represents the 2-dimensional array of patches in Rock-Scissors-Paper Game.
+    This model is based on the Rock-Paper-Scissors model implemented in NetLogo.
+
+    References:
+    [1] Reichenbach, Tobias, Mauro Mobilia, and Erwin Frey.
+    "Mobility promotes and jeopardizes biodiversity in rock-paper-scissors games."
+    Nature 448.7157 (2007): 1046-1049.
+    [2] Head, B., Grider, R. and Wilensky, U. (2017). NetLogo Rock Paper Scissors model.
+    http://ccl.northwestern.edu/netlogo/models/RockPaperScissors.
+    Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
     """
 
     rules3 = {1: [2], 2: [3], 3: [1]}

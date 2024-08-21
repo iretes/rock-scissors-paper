@@ -1,6 +1,6 @@
 # Rock, Scissors, Paper: the survival of the weakest 🪨✂️📄
 
-This project replicates the experimental results of the models proposed by Frean et al. [1] and Reichenbach et al. [2], which describe a system involving three species in a competitive loop: a rock beats (and replicates into) a pair of scissors, scissors beat a sheet of paper and paper beats a rock. The model is explored through various formalisms, and its properties are analyzed within each framework.
+This project reproduces the experiments conducted by Frean et al. [1] and Reichenbach et al. [2] to study a system involving three species in a competitive loop: a rock beats (and replicates into) a pair of scissors, scissors beat a sheet of paper and paper beats a rock. The proposed model is explored through various formalisms, and its properties are analyzed within each framework.
 
 ## Long range dispersal model
 
@@ -18,25 +18,13 @@ After cloning the [GitHub repository](https://github.com/iretes/rock-scissors-pa
 pip install -r requirements.txt
 ```
 
-To interactively run the rock-scissors-paper model based on [1], where agents activating sequentially, execute the following command:
+To interactively run the model, execute the following command:
 
 ```bash
-python ./run_lattice_randact.py
+python ./run_lattice_model.py
 ```
 
-To interactively run the rock-scissors-paper model where agents activating simultaneously, execute the following command:
-
-```bash
-python ./run_lattice_simact.py
-```
-
-To interactively run the the rock-scissors-paper model based on [2], execute the following command:
-
-```bash
-python ./run_lattice_mobility.py
-```
-
-Then open your browser to http://127.0.0.1:8521/.
+Set the grid's width and height, choose the model to run (either the one based on [1], [2], or a variant where agents activate simultaneously), and then open your browser to http://127.0.0.1:8521/."
 
 The sliders labeled 'Initial weight of species *' allow you to set the weights used by the [`random.choices`](https://docs.python.org/3/library/random.html#random.choices) method from the Python Standard Library for initializing grid patches with individuals. These weights don't need to sum to 1.
 
