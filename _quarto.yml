@@ -1,0 +1,20 @@
+project:
+  type: website
+  output-dir: docs
+
+website: 
+  title: "Computational Models for Complex system"
+  navbar:
+    search: true
+    right:
+      - href: index.md
+        text: Home
+      - icon: github
+        href: https://github.com/iretes/rock-scissors-paper
+
+format:
+  html:
+    theme: cosmo dark
+    toc: true
+
+editor: visual
