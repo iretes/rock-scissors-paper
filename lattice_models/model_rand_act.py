@@ -25,7 +25,7 @@ class RSPRandAct(mesa.Model):
                  increase_rate=False,
                  width=50, height=50):
         """
-        Create a new playing area of (width, height) patches.
+        Initialize the model with the given parameters.
         """
         super().__init__()
 
@@ -65,7 +65,7 @@ class RSPRandAct(mesa.Model):
         for i in range(self.n_species):
             model_reporter[i] = lambda model, species=i: model.count_patches(species)
         if self.increase_rate:
-           model_reporter['increased_rate'] = lambda model: model.invasion_rates[0] # TODO: lambda model: model.compute_average_invrate0()=
+           model_reporter['increased_rate'] = lambda model: model.invasion_rates[0]
         self.datacollector = DataCollector(
             model_reporter
         )
@@ -76,10 +76,6 @@ class RSPRandAct(mesa.Model):
         Helper method to count the number of patches in the given state.
         """
         return sum([1 for patch in self.schedule.agents if patch.state == species])
-    
-    def compute_average_invrate0(self): # TODO: delete?
-        rates = [patch.invasion_rate for patch in self.schedule.agents if patch.state == 0]
-        return sum(rates) / len(rates)
 
     def step(self):
         """

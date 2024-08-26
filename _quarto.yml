@@ -11,10 +11,14 @@ website:
         text: Home
       - icon: github
         href: https://github.com/iretes/rock-scissors-paper
+  
+  page-footer: 
+    left: "© 2024 Irene Testa"
 
 format:
   html:
     theme: cosmo dark
     toc: true
+    toc-location: left
 
 editor: visual

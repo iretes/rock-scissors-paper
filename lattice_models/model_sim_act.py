@@ -7,13 +7,15 @@ class RSPSimAct(mesa.Model):
     This implementation of the Rock-Paper-Scissors model uses simultaneous activations of agents.
     """
 
+    # key: species, value: list of species that the key species can beat
+    # e.g. ROCK (0) beats SCISSOR (1), SCISSOR (1) beats PAPER (2), PAPER (2) beats ROCK (0)
     rules3 = {0: [1], 1: [2], 2: [0]}
     rules4 = {0: [1], 1: [2], 2: [3], 3: [0]}
     rules5 = {0: [1,2], 1: [2,3], 2: [3,4], 3: [4,0], 4: [0,1]}
 
     def __init__(self, init0, init1, init2, init3, init4, n_species, color_map, width=50, height=50):
         """
-        Create a new playing area of (width, height) patches.
+        Initialize the model with the given parameters.
         """
         super().__init__()
 

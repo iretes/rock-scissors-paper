@@ -16,6 +16,8 @@ class RSPMobility(mesa.Model):
     Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
     """
 
+    # key: species, value: list of species that the key species can beat
+    # e.g. ROCK (0) beats SCISSOR (1), SCISSOR (1) beats PAPER (2), PAPER (2) beats ROCK (0)
     rules3 = {1: [2], 2: [3], 3: [1]}
     rules4 = {1: [2], 2: [3], 3: [4], 4: [1]}
     rules5 = {1: [2,3], 2: [3,4], 3: [4,5], 4: [5,1], 5: [1,2]}
@@ -27,7 +29,7 @@ class RSPMobility(mesa.Model):
             n_species, color_map, width=50, height=50
         ):
         """
-        Create a new playing area of (width, height) patches.
+        Initialize the model with the given parameters.
         """
         super().__init__()
 
