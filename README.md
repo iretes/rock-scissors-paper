@@ -1,6 +1,6 @@
 # Rock, Scissors, Paper: the survival of the weakest 🪨✂️📄
 
-This project reproduces the experiments conducted by Frean et al. [[1]](#references) and Reichenbach et al. [[2]](#references) to study a system involving three species in a competitive loop: a rock beats (and replicates into) a pair of scissors, scissors beat a sheet of paper and paper beats a rock. The proposed model is explored through various formalisms, and its properties are analyzed within each framework.
+This project reproduces the experiments conducted by Frean et al. [[1]](#references) and Reichenbach et al. [[2]](#references) to study a system involving three species in a competitive loop: a rock beats (and replicates into) a pair of scissors, scissors beat a sheet of paper and paper beats a rock. The self-referential nature of the competitive loop leads to counterintuitive phenomena, such as the expectation that the least competitive species will dominate in population. The proposed model is explored through various formalisms, and its properties are analyzed within each framework.
 
 ## Long range dispersal model
 

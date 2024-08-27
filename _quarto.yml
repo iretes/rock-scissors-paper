@@ -9,6 +9,12 @@ website:
     right:
       - href: index.md
         text: Home
+      - text: "Site Map"
+        menu:
+          - text: "Long range model analysis"
+            href: ./notebooks/long_range_simulations.ipynb
+          - text: "Lattice model analysis"
+            href: ./notebooks/lattice_simulations.ipynb
       - icon: github
         href: https://github.com/iretes/rock-scissors-paper
   
@@ -17,8 +23,12 @@ website:
 
 format:
   html:
-    theme: cosmo dark
+    theme:
+      light: flatly
+      dark: darkly
     toc: true
     toc-location: left
+    tools:
+      theme-toggle: true
 
 editor: visual
