@@ -159,7 +159,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#theoretical-framework" id="toc-theoretical-framework" class="nav-link active" data-scroll-target="#theoretical-framework">Theoretical framework</a></li>
-  <li><a href="#empirical-findings" id="toc-empirical-findings" class="nav-link" data-scroll-target="#empirical-findings">Empirical findings</a>
+  <li><a href="#experiments" id="toc-experiments" class="nav-link" data-scroll-target="#experiments">Experiments</a>
   <ul class="collapse">
   <li><a href="#discrete-time-model" id="toc-discrete-time-model" class="nav-link" data-scroll-target="#discrete-time-model">1. Discrete-time model</a></li>
   <li><a href="#continuous-time-model" id="toc-continuous-time-model" class="nav-link" data-scroll-target="#continuous-time-model">2. Continuous-time model</a></li>
@@ -232,8 +232,8 @@ n_r=\frac{n_p\cdot P_s}{P_r}=\frac{\cancel{P_r}\cdot P_s}{\cancel{P_r}\cdot (P_p
 <p>In the following, we will refer to the population density at the fixed point as <span class="math inline">\(R\)</span>, <span class="math inline">\(S\)</span> and <span class="math inline">\(P\)</span> for species <span class="math inline">\(r\)</span>, <span class="math inline">\(s\)</span> and <span class="math inline">\(p\)</span> respectively.</p>
 <p>The population densities at the fixed point are controlled by the invasion rate of the species they invade (the fixed point population of species <span class="math inline">\(r\)</span> depends on the invasion rate of species <span class="math inline">\(s\)</span>, the fixed point population of species <span class="math inline">\(s\)</span> depends on the invasion rate of species <span class="math inline">\(p\)</span> and the fixed point population of species <span class="math inline">\(p\)</span> depends on the invasion rate of species <span class="math inline">\(r\)</span>). As a consequence, the most aggressive species never has the highest fixed-point population. Moreover, if the invasion probabilities of two species are held steady, then a decrease in the competitive ability of the third leads to an increase in its fixed-point population. For example, if the invasion rate of species <span class="math inline">\(p\)</span> decreases, then the population at the fixed point of species <span class="math inline">\(s\)</span> decreases and since there are less <span class="math inline">\(s\)</span> individuals invading species <span class="math inline">\(p\)</span>, the population of <span class="math inline">\(p\)</span> increases.</p>
 </section>
-<section id="empirical-findings" class="level2">
-<h2 class="anchored" data-anchor-id="empirical-findings">Empirical findings</h2>
+<section id="experiments" class="level2">
+<h2 class="anchored" data-anchor-id="experiments">Experiments</h2>
 <p>Importing the necessary libraries:</p>
 <div class="cell" data-execution_count="1">
 <details open="">
@@ -866,9 +866,9 @@ n_p[t+\Delta_t]=n_p[t] + \Delta_t \cdot n_p[t](n_r[t]P_p - n_s[t] P_s)\\
 <div class="cell" data-execution_count="19">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1"></a><span class="kw">def</span> ODE_solver(t, P, x0):</span>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1"></a><span class="kw">def</span> RSP_ODE_solver(t, P, x0):</span>
 <span id="cb20-2"><a href="#cb20-2"></a>    <span class="co">'''</span></span>
-<span id="cb20-3"><a href="#cb20-3"></a><span class="co">    Solve the initial value problem for the ODE system.</span></span>
+<span id="cb20-3"><a href="#cb20-3"></a><span class="co">    Solve the initial value problem for the RSP ODE system.</span></span>
 <span id="cb20-4"><a href="#cb20-4"></a><span class="co">    '''</span></span>
 <span id="cb20-5"><a href="#cb20-5"></a>    <span class="kw">def</span> RSP(x, t, P):</span>
 <span id="cb20-6"><a href="#cb20-6"></a>        nr <span class="op">=</span> x[<span class="dv">0</span>]</span>
@@ -905,7 +905,7 @@ n_p[t+\Delta_t]=n_p[t] + \Delta_t \cdot n_p[t](n_r[t]P_p - n_s[t] P_s)\\
 <span id="cb20-37"><a href="#cb20-37"></a></span>
 <span id="cb20-38"><a href="#cb20-38"></a>    P <span class="op">=</span> [Pr, Ps, Pp]</span>
 <span id="cb20-39"><a href="#cb20-39"></a>    x0 <span class="op">=</span> [nr_init, ns_init]</span>
-<span id="cb20-40"><a href="#cb20-40"></a>    s <span class="op">=</span> ODE_solver(t, P, x0)</span>
+<span id="cb20-40"><a href="#cb20-40"></a>    s <span class="op">=</span> RSP_ODE_solver(t, P, x0)</span>
 <span id="cb20-41"><a href="#cb20-41"></a>    <span class="cf">return</span> s</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
@@ -1022,7 +1022,7 @@ n_p[t+\Delta_t]=n_p[t] + \Delta_t \cdot n_p[t](n_r[t]P_p - n_s[t] P_s)\\
 <span id="cb28-8"><a href="#cb28-8"></a>plt.legend()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display" data-execution_count="27">
-<pre><code>&lt;matplotlib.legend.Legend at 0x28fb3a4d0&gt;</code></pre>
+<pre><code>&lt;matplotlib.legend.Legend at 0x2a380ec10&gt;</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <p><img src="long_range_simulations_files/figure-html/cell-28-output-2.png" class="img-fluid"></p>
@@ -1190,7 +1190,7 @@ DoStochSim(end=False, mode=False, method=False, trajectories=False, epsilon=0.03
 <pre><code>Info: 1 trajectory is generated
 simulation done!               
 Info: Number of time steps 1000 End time 1.0951329075756742e-06
-Info: Simulation time 0.00992</code></pre>
+Info: Simulation time 0.00977</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <p><img src="long_range_simulations_files/figure-html/cell-34-output-2.png" class="img-fluid"></p>
@@ -1211,7 +1211,7 @@ Info: Simulation time 0.00992</code></pre>
 <pre><code>Info: 1 trajectory is generated
 simulation done!               
 Info: Number of time steps 1928 End time 2.519492477708811
-Info: Simulation time 0.05302</code></pre>
+Info: Simulation time 0.02972</code></pre>
 </div>
 </div>
 <p>Plotting the evolution of the system:</p>
@@ -1280,7 +1280,7 @@ R3  0.004</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>Info: 100 trajectories are generated
 Info: Time simulation output of the trajectories is stored at RSP_model_reduced(trajectory).dat in directory: /Users/irenetesta/Stochpy/temp
-Info: Simulation time: 0.14871883392333984                                                   </code></pre>
+Info: Simulation time: 0.15464997291564941                                                   </code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <p><img src="long_range_simulations_files/figure-html/cell-40-output-2.png" class="img-fluid"></p>
@@ -1514,7 +1514,7 @@ Info: 21500000 time steps simulated
 Info: 21600000 time steps simulated
 Info: 21700000 time steps simulated
 Info: 21800000 time steps simulated
-Info: Simulation time 13.27896</code></pre>
+Info: Simulation time 13.30178</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <p><img src="long_range_simulations_files/figure-html/cell-41-output-2.png" class="img-fluid"></p>
@@ -1555,7 +1555,7 @@ Parsing file: ../long_range_models/RSP_model_reduced.psc
 Info: No reagents have been fixed
 Info: 100 trajectories are generated
 Info: Time simulation output of the trajectories is stored at RSP_model_reduced(trajectory).dat in directory: /Users/irenetesta/Stochpy/temp
-Info: Simulation time: 17.62055230140686                                                   *** WARNING ***: No regular grid is created yet. Use GetRegularGrid(n_samples) if averaged results are unsatisfactory (e.g. more or less 'samples')</code></pre>
+Info: Simulation time: 17.422198057174683                                                   *** WARNING ***: No regular grid is created yet. Use GetRegularGrid(n_samples) if averaged results are unsatisfactory (e.g. more or less 'samples')</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <p><img src="long_range_simulations_files/figure-html/cell-43-output-2.png" class="img-fluid"></p>
@@ -1581,23 +1581,267 @@ Info: No reagents have been fixed
 Info: 1 trajectory is generated
 simulation done!               
 Info: Number of time steps 469 End time 1.0884810590458118
-Info: Simulation time 0.00349</code></pre>
+Info: Simulation time 0.00356</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <p><img src="long_range_simulations_files/figure-html/cell-44-output-2.png" class="img-fluid"></p>
 </div>
 </div>
 <p>Differently from the simulation with ODEs, the system does not exhibit sustained oscillations, as the inherent randomness in the timing and sequence of reactions introduces fluctuations that prevent the emergence of periodic behavior.</p>
+<section id="genetic-network-with-negative-feedback-loop" class="level4">
+<h4 class="anchored" data-anchor-id="genetic-network-with-negative-feedback-loop">Genetic Network with Negative Feedback Loop</h4>
+<p>A suitable case study for stochastic simulations is a genetic network consisting of a feedback loop involving three genes. In this system, each gene encodes a protein that represses the expression of the subsequent gene in the loop, similar to the dynamics seen in a rock-paper-scissors game.</p>
+<span class="math display">\[\begin{cases}
+G_1 \xrightarrow{r_{P_1}} G_1 + P_1\quad (1)\\
+G_2 \xrightarrow{r_{P_2}} G_2 + P_2\quad (2)\\
+G_3 \xrightarrow{r_{P_3}} G_3 + P_3\quad (3)\\
+P_1 + G_2 \underset{r_{U_1}}{\xrightleftharpoons{r_{B_1}}} P_1G_2\quad (4)\\
+P_2 + G_3 \underset{r_{U_2}}{\xrightleftharpoons{r_{B_2}}} P_2G_3\quad (5)\\
+P_3 + G_1 \underset{r_{U_3}}{\xrightleftharpoons{r_{B_3}}} P_3G_1\quad (6)\\
+P_1 \xrightarrow{r_{D_1}}\quad (7)\\
+P_2 \xrightarrow{r_{D_2}}\quad (8)\\
+P_3 \xrightarrow{r_{D_3}}\quad (9)\\
+\end{cases}\]</span>
+<p>In this network, each gene produces a protein (reactions <span class="math inline">\((1), (2), (3)\)</span>), which can interact with the next gene in the loop to inhibit its expression (reactions <span class="math inline">\((4), (5), (6)\)</span>, forward reactions). This inhibition creates a negative feedback loop, as each protein suppresses the activity of the subsequent gene in the sequence. The inhibition occurs when the protein binds to the gene, preventing it from synthesizing its associated protein. However, the protein-gene complex can dissociate, freeing the gene to resume protein production (reactions <span class="math inline">\((4), (5), (6)\)</span>, reverse reactions). Additionally, over time, the proteins degrade and disappear from the system (reactions <span class="math inline">\((7), (8), (9)\)</span>).</p>
+<p>Visualizing the model in the <code>PySCeS MDL</code> format:</p>
+<div class="cell" data-execution_count="44">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb58-1"><a href="#cb58-1"></a><span class="op">!</span>cat ..<span class="op">/</span>long_range_models<span class="op">/</span>negative_feedback_loop_model.psc</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># Negative feedback loop
+
+# G1 --&gt; RP1, G1 + P1
+# G2 --&gt; RP2, G2 + P2
+# G3 --&gt; RP2, G3 + P3
+# P1 + G2, RU1 &lt;--&gt; RB1, P1G2
+# P2 + G3, RU2 &lt;--&gt; RB2, P2G3
+# P3 + G1, RU3 &lt;--&gt; RB3, P3G1
+# P1 --&gt; RD1,
+# P2 --&gt; RD2,
+# P3 --&gt; RD3,
+
+R1:
+    G1 &gt; G1 + P1
+    G1*RP1
+
+R2:
+    G2 &gt; G2 + P2
+    G2*RP2
+
+R3:
+    G3 &gt; G3 + P3
+    G3*RP3
+
+R4:
+    P1 + G2 &gt; P1G2
+    P1*G2*RB1
+
+R5:
+    P1G2 &gt; P1 + G2
+    P1G2*RU1
+
+R6:
+    P2 + G3 &gt; P2G3
+    P2*G3*RB2
+
+R7:
+    P2G3 &gt; P2 + G3
+    P2G3*RU2
+
+R8:
+    P3 + G1 &gt; P3G1
+    P3*G1*RB3
+
+R9:
+    P3G1 &gt; P3 + G1
+    P3G1*RU3
+
+R10:
+    P1 &gt; $pool
+    P1*RD1
+
+R11:
+    P2 &gt; $pool
+    P2*RD2
+
+R12:
+    P3 &gt; $pool
+    P3*RD3
+
+# Parameters
+RP1 = 10
+RP2 = 10000
+RP3 = 10
+RB1 = 10
+RU1 = 2
+RB2 = 0.1
+RU2 = 20
+RB3 = 10
+RU3 = 20
+RD1 = 1
+RD2 = 100
+RD3 = 1
+
+# Init Values
+P1 = 0
+P2 = 0
+P3 = 0
+G1 = 1
+G2 = 1
+G3 = 1
+P1G2 = 0
+P2G3 = 0
+P3G1 = 0</code></pre>
+</div>
+</div>
+<p>The system is initialized with a copy of each gene, no proteins and no protein-gene complexes. The reaction rates are set so that <span class="math inline">\(G2\)</span> produces its protein much more rapidly, and this protein has a shorter lifespan, degrading at a faster rate.</p>
+<p>Loading the model into <code>StochPy</code> and performing a stochastic simulation:</p>
+<div class="cell" data-execution_count="45">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb60-1"><a href="#cb60-1"></a>smod <span class="op">=</span> stochpy.SSA(IsQuiet<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb60-2"><a href="#cb60-2"></a>smod.Model(model_file<span class="op">=</span><span class="st">"negative_feedback_loop_model.psc"</span>,<span class="bu">dir</span><span class="op">=</span><span class="st">"../long_range_models/"</span>)</span>
+<span id="cb60-3"><a href="#cb60-3"></a>smod.DoStochSim(IsTrackPropensities<span class="op">=</span><span class="va">True</span>, end<span class="op">=</span><span class="dv">10000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Info: Direct method is selected to perform stochastic simulations.
+Parsing file: /Users/irenetesta/Stochpy/pscmodels/ImmigrationDeath.psc
+Info: No reagents have been fixed
+Parsing file: ../long_range_models/negative_feedback_loop_model.psc
+Info: No reagents have been fixed
+Info: 1 trajectory is generated
+simulation done!               
+Info: Number of time steps 10000 End time 6.3121454739530645
+Info: Simulation time 0.12413</code></pre>
+</div>
+</div>
+<p>Visualizing the evolution of the system:</p>
+<div class="cell" data-execution_count="46">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb62-1"><a href="#cb62-1"></a>nfl_stoch_df <span class="op">=</span> pd.DataFrame(smod.data_stochsim.species, columns<span class="op">=</span>smod.data_stochsim.species_labels)</span>
+<span id="cb62-2"><a href="#cb62-2"></a>nfl_stoch_df[[<span class="st">'P1'</span>, <span class="st">'P2'</span>, <span class="st">'P3'</span>]].plot(figsize<span class="op">=</span>(<span class="dv">20</span>,<span class="dv">5</span>), color<span class="op">=</span>[<span class="st">'red'</span>, <span class="st">'green'</span>, <span class="st">'blue'</span>], xlabel<span class="op">=</span><span class="st">"Steps"</span>, ylabel<span class="op">=</span><span class="st">"Copy number"</span>, title<span class="op">=</span><span class="st">"Proteins"</span>)</span>
+<span id="cb62-3"><a href="#cb62-3"></a>nfl_stoch_df[[<span class="st">'P3G1'</span>, <span class="st">'G1'</span>]].plot(figsize<span class="op">=</span>(<span class="dv">20</span>,<span class="dv">5</span>), color<span class="op">=</span>[<span class="st">'black'</span>, <span class="st">'darkturquoise'</span>], xlabel<span class="op">=</span><span class="st">"Steps"</span>, ylabel<span class="op">=</span><span class="st">"Copy number"</span>, title<span class="op">=</span><span class="st">"G1 inhibition"</span>)</span>
+<span id="cb62-4"><a href="#cb62-4"></a>nfl_stoch_df[[<span class="st">'P1G2'</span>, <span class="st">'G2'</span>]].plot(figsize<span class="op">=</span>(<span class="dv">20</span>,<span class="dv">5</span>), color<span class="op">=</span>[<span class="st">'black'</span>, <span class="st">'magenta'</span>], xlabel<span class="op">=</span><span class="st">"Steps"</span>, ylabel<span class="op">=</span><span class="st">"Copy number"</span>, title<span class="op">=</span><span class="st">"G2 inhibition"</span>)</span>
+<span id="cb62-5"><a href="#cb62-5"></a>nfl_stoch_df[[<span class="st">'P2G3'</span>, <span class="st">'G3'</span>]].plot(figsize<span class="op">=</span>(<span class="dv">20</span>,<span class="dv">5</span>), color<span class="op">=</span>[<span class="st">'black'</span>, <span class="st">'gold'</span>], xlabel<span class="op">=</span><span class="st">"Steps"</span>, ylabel<span class="op">=</span><span class="st">"Copy number"</span>, title<span class="op">=</span><span class="st">"G3 inhibition"</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p><img src="long_range_simulations_files/figure-html/cell-47-output-1.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="long_range_simulations_files/figure-html/cell-47-output-2.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="long_range_simulations_files/figure-html/cell-47-output-3.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="long_range_simulations_files/figure-html/cell-47-output-4.png" class="img-fluid"></p>
+</div>
+</div>
+<p>The production of <span class="math inline">\(P2\)</span> exhibits valleys, where the protein is not produced, corresponding to the presence of the <span class="math inline">\(P1G2\)</span> protein-gene complex.</p>
+<p>If we adopt the continuous time approach and solve the corresponding system of ODEs, i.e.</p>
+<span class="math display">\[\begin{cases}
+\frac{\partial G_1}{\partial t}=-r_{B_3} \cdot P_3\cdot G_1 + r_{U_3} \cdot P_3G_1\\
+\frac{\partial G_2}{\partial t}=-r_{B_1} \cdot P_1\cdot G_2 + r_{U_1} \cdot P_1G_2\\
+\frac{\partial G_3}{\partial t}=-r_{B_2} \cdot P_2\cdot G_3 + r_{U_2} \cdot P_2G_3\\\
+\frac{\partial P_1}{\partial t}=r_{P_1}\cdot G_1 - r_{B_1} \cdot P_1\cdot G_2 + r_{U_1}\cdot P_1G_2 - r_{D_1}\cdot P_1\\
+\frac{\partial P_2}{\partial t}=r_{P_2}\cdot G_2- r_{B_2}\cdot P_2\cdot G_3+r_{U_2}\cdot P_2G_3-r_{D_2}\cdot P_2\\
+\frac{\partial P_3}{\partial t}=r_{P_3}\cdot G_3- r_{B_3}\cdot P_3\cdot G_1 +r_{U_3} \cdot P_3G_1-r_{D_3}\cdot P_3\\
+\frac{\partial P_1G_2}{\partial t}=r_{B_1}\cdot P_1\cdot G_2 - r_{U_1} \cdot P_1G_2\\
+\frac{\partial P_2G_3}{\partial t}=r_{B_2}\cdot P_2\cdot G_3 - r_{U_2}\cdot P_2G_3\\
+\frac{\partial P_3G_1}{\partial t}=r_{B_3}\cdot P_3\cdot G_1 - r_{U_3} \cdot P_3G_1\\
+\end{cases}\]</span>
+<p>ial P_3G_1}{t}=r_{B_3}P_3G_1 - r_{U_3} P_3G_1\ \end{cases}</p>
+<p>we would allow molecules to assume continuous values, meaning that genes and protein-gene complexes could take on values between <span class="math inline">\(0\)</span> and <span class="math inline">\(1\)</span>, which does not accurately reflect the discrete nature of the system.</p>
+<p>Defining a function to simulate the evolution of the system in the continuous setting:</p>
+<div class="cell" data-execution_count="47">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb63-1"><a href="#cb63-1"></a><span class="kw">def</span> NFL_ODE_solver(t, rates, init):</span>
+<span id="cb63-2"><a href="#cb63-2"></a>    <span class="co">'''</span></span>
+<span id="cb63-3"><a href="#cb63-3"></a><span class="co">    Solve the initial value problem for ODE system modeling the genetic network with negative feedback loop.</span></span>
+<span id="cb63-4"><a href="#cb63-4"></a><span class="co">    '''</span></span>
+<span id="cb63-5"><a href="#cb63-5"></a>    <span class="kw">def</span> neg_feedback_loop(x0, t, rates):</span>
+<span id="cb63-6"><a href="#cb63-6"></a>        G1, G2, G3, P1, P2, P3, P1G2, P2G3, P3G1 <span class="op">=</span> x0</span>
+<span id="cb63-7"><a href="#cb63-7"></a>        d_G1_dt <span class="op">=</span> <span class="op">-</span>rates[<span class="st">'rB3'</span>]<span class="op">*</span>P3<span class="op">*</span>G1 <span class="op">+</span> rates[<span class="st">'rU3'</span>]<span class="op">*</span>P3G1</span>
+<span id="cb63-8"><a href="#cb63-8"></a>        d_G2_dt <span class="op">=</span> <span class="op">-</span>rates[<span class="st">'rB1'</span>]<span class="op">*</span>P1<span class="op">*</span>G2 <span class="op">+</span> rates[<span class="st">'rU1'</span>]<span class="op">*</span>P1G2</span>
+<span id="cb63-9"><a href="#cb63-9"></a>        d_G3_dt <span class="op">=</span> <span class="op">-</span>rates[<span class="st">'rB2'</span>]<span class="op">*</span>P2<span class="op">*</span>G3 <span class="op">+</span> rates[<span class="st">'rU2'</span>]<span class="op">*</span>P2G3</span>
+<span id="cb63-10"><a href="#cb63-10"></a>        d_P1_dt <span class="op">=</span> <span class="op">+</span>rates[<span class="st">'rP1'</span>]<span class="op">*</span>G1 <span class="op">-</span> rates[<span class="st">'rB1'</span>]<span class="op">*</span>P1<span class="op">*</span>G2 <span class="op">+</span> rates[<span class="st">'rU1'</span>]<span class="op">*</span>P1G2 <span class="op">-</span> rates[<span class="st">'rD1'</span>]<span class="op">*</span>P1</span>
+<span id="cb63-11"><a href="#cb63-11"></a>        d_P2_dt <span class="op">=</span> <span class="op">+</span>rates[<span class="st">'rP2'</span>]<span class="op">*</span>G2 <span class="op">-</span> rates[<span class="st">'rB2'</span>]<span class="op">*</span>P2<span class="op">*</span>G3 <span class="op">+</span> rates[<span class="st">'rU2'</span>]<span class="op">*</span>P2G3 <span class="op">-</span> rates[<span class="st">'rD2'</span>]<span class="op">*</span>P2</span>
+<span id="cb63-12"><a href="#cb63-12"></a>        d_P3_dt <span class="op">=</span> <span class="op">+</span>rates[<span class="st">'rP3'</span>]<span class="op">*</span>G3 <span class="op">-</span> rates[<span class="st">'rB3'</span>]<span class="op">*</span>P3<span class="op">*</span>G1 <span class="op">+</span> rates[<span class="st">'rU3'</span>]<span class="op">*</span>P3G1 <span class="op">-</span> rates[<span class="st">'rD3'</span>]<span class="op">*</span>P3</span>
+<span id="cb63-13"><a href="#cb63-13"></a>        d_P1G2_dt <span class="op">=</span> <span class="op">+</span>rates[<span class="st">'rB1'</span>]<span class="op">*</span>P1<span class="op">*</span>G2 <span class="op">-</span> rates[<span class="st">'rU1'</span>]<span class="op">*</span>P1G2</span>
+<span id="cb63-14"><a href="#cb63-14"></a>        d_P2G3_dt <span class="op">=</span> <span class="op">+</span>rates[<span class="st">'rB2'</span>]<span class="op">*</span>P2<span class="op">*</span>G3 <span class="op">-</span> rates[<span class="st">'rU2'</span>]<span class="op">*</span>P2G3</span>
+<span id="cb63-15"><a href="#cb63-15"></a>        d_P3G1_dt <span class="op">=</span> <span class="op">+</span>rates[<span class="st">'rB3'</span>]<span class="op">*</span>P3<span class="op">*</span>G1 <span class="op">-</span> rates[<span class="st">'rU3'</span>]<span class="op">*</span>P3G1</span>
+<span id="cb63-16"><a href="#cb63-16"></a>        <span class="cf">return</span> [d_G1_dt, d_G2_dt, d_G3_dt, d_P1_dt, d_P2_dt, d_P3_dt, d_P1G2_dt, d_P2G3_dt, d_P3G1_dt]</span>
+<span id="cb63-17"><a href="#cb63-17"></a></span>
+<span id="cb63-18"><a href="#cb63-18"></a>    x0 <span class="op">=</span> [init[<span class="st">'G1'</span>], init[<span class="st">'G2'</span>], init[<span class="st">'G3'</span>], init[<span class="st">'P1'</span>], init[<span class="st">'P2'</span>], init[<span class="st">'P3'</span>], init[<span class="st">'P1G2'</span>], init[<span class="st">'P2G3'</span>], init[<span class="st">'P3G1'</span>]]</span>
+<span id="cb63-19"><a href="#cb63-19"></a>    y <span class="op">=</span> odeint(neg_feedback_loop, x0, t, args<span class="op">=</span>(rates,))</span>
+<span id="cb63-20"><a href="#cb63-20"></a>    results_df <span class="op">=</span> pd.DataFrame(y, columns<span class="op">=</span>[<span class="st">'$G_1$'</span>, <span class="st">'$G_2$'</span>, <span class="st">'$G_3$'</span>, <span class="st">'$P_1$'</span>, <span class="st">'$P_2$'</span>, <span class="st">'$P_3$'</span>, <span class="st">'$P_1G_2$'</span>, <span class="st">'$P_2G_3$'</span>, <span class="st">'$P_3G_1$'</span>])</span>
+<span id="cb63-21"><a href="#cb63-21"></a>    <span class="cf">return</span> results_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Simulate the system for 50 time units:</p>
+<div class="cell" data-execution_count="48">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb64-1"><a href="#cb64-1"></a>nfl_rates <span class="op">=</span> {</span>
+<span id="cb64-2"><a href="#cb64-2"></a>    <span class="st">'rP1'</span>: <span class="dv">10</span>,</span>
+<span id="cb64-3"><a href="#cb64-3"></a>    <span class="st">'rP2'</span>: <span class="dv">10000</span>,</span>
+<span id="cb64-4"><a href="#cb64-4"></a>    <span class="st">'rP3'</span>: <span class="dv">10</span>,</span>
+<span id="cb64-5"><a href="#cb64-5"></a>    <span class="st">'rB1'</span>: <span class="dv">10</span>,</span>
+<span id="cb64-6"><a href="#cb64-6"></a>    <span class="st">'rB2'</span>: <span class="fl">0.1</span>,</span>
+<span id="cb64-7"><a href="#cb64-7"></a>    <span class="st">'rB3'</span>: <span class="dv">10</span>,</span>
+<span id="cb64-8"><a href="#cb64-8"></a>    <span class="st">'rU1'</span>: <span class="dv">2</span>,</span>
+<span id="cb64-9"><a href="#cb64-9"></a>    <span class="st">'rU2'</span>: <span class="dv">20</span>,</span>
+<span id="cb64-10"><a href="#cb64-10"></a>    <span class="st">'rU3'</span>: <span class="dv">20</span>,</span>
+<span id="cb64-11"><a href="#cb64-11"></a>    <span class="st">'rD1'</span>: <span class="dv">1</span>,</span>
+<span id="cb64-12"><a href="#cb64-12"></a>    <span class="st">'rD2'</span>: <span class="dv">100</span>,</span>
+<span id="cb64-13"><a href="#cb64-13"></a>    <span class="st">'rD3'</span>: <span class="dv">1</span></span>
+<span id="cb64-14"><a href="#cb64-14"></a>}</span>
+<span id="cb64-15"><a href="#cb64-15"></a>nfl_init <span class="op">=</span> {</span>
+<span id="cb64-16"><a href="#cb64-16"></a>    <span class="st">'G1'</span>: <span class="dv">1</span>,</span>
+<span id="cb64-17"><a href="#cb64-17"></a>    <span class="st">'G2'</span>: <span class="dv">1</span>,</span>
+<span id="cb64-18"><a href="#cb64-18"></a>    <span class="st">'G3'</span>: <span class="dv">1</span>,</span>
+<span id="cb64-19"><a href="#cb64-19"></a>    <span class="st">'P1'</span>: <span class="dv">0</span>,</span>
+<span id="cb64-20"><a href="#cb64-20"></a>    <span class="st">'P2'</span>: <span class="dv">0</span>,</span>
+<span id="cb64-21"><a href="#cb64-21"></a>    <span class="st">'P3'</span>: <span class="dv">0</span>,</span>
+<span id="cb64-22"><a href="#cb64-22"></a>    <span class="st">'P1G2'</span>: <span class="dv">0</span>,</span>
+<span id="cb64-23"><a href="#cb64-23"></a>    <span class="st">'P2G3'</span>: <span class="dv">0</span>,</span>
+<span id="cb64-24"><a href="#cb64-24"></a>    <span class="st">'P3G1'</span>: <span class="dv">0</span></span>
+<span id="cb64-25"><a href="#cb64-25"></a>}</span>
+<span id="cb64-26"><a href="#cb64-26"></a>nfl_cont_df <span class="op">=</span> NFL_ODE_solver(np.linspace(<span class="dv">0</span>,<span class="dv">50</span>,<span class="dv">51</span>), nfl_rates, nfl_init)</span>
+<span id="cb64-27"><a href="#cb64-27"></a>nfl_cont_df[[<span class="st">'$P_1$'</span>, <span class="st">'$P_2$'</span>, <span class="st">'$P_3$'</span>]].plot(figsize<span class="op">=</span>(<span class="dv">20</span>,<span class="dv">5</span>), color<span class="op">=</span>[<span class="st">'red'</span>, <span class="st">'green'</span>, <span class="st">'blue'</span>], xlabel<span class="op">=</span><span class="st">"Time"</span>, ylabel<span class="op">=</span><span class="st">"Value"</span>, title<span class="op">=</span><span class="st">"Proteins"</span>)</span>
+<span id="cb64-28"><a href="#cb64-28"></a>nfl_cont_df[[<span class="st">'$P_3G_1$'</span>, <span class="st">'$G_1$'</span>]].plot(figsize<span class="op">=</span>(<span class="dv">20</span>,<span class="dv">5</span>), color<span class="op">=</span>[<span class="st">'black'</span>, <span class="st">'darkturquoise'</span>], xlabel<span class="op">=</span><span class="st">"Time"</span>, ylabel<span class="op">=</span><span class="st">"Value"</span>, title<span class="op">=</span><span class="st">"G1 inhibition"</span>)</span>
+<span id="cb64-29"><a href="#cb64-29"></a>nfl_cont_df[[<span class="st">'$P_1G_2$'</span>, <span class="st">'$G_2$'</span>]].plot(figsize<span class="op">=</span>(<span class="dv">20</span>,<span class="dv">5</span>), color<span class="op">=</span>[<span class="st">'black'</span>, <span class="st">'magenta'</span>], xlabel<span class="op">=</span><span class="st">"Time"</span>, ylabel<span class="op">=</span><span class="st">"Value"</span>, title<span class="op">=</span><span class="st">"G2 inhibition"</span>)</span>
+<span id="cb64-30"><a href="#cb64-30"></a>nfl_cont_df[[<span class="st">'$P_2G_3$'</span>, <span class="st">'$G_3$'</span>]].plot(figsize<span class="op">=</span>(<span class="dv">20</span>,<span class="dv">5</span>), color<span class="op">=</span>[<span class="st">'black'</span>, <span class="st">'gold'</span>], xlabel<span class="op">=</span><span class="st">"Time"</span>, ylabel<span class="op">=</span><span class="st">"Value"</span>, title<span class="op">=</span><span class="st">"G3 inhibition"</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p><img src="long_range_simulations_files/figure-html/cell-49-output-1.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="long_range_simulations_files/figure-html/cell-49-output-2.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="long_range_simulations_files/figure-html/cell-49-output-3.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="long_range_simulations_files/figure-html/cell-49-output-4.png" class="img-fluid"></p>
+</div>
+</div>
+<p>Indeed, this simulation shows a completely different behavior. Over time, the negative feedback loop stabilizes the levels of all proteins, leading the system to reach a steady state. This dynamic does not occur in nature, as the system is inherently stochastic and discrete.</p>
+</section>
 </section>
 <section id="stochastic-model-checking" class="level3">
 <h3 class="anchored" data-anchor-id="stochastic-model-checking">4. Stochastic model checking</h3>
 <p>Stochastic model checking enables the verification of properties in stochastic systems by quantifying their probabilities through systematic exploration of all possible system behaviors.</p>
 <p>To perform stochastic model checking we need to translate the model into a Continuous Time Markov Chain (CTMC) and specify the properties we want to verify. Dynamical properties of the resulting CTMC could then be analyzed using the stochastic model checker <a href="https://www.prismmodelchecker.org">PRISM</a>.</p>
 <p>PRISM represents CTMC states using a set of bounded integer variables, necessitating the assumption of a discrete state space. This results in the following CTMC specification in PRISM’s input language (stored in the file <code>../long_range_models/RSP.prism</code>), where model parameters are defined by <code>Pr</code>, <code>Ps</code> and <code>Pp</code> constants (initialized with the same values used in the previous simulations), <code>MAX</code> is the maximum number of molecules per species (set to 100 due to the prohibitive computational time required for higher values) and we have three transitions describing the three possible reactions:</p>
-<div class="cell" data-execution_count="44">
+<div class="cell" data-execution_count="49">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb58-1"><a href="#cb58-1"></a><span class="op">!</span>cat ..<span class="op">/</span>long_range_models<span class="op">/</span>RSP.prism</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb65-1"><a href="#cb65-1"></a><span class="op">!</span>cat ..<span class="op">/</span>long_range_models<span class="op">/</span>RSP.prism</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>ctmc
@@ -1622,10 +1866,10 @@ endmodule</code></pre>
 </div>
 </div>
 <p>Noting that <code>r + s + p = 1</code>, we can simplify the model to reduce computational time by eliminating the variable <code>p</code>. This results in the following PRISM input:</p>
-<div class="cell" data-execution_count="45">
+<div class="cell" data-execution_count="50">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb60-1"><a href="#cb60-1"></a><span class="op">!</span>cat ..<span class="op">/</span>long_range_models<span class="op">/</span>RSP_reduced.prism</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb67-1"><a href="#cb67-1"></a><span class="op">!</span>cat ..<span class="op">/</span>long_range_models<span class="op">/</span>RSP_reduced.prism</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>ctmc
@@ -1649,24 +1893,24 @@ endmodule</code></pre>
 </div>
 </div>
 <p>Let’s visualize the graphical representation of the CTMC (that can be exported from PRISM) for a system with <code>MAX=10</code>:</p>
-<div class="cell" data-execution_count="46">
+<div class="cell" data-execution_count="51">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb62-1"><a href="#cb62-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">'../results/ctmc.dot'</span>, <span class="st">'r'</span>) <span class="im">as</span> <span class="bu">file</span>:</span>
-<span id="cb62-2"><a href="#cb62-2"></a>    dot_data <span class="op">=</span> <span class="bu">file</span>.read()</span>
-<span id="cb62-3"><a href="#cb62-3"></a>graph <span class="op">=</span> Source(dot_data)</span>
-<span id="cb62-4"><a href="#cb62-4"></a>graph</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb69-1"><a href="#cb69-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">'../results/ctmc.dot'</span>, <span class="st">'r'</span>) <span class="im">as</span> <span class="bu">file</span>:</span>
+<span id="cb69-2"><a href="#cb69-2"></a>    dot_data <span class="op">=</span> <span class="bu">file</span>.read()</span>
+<span id="cb69-3"><a href="#cb69-3"></a>graph <span class="op">=</span> Source(dot_data)</span>
+<span id="cb69-4"><a href="#cb69-4"></a>graph</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="46">
-<p><img src="long_range_simulations_files/figure-html/cell-47-output-1.svg" class="img-fluid"></p>
+<div class="cell-output cell-output-display" data-execution_count="51">
+<p><img src="long_range_simulations_files/figure-html/cell-52-output-1.svg" class="img-fluid"></p>
 </div>
 </div>
 <p>The initial state of the system is state 48, where all exit rates are equal to 3, corresponding to the equilibrium point.</p>
 <p>We can define a list of properties to be verified, using the CSL temporal logic:</p>
-<div class="cell" data-execution_count="47">
+<div class="cell" data-execution_count="52">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb63-1"><a href="#cb63-1"></a><span class="op">!</span>cat ..<span class="op">/</span>long_range_models<span class="op">/</span>RSP_properties.csl</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb70-1"><a href="#cb70-1"></a><span class="op">!</span>cat ..<span class="op">/</span>long_range_models<span class="op">/</span>RSP_properties.csl</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>P=?[ F r=0 ]
@@ -1707,10 +1951,10 @@ P=? [ F=1 (MAX-r-s)&gt;=x &amp; (MAX-r-s)&lt;x+10 ]</code></pre>
 </div>
 </div>
 <p>and then use PRISM to verify these properties. PRISM saves the results in a log file, which we can load and analyze:</p>
-<div class="cell" data-execution_count="48">
+<div class="cell" data-execution_count="53">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb65-1"><a href="#cb65-1"></a><span class="op">!</span>sed <span class="op">-</span>n <span class="st">'9,128p'</span> ..<span class="op">/</span>results<span class="op">/</span>prism_log.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb72-1"><a href="#cb72-1"></a><span class="op">!</span>sed <span class="op">-</span>n <span class="st">'9,128p'</span> ..<span class="op">/</span>results<span class="op">/</span>prism_log.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Type:        CTMC
@@ -1838,10 +2082,10 @@ Result: 0.8745308920684021 (+/- 8.735542417834342E-6 estimated; rel err 9.988832
 <p>By inspecting the log file, we can see that the model has <span class="math inline">\(5151\)</span> states and <span class="math inline">\(14853\)</span> transitions.</p>
 <p>The probabilities of extinction for species <code>r</code>, <code>s</code>, and <code>p</code> are <span class="math inline">\(0.14\)</span>, <span class="math inline">\(0.98\)</span>, and <span class="math inline">\(0.87\)</span>, respectively. Again, the population with the lowest invasion rate is the least likely to become extinct.</p>
 <p>Loading subsequent lines of PRISM log file:</p>
-<div class="cell" data-execution_count="49">
+<div class="cell" data-execution_count="54">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb67-1"><a href="#cb67-1"></a><span class="op">!</span>sed <span class="op">-</span>n <span class="st">'128,278p'</span> ..<span class="op">/</span>results<span class="op">/</span>PRISM_log.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb74-1"><a href="#cb74-1"></a><span class="op">!</span>sed <span class="op">-</span>n <span class="st">'128,278p'</span> ..<span class="op">/</span>results<span class="op">/</span>PRISM_log.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>---------------------------------------------------------------------
@@ -1999,10 +2243,10 @@ Result: 0.28962347433238994
 </div>
 <p>The probability of a species to go extinct after having reached a density of <span class="math inline">\(0.7\)</span> is <span class="math inline">\(0.14\)</span> for species <code>r</code>, <span class="math inline">\(0.65\)</span> for species <code>s</code>, and <span class="math inline">\(0.29\)</span> for species <code>p</code>. If species <code>s</code>and <code>p</code> reach a density of <span class="math inline">\(0.7\)</span>, they are less likely to become extinct in the future as compared to the extinction probability of these species from the initial state.</p>
 <p>Loading subsequent lines of PRISM log file:</p>
-<div class="cell" data-execution_count="50">
+<div class="cell" data-execution_count="55">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb69-1"><a href="#cb69-1"></a><span class="op">!</span>sed <span class="op">-</span>n <span class="st">'278,375p'</span> ..<span class="op">/</span>results<span class="op">/</span>PRISM_log.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb76-1"><a href="#cb76-1"></a><span class="op">!</span>sed <span class="op">-</span>n <span class="st">'278,375p'</span> ..<span class="op">/</span>results<span class="op">/</span>PRISM_log.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>---------------------------------------------------------------------
@@ -2149,10 +2393,10 @@ P=? [ F=1 (MAX-r-s)&gt;=x &amp; (MAX-r-s)&lt;x+10 ]</code></pre>
 <p>In this particular net, the pretransition and posttransition of the sites are as follows: - <span class="math inline">\(•P=\{Pp\}\)</span> - <span class="math inline">\(•R=\{Pr\}\)</span> - <span class="math inline">\(•S=\{Ps\}\)</span> - <span class="math inline">\(P•=\{Pp,Ps\}\)</span> - <span class="math inline">\(R•=\{Pr,Pp\}\)</span> - <span class="math inline">\(S•=\{Ps,Pr\}\)</span></p>
 <p>The <strong>incidence matrix</strong> of <span class="math inline">\(\mathcal{N}\)</span> is a matrix <span class="math inline">\(C:P\times T \rightarrow \mathbb{Z}\)</span>, indexed by <span class="math inline">\(P\)</span> and <span class="math inline">\(T\)</span>, such that <span class="math inline">\(C(p,t)=f(t,p)−f(p,t)\)</span>.</p>
 <p>Loading the file containing the incidence matrix produced by Charlie:</p>
-<div class="cell" data-execution_count="51">
+<div class="cell" data-execution_count="56">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb74-1"><a href="#cb74-1"></a><span class="op">!</span>cat ..<span class="op">/</span>results<span class="op">/</span>petri_net_incidence_matrix.txtm</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb81-1"><a href="#cb81-1"></a><span class="op">!</span>cat ..<span class="op">/</span>results<span class="op">/</span>petri_net_incidence_matrix.txtm</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>placeNames = {P R S };
@@ -2176,14 +2420,14 @@ C=[
 0 &amp; 1 &amp; 1
 \end{bmatrix}\]</span></p>
 <p>and we can compute its rank (which is necessary to determine if certain properties of the net hold, as discussed later) as follows:</p>
-<div class="cell" data-execution_count="52">
+<div class="cell" data-execution_count="57">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb76-1"><a href="#cb76-1"></a>C <span class="op">=</span> Matrix([[<span class="dv">1</span>, <span class="dv">0</span>, <span class="op">-</span><span class="dv">1</span>], [<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>], [<span class="dv">0</span>, <span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>]])</span>
-<span id="cb76-2"><a href="#cb76-2"></a>rank <span class="op">=</span> C.rank()</span>
-<span id="cb76-3"><a href="#cb76-3"></a>rank</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb83-1"><a href="#cb83-1"></a>C <span class="op">=</span> Matrix([[<span class="dv">1</span>, <span class="dv">0</span>, <span class="op">-</span><span class="dv">1</span>], [<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>], [<span class="dv">0</span>, <span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>]])</span>
+<span id="cb83-2"><a href="#cb83-2"></a>rank <span class="op">=</span> C.rank()</span>
+<span id="cb83-3"><a href="#cb83-3"></a>rank</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="52">
+<div class="cell-output cell-output-display" data-execution_count="57">
 <pre><code>2</code></pre>
 </div>
 </div>
@@ -2191,25 +2435,25 @@ C=[
 <p>A place vector (transition vector) is called a <strong>P-invariant</strong> (<strong>T-invariant</strong>) if it is a nontrivial nonnegative integer solution of the linear equation system <span class="math inline">\(x \cdot C = 0\)</span> (<span class="math inline">\(C \cdot y = 0\)</span>).</p>
 <p>If <span class="math inline">\(p\)</span> is a P-invariant, then the weighted sum of tokens across the places (using the weights specified by the p-invariant) is preserved under the firing of transitions. If <span class="math inline">\(t\)</span> is a T-invariant, then if you fire the transitions according to the vector <span class="math inline">\(t\)</span> (where the number of times each transition is fired is given by the corresponding entry in <span class="math inline">\(t\)</span>), the net’s marking will remain unchanged.</p>
 <p>Computing P-invariants:</p>
-<div class="cell" data-execution_count="53">
+<div class="cell" data-execution_count="58">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb78-1"><a href="#cb78-1"></a>x1, x2, x3 <span class="op">=</span> symbols(<span class="st">'x1 x2 x3'</span>)</span>
-<span id="cb78-2"><a href="#cb78-2"></a>x <span class="op">=</span> Matrix([x1, x2, x3])</span>
-<span id="cb78-3"><a href="#cb78-3"></a>equation <span class="op">=</span> Eq(x.T <span class="op">*</span> C, Matrix([[<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>]]))</span>
-<span id="cb78-4"><a href="#cb78-4"></a>solution <span class="op">=</span> solve(equation, (x1, x2, x3), <span class="bu">dict</span><span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb78-5"><a href="#cb78-5"></a>solution</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb85-1"><a href="#cb85-1"></a>x1, x2, x3 <span class="op">=</span> symbols(<span class="st">'x1 x2 x3'</span>)</span>
+<span id="cb85-2"><a href="#cb85-2"></a>x <span class="op">=</span> Matrix([x1, x2, x3])</span>
+<span id="cb85-3"><a href="#cb85-3"></a>equation <span class="op">=</span> Eq(x.T <span class="op">*</span> C, Matrix([[<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>]]))</span>
+<span id="cb85-4"><a href="#cb85-4"></a>solution <span class="op">=</span> solve(equation, (x1, x2, x3), <span class="bu">dict</span><span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb85-5"><a href="#cb85-5"></a>solution</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="53">
+<div class="cell-output cell-output-display" data-execution_count="58">
 <pre><code>[{x1: x3, x2: x3}]</code></pre>
 </div>
 </div>
 <p>Any vector of the form <span class="math inline">\([x,x,x]\)</span> is a place invariant. In fact it is trivial that the sum of the number of tokens in the places is constant (equal to <span class="math inline">\(100\)</span>).</p>
 <p>Checking the file containing the P-invariants computed by Charlie:</p>
-<div class="cell" data-execution_count="54">
+<div class="cell" data-execution_count="59">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb80-1"><a href="#cb80-1"></a><span class="op">!</span>cat ..<span class="op">/</span>results<span class="op">/</span>rsp_P.inv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb87-1"><a href="#cb87-1"></a><span class="op">!</span>cat ..<span class="op">/</span>results<span class="op">/</span>rsp_P.inv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>minimal semipositive place invariants=
@@ -2220,25 +2464,25 @@ C=[
 </div>
 <p>The vector <span class="math inline">\([1, 1, 1]\)</span> is a P-invariant for any multiplicative constants.</p>
 <p>Computing T-invariants:</p>
-<div class="cell" data-execution_count="55">
+<div class="cell" data-execution_count="60">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb82"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb82-1"><a href="#cb82-1"></a>y1, y2, y3 <span class="op">=</span> symbols(<span class="st">'y1 y2 y3'</span>)</span>
-<span id="cb82-2"><a href="#cb82-2"></a>y <span class="op">=</span> Matrix([y1, y2, y3])</span>
-<span id="cb82-3"><a href="#cb82-3"></a>equation <span class="op">=</span> Eq(C <span class="op">*</span> y, Matrix([[<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>]]).T)</span>
-<span id="cb82-4"><a href="#cb82-4"></a>solution <span class="op">=</span> solve(equation, (y1, y2, y3), <span class="bu">dict</span><span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb82-5"><a href="#cb82-5"></a>solution</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb89"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb89-1"><a href="#cb89-1"></a>y1, y2, y3 <span class="op">=</span> symbols(<span class="st">'y1 y2 y3'</span>)</span>
+<span id="cb89-2"><a href="#cb89-2"></a>y <span class="op">=</span> Matrix([y1, y2, y3])</span>
+<span id="cb89-3"><a href="#cb89-3"></a>equation <span class="op">=</span> Eq(C <span class="op">*</span> y, Matrix([[<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>]]).T)</span>
+<span id="cb89-4"><a href="#cb89-4"></a>solution <span class="op">=</span> solve(equation, (y1, y2, y3), <span class="bu">dict</span><span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb89-5"><a href="#cb89-5"></a>solution</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="55">
+<div class="cell-output cell-output-display" data-execution_count="60">
 <pre><code>[{y1: y3, y2: y3}]</code></pre>
 </div>
 </div>
 <p>Any vector of the form <span class="math inline">\([y,y,y]\)</span> is a transition invariant. In fact it is trivial that applying the three transitions an equal number of times will not change the marking of the net.</p>
 <p>Checking the file containing the T-invariants computed by Charlie:</p>
-<div class="cell" data-execution_count="56">
+<div class="cell" data-execution_count="61">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb84-1"><a href="#cb84-1"></a><span class="op">!</span>cat ..<span class="op">/</span>results<span class="op">/</span>rsp_T.inv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb91-1"><a href="#cb91-1"></a><span class="op">!</span>cat ..<span class="op">/</span>results<span class="op">/</span>rsp_T.inv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>minimal semipositive transition invariants=
@@ -2257,10 +2501,10 @@ C=[
 <p>A siphon is minimal if it does not properly contain a non-empty siphon.</p>
 <p>In this particular net, <span class="math inline">\(\{P\}, \{R\}, \{S\}\)</span> are minimal siphons.</p>
 <p>Checking the file containing the minimal siphons computed by Charlie:</p>
-<div class="cell" data-execution_count="57">
+<div class="cell" data-execution_count="62">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb86-1"><a href="#cb86-1"></a><span class="op">!</span>cat ..<span class="op">/</span>results<span class="op">/</span>rsp_DLS.res</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb93-1"><a href="#cb93-1"></a><span class="op">!</span>cat ..<span class="op">/</span>results<span class="op">/</span>rsp_DLS.res</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code> minimal proper siphon ( place )= 
@@ -2280,10 +2524,10 @@ C=[
 <p>A trap is minimal if it does not properly contain a non-empty trap.</p>
 <p>In this particular net, <span class="math inline">\(\{P, R, S\}\)</span> is a minimal trap.</p>
 <p>Checking the file containing the minimal traps computed by Charlie:</p>
-<div class="cell" data-execution_count="58">
+<div class="cell" data-execution_count="63">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb88-1"><a href="#cb88-1"></a><span class="op">!</span>cat ..<span class="op">/</span>results<span class="op">/</span>rsp_TPS.res</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb95"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb95-1"><a href="#cb95-1"></a><span class="op">!</span>cat ..<span class="op">/</span>results<span class="op">/</span>rsp_TPS.res</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code> minimal traps ( place )= 
@@ -2465,10 +2709,10 @@ C=[
 </tbody>
 </table>
 <p>Charlie checks these properties by applying a set of rules, as shown in the log file generated by the tool:</p>
-<div class="cell" data-execution_count="59">
+<div class="cell" data-execution_count="64">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb90-1"><a href="#cb90-1"></a><span class="op">!</span>cat ..<span class="op">/</span>results<span class="op">/</span>charlie_log.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb97"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb97-1"><a href="#cb97-1"></a><span class="op">!</span>cat ..<span class="op">/</span>results<span class="op">/</span>charlie_log.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>
@@ -2666,10 +2910,10 @@ PUR   ORD   HOM   NBM   CSV   SCF   FT0   TF0   FP0   PF0   CON   SC    NC
 </div>
 </div>
 <p>Since a stochastic Petri net can be translated into a CTMC, Charlie provides the possibility to export the net in the PRISM input language. Let’s check whether the PRISM model produced by Charlie corresponds to the one we manually created:</p>
-<div class="cell" data-execution_count="60">
+<div class="cell" data-execution_count="65">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb92-1"><a href="#cb92-1"></a><span class="op">!</span>cat ..<span class="op">/</span>long_range_models<span class="op">/</span>rsp.sm</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb99"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb99-1"><a href="#cb99-1"></a><span class="op">!</span>cat ..<span class="op">/</span>long_range_models<span class="op">/</span>rsp.sm</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>//created by Snoopy 2

@@ -47,4 +47,4 @@ The sliders 'Swap rate', 'Reproduce rate' and 'Select rate' in the model based o
 ## References
 - [1] Frean, Marcus, and Edward R. Abraham. "Rock–scissors–paper and the survival of the weakest." Proceedings of the Royal Society of London. Series B: Biological Sciences 268.1474 (2001): 1323-1327.
 - [2] Reichenbach, Tobias, Mauro Mobilia, and Erwin Frey. "Mobility promotes and jeopardizes biodiversity in rock–paper–scissors games." Nature 448.7157 (2007): 1046-1049.
-- [3] Head, B., Grider, R. and Wilensky, U. (2017). NetLogo Rock Paper Scissors model. http://ccl.northwestern.edu/netlogo/models/RockPaperScissors. Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
+- [3] Head, B., Grider, R. and Wilensky, U. (2017). [NetLogo Rock Paper Scissors model](http://ccl.northwestern.edu/netlogo/models/RockPaperScissors). Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
