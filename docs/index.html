@@ -129,11 +129,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-site-map">    
         <li>
     <a class="dropdown-item" href="./notebooks/long_range_simulations.html" rel="" target="">
- <span class="dropdown-text">Long range model analysis</span></a>
+ <span class="dropdown-text">Analysis of long-range ecological models</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="./notebooks/lattice_simulations.html" rel="" target="">
- <span class="dropdown-text">Lattice model analysis</span></a>
+ <span class="dropdown-text">Analysis of ecological lattice models</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./notebooks/repressilator.html" rel="" target="">
+ <span class="dropdown-text">Analysis of the Repressilator model</span></a>
   </li>  
     </ul>
   </li>
@@ -160,12 +164,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#rock-scissors-paper-the-survival-of-the-weakest" id="toc-rock-scissors-paper-the-survival-of-the-weakest" class="nav-link active" data-scroll-target="#rock-scissors-paper-the-survival-of-the-weakest">Rock, Scissors, Paper: the survival of the weakest</a>
   <ul class="collapse">
-  <li><a href="#long-range-dispersal-model" id="toc-long-range-dispersal-model" class="nav-link" data-scroll-target="#long-range-dispersal-model">Long range dispersal model</a></li>
-  <li><a href="#lattice-model" id="toc-lattice-model" class="nav-link" data-scroll-target="#lattice-model">Lattice model</a>
+  <li><a href="#ecological-models" id="toc-ecological-models" class="nav-link" data-scroll-target="#ecological-models">Ecological models</a>
   <ul class="collapse">
-  <li><a href="#how-to-run-simulations-from-your-browser" id="toc-how-to-run-simulations-from-your-browser" class="nav-link" data-scroll-target="#how-to-run-simulations-from-your-browser">How to run simulations from your browser</a></li>
-  <li><a href="#demo" id="toc-demo" class="nav-link" data-scroll-target="#demo">Demo</a></li>
+  <li><a href="#long-range-dispersal-model" id="toc-long-range-dispersal-model" class="nav-link" data-scroll-target="#long-range-dispersal-model">Long range dispersal model</a></li>
+  <li><a href="#lattice-model" id="toc-lattice-model" class="nav-link" data-scroll-target="#lattice-model">Lattice model</a></li>
   </ul></li>
+  <li><a href="#repressilator-model" id="toc-repressilator-model" class="nav-link" data-scroll-target="#repressilator-model">Repressilator model</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul></li>
   </ul>
@@ -182,34 +186,43 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="rock-scissors-paper-the-survival-of-the-weakest" class="level1">
 <h1>Rock, Scissors, Paper: the survival of the weakest</h1>
-<p>This project reproduces the experiments conducted by Frean et al.&nbsp;<a href="#references">[1]</a> and Reichenbach et al.&nbsp;<a href="#references">[2]</a> to study a system involving three species in a competitive loop: a rock beats (and replicates into) a pair of scissors, scissors beat a sheet of paper and paper beats a rock. The self-referential nature of the competitive loop leads to counterintuitive phenomena, such as the expectation that the least competitive species will dominate in population. The proposed model is explored through various formalisms, and its properties are analyzed within each framework.</p>
-<section id="long-range-dispersal-model" class="level2">
-<h2 class="anchored" data-anchor-id="long-range-dispersal-model">Long range dispersal model</h2>
+<p>This project reproduces the experiments conducted by Frean et al.&nbsp;<a href="#references">[1]</a> and Reichenbach et al.&nbsp;<a href="#references">[2], [3]</a> to study a system involving three species in a competitive loop: a rock beats (and replicates into) a pair of scissors, scissors beat a sheet of paper and paper beats a rock. The self-referential nature of the competitive loop leads to counterintuitive phenomena, such as the expectation that the least competitive species will dominate in population. The proposed model is explored through various formalisms, and its properties are analyzed within each framework.</p>
+<p>Additionally, we explore an oscillatory network of transcriptional regulators known as Repressilator. This network consists of a feedback loop with at least three genes, each encoding a protein that represses the expression of the next gene in the loop. The dynamic behavior of the Repressilator mirrors the competitive interactions of the rock-paper-scissors game, as each component cyclically inhibits the next. We investigate how this cyclical repression creates oscillatory patterns and maintains biological rhythms. This analysis is based on <a href="#references">[4]</a>.</p>
+<section id="ecological-models" class="level2">
+<h2 class="anchored" data-anchor-id="ecological-models">Ecological models</h2>
+<section id="long-range-dispersal-model" class="level3">
+<h3 class="anchored" data-anchor-id="long-range-dispersal-model">Long range dispersal model</h3>
 <p>In the long range dispersal model individuals are treated as gas molecules, with interactions occurring between any pair.</p>
 <p>The model is examined under both discrete and continuous time frameworks. For the continuous time approach, the differential equation system defining the model is solved using the&nbsp;<a href="https://docs.scipy.org/doc/scipy/reference/integrate.html#module-scipy.integrate"><code>scipy.integrate</code></a>&nbsp;package. Additionally, the model is reframed in terms of chemical reactions for stochastic simulations, which are conducted using the&nbsp;<a href="https://stochpy.sourceforge.net"><code>StochPy</code></a>&nbsp;package. It is further examined as a continuous-time Markov chain with the <a href="https://www.prismmodelchecker.org"><code>PRISM</code></a> stochastic model checker and as a Petri net with the tool <a href="https://www-dssz.informatik.tu-cottbus.de/DSSZ/Software/Charlie"><code>Charlie</code></a>.</p>
 <p><a href="./notebooks/long_range_simulations.html" class="btn btn-outline-primary btn" role="button">View Model Analysis</a></p>
 </section>
-<section id="lattice-model" class="level2">
-<h2 class="anchored" data-anchor-id="lattice-model">Lattice model</h2>
+<section id="lattice-model" class="level3">
+<h3 class="anchored" data-anchor-id="lattice-model">Lattice model</h3>
 <p>In the lattice model, individuals are situated on a lattice and interact solely with their neighbors.</p>
 <p>The model is developed using the <a href="https://mesa.readthedocs.io/en/stable/"><code>Mesa</code></a> framework.</p>
 <p><a href="./notebooks/lattice_simulations.html" class="btn btn-outline-primary btn" role="button">View Model Analysis</a></p>
-<section id="how-to-run-simulations-from-your-browser" class="level3">
-<h3 class="anchored" data-anchor-id="how-to-run-simulations-from-your-browser">How to run simulations from your browser</h3>
+<section id="how-to-run-simulations-from-your-browser" class="level4">
+<h4 class="anchored" data-anchor-id="how-to-run-simulations-from-your-browser">How to run simulations from your browser</h4>
 <p>After cloning the <a href="https://github.com/iretes/rock-scissors-paper">GitHub repository</a>, install the dependencies by executing the following command:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="at">-r</span> requirements.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>To interactively run the model, execute the following command:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> ./run_lattice_model.py</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Set the grid’s width and height, choose the model to run (either the one based on <a href="#references">[1]</a>, <a href="#references">[2]</a>, or a variant where agents activate simultaneously), and then open your browser to http://127.0.0.1:8521/.”</p>
 <p>The sliders labeled ’Initial weight of species *’ allow you to set the weights used by the <a href="https://docs.python.org/3/library/random.html#random.choices"><code>random.choices</code></a> method from the Python Standard Library for initializing grid patches with individuals. These weights don’t need to sum to <span class="math inline">\(1\)</span>.</p>
-<p>The sliders ‘Swap rate’, ‘Reproduce rate’ and ‘Select rate’ in the model based on <a href="#references">[2]</a> have the same meaning as those in the <a href="https://ccl.northwestern.edu/netlogo/models/RockPaperScissors">NetLogo Rock-Paper-Scissors model</a> <a href="#references">[3]</a>.</p>
+<p>The sliders ‘Swap rate’, ‘Reproduce rate’ and ‘Select rate’ in the model based on <a href="#references">[2]</a> have the same meaning as those in the NetLogo Rock-Paper-Scissors model <a href="#references">[3]</a>.</p>
 </section>
-<section id="demo" class="level3">
-<h3 class="anchored" data-anchor-id="demo">Demo</h3>
+<section id="demo" class="level4">
+<h4 class="anchored" data-anchor-id="demo">Demo</h4>
 <video width="640" height="480" controls="" loop="" muted="" autoplay="">
 <source src="https://github.com/iretes/rock-scissors-paper/assets/46034276/2a1055cc-fee6-4a60-b513-3b3d7210b7ad">
 </video>
 </section>
+</section>
+</section>
+<section id="repressilator-model" class="level2">
+<h2 class="anchored" data-anchor-id="repressilator-model">Repressilator model</h2>
+<p>The system dynamics were simulated by solving the differential equations governing protein concentration changes, using the&nbsp;<a href="https://docs.scipy.org/doc/scipy/reference/integrate.html#module-scipy.integrate"><code>scipy.integrate</code></a>&nbsp;package.</p>
+<p><a href="./notebooks/repressilator.html" class="btn btn-outline-primary btn" role="button">View Model Analysis</a></p>
 </section>
 <section id="references" class="level2">
 <h2 class="anchored" data-anchor-id="references">References</h2>
@@ -217,6 +230,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>[1] Frean, Marcus, and Edward R. Abraham. “Rock–scissors–paper and the survival of the weakest.” Proceedings of the Royal Society of London. Series B: Biological Sciences 268.1474 (2001): 1323-1327.</li>
 <li>[2] Reichenbach, Tobias, Mauro Mobilia, and Erwin Frey. “Mobility promotes and jeopardizes biodiversity in rock–paper–scissors games.” Nature 448.7157 (2007): 1046-1049.</li>
 <li>[3] Head, B., Grider, R. and Wilensky, U. (2017). <a href="http://ccl.northwestern.edu/netlogo/models/RockPaperScissors">NetLogo Rock Paper Scissors model</a>.&nbsp;Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.</li>
+<li>[4] Elowitz M., Bois J. and Marken J. (2022). <a href="https://biocircuits.github.io/chapters/09_repressilator.html">“Biological Circuits Design”</a>. California Institute of Technology.</li>
 </ul>
 
 

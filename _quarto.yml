@@ -11,10 +11,12 @@ website:
         text: Home
       - text: "Site Map"
         menu:
-          - text: "Long range model analysis"
+          - text: "Analysis of long-range ecological models"
             href: ./notebooks/long_range_simulations.ipynb
-          - text: "Lattice model analysis"
+          - text: "Analysis of ecological lattice models"
             href: ./notebooks/lattice_simulations.ipynb
+          - text: "Analysis of the Repressilator model"
+            href: ./notebooks/repressilator.ipynb
       - icon: github
         href: https://github.com/iretes/rock-scissors-paper
   

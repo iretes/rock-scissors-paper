@@ -129,11 +129,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-site-map">    
         <li>
     <a class="dropdown-item" href="../notebooks/long_range_simulations.html" rel="" target="">
- <span class="dropdown-text">Long range model analysis</span></a>
+ <span class="dropdown-text">Analysis of long-range ecological models</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="../notebooks/lattice_simulations.html" rel="" target="">
- <span class="dropdown-text">Lattice model analysis</span></a>
+ <span class="dropdown-text">Analysis of ecological lattice models</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../notebooks/repressilator.html" rel="" target="">
+ <span class="dropdown-text">Analysis of the Repressilator model</span></a>
   </li>  
     </ul>
   </li>
@@ -1590,7 +1594,7 @@ Info: Simulation time 0.00356</code></pre>
 <p>Differently from the simulation with ODEs, the system does not exhibit sustained oscillations, as the inherent randomness in the timing and sequence of reactions introduces fluctuations that prevent the emergence of periodic behavior.</p>
 <section id="genetic-network-with-negative-feedback-loop" class="level4">
 <h4 class="anchored" data-anchor-id="genetic-network-with-negative-feedback-loop">Genetic Network with Negative Feedback Loop</h4>
-<p>A suitable case study for stochastic simulations is a genetic network consisting of a feedback loop involving three genes. In this system, each gene encodes a protein that represses the expression of the subsequent gene in the loop, similar to the dynamics seen in a rock-paper-scissors game.</p>
+<p>A suitable case study for stochastic simulations is a genetic network consisting of a feedback loop involving three genes. In this system, each gene encodes a protein that represses the expression of the subsequent gene in the loop, similar to the dynamics seen in a rock-paper-scissors game. This genetic network is known as a Repressilator; for a detailed analysis, see <a href="repressilator.html">here</a>.</p>
 <span class="math display">\[\begin{cases}
 G_1 \xrightarrow{r_{P_1}} G_1 + P_1\quad (1)\\
 G_2 \xrightarrow{r_{P_2}} G_2 + P_2\quad (2)\\
@@ -1602,7 +1606,7 @@ P_1 \xrightarrow{r_{D_1}}\quad (7)\\
 P_2 \xrightarrow{r_{D_2}}\quad (8)\\
 P_3 \xrightarrow{r_{D_3}}\quad (9)\\
 \end{cases}\]</span>
-<p>In this network, each gene produces a protein (reactions <span class="math inline">\((1), (2), (3)\)</span>), which can interact with the next gene in the loop to inhibit its expression (reactions <span class="math inline">\((4), (5), (6)\)</span>, forward reactions). This inhibition creates a negative feedback loop, as each protein suppresses the activity of the subsequent gene in the sequence. The inhibition occurs when the protein binds to the gene, preventing it from synthesizing its associated protein. However, the protein-gene complex can dissociate, freeing the gene to resume protein production (reactions <span class="math inline">\((4), (5), (6)\)</span>, reverse reactions). Additionally, over time, the proteins degrade and disappear from the system (reactions <span class="math inline">\((7), (8), (9)\)</span>).</p>
+<p>Each gene produces a protein (reactions <span class="math inline">\((1), (2), (3)\)</span>), which can interact with the next gene in the loop to inhibit its expression (reactions <span class="math inline">\((4), (5), (6)\)</span>, forward reactions). This inhibition creates a negative feedback loop, as each protein suppresses the activity of the subsequent gene in the sequence. The inhibition occurs when the protein binds to the gene, preventing it from synthesizing its associated protein. However, the protein-gene complex can dissociate, freeing the gene to resume protein production (reactions <span class="math inline">\((4), (5), (6)\)</span>, reverse reactions). Additionally, over time, the proteins degrade and disappear from the system (reactions <span class="math inline">\((7), (8), (9)\)</span>).</p>
 <p>Visualizing the model in the <code>PySCeS MDL</code> format:</p>
 <div class="cell" data-execution_count="44">
 <details open="">

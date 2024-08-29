@@ -1,8 +1,12 @@
 # Rock, Scissors, Paper: the survival of the weakest
 
-This project reproduces the experiments conducted by Frean et al. [[1]](#references) and Reichenbach et al. [[2]](#references) to study a system involving three species in a competitive loop: a rock beats (and replicates into) a pair of scissors, scissors beat a sheet of paper and paper beats a rock. The self-referential nature of the competitive loop leads to counterintuitive phenomena, such as the expectation that the least competitive species will dominate in population. The proposed model is explored through various formalisms, and its properties are analyzed within each framework.
+This project reproduces the experiments conducted by Frean et al. [[1]](#references) and Reichenbach et al. [[2], [3]](#references) to study a system involving three species in a competitive loop: a rock beats (and replicates into) a pair of scissors, scissors beat a sheet of paper and paper beats a rock. The self-referential nature of the competitive loop leads to counterintuitive phenomena, such as the expectation that the least competitive species will dominate in population. The proposed model is explored through various formalisms, and its properties are analyzed within each framework.
 
-## Long range dispersal model
+Additionally, we explore an oscillatory network of transcriptional regulators known as Repressilator. This network consists of a feedback loop with at least three genes, each encoding a protein that represses the expression of the next gene in the loop. The dynamic behavior of the Repressilator mirrors the competitive interactions of the rock-paper-scissors game, as each component cyclically inhibits the next. We investigate how this cyclical repression creates oscillatory patterns and maintains biological rhythms. This analysis is based on [[4]](#references).
+
+## Ecological models
+
+### Long range dispersal model
 
 In the long range dispersal model individuals are treated as gas molecules, with interactions occurring between any pair.
 
@@ -10,7 +14,7 @@ The model is examined under both discrete and continuous time frameworks. For th
 
 [View Model Analysis](./notebooks/long_range_simulations.html){.btn .btn-outline-primary .btn role="button"}
 
-## Lattice model
+### Lattice model
 
 In the lattice model, individuals are situated on a lattice and interact solely with their neighbors.
 
@@ -18,7 +22,7 @@ The model is developed using the [`Mesa`](https://mesa.readthedocs.io/en/stable/
 
 [View Model Analysis](./notebooks/lattice_simulations.html){.btn .btn-outline-primary .btn role="button"}
 
-### How to run simulations from your browser
+#### How to run simulations from your browser
 
 After cloning the [GitHub repository](https://github.com/iretes/rock-scissors-paper), install the dependencies by executing the following command:
 
@@ -36,15 +40,22 @@ Set the grid's width and height, choose the model to run (either the one based o
 
 The sliders labeled 'Initial weight of species *' allow you to set the weights used by the [`random.choices`](https://docs.python.org/3/library/random.html#random.choices) method from the Python Standard Library for initializing grid patches with individuals. These weights don't need to sum to $1$.
 
-The sliders 'Swap rate', 'Reproduce rate' and 'Select rate' in the model based on [[2]](#references) have the same meaning as those in the [NetLogo Rock-Paper-Scissors model](https://ccl.northwestern.edu/netlogo/models/RockPaperScissors) [[3]](#references).
+The sliders 'Swap rate', 'Reproduce rate' and 'Select rate' in the model based on [[2]](#references) have the same meaning as those in the NetLogo Rock-Paper-Scissors model [[3]](#references).
 
-### Demo
+#### Demo
 
 <video width="640" height="480" controls loop="" muted="" autoplay="">
     <source src="https://github.com/iretes/rock-scissors-paper/assets/46034276/2a1055cc-fee6-4a60-b513-3b3d7210b7ad">
 </video>
 
+## Repressilator model
+
+The system dynamics were simulated by solving the differential equations governing protein concentration changes, using the [`scipy.integrate`](https://docs.scipy.org/doc/scipy/reference/integrate.html#module-scipy.integrate) package.
+
+[View Model Analysis](./notebooks/repressilator.html){.btn .btn-outline-primary .btn role="button"}
+
 ## References
 - [1] Frean, Marcus, and Edward R. Abraham. "Rock–scissors–paper and the survival of the weakest." Proceedings of the Royal Society of London. Series B: Biological Sciences 268.1474 (2001): 1323-1327.
 - [2] Reichenbach, Tobias, Mauro Mobilia, and Erwin Frey. "Mobility promotes and jeopardizes biodiversity in rock–paper–scissors games." Nature 448.7157 (2007): 1046-1049.
 - [3] Head, B., Grider, R. and Wilensky, U. (2017). [NetLogo Rock Paper Scissors model](http://ccl.northwestern.edu/netlogo/models/RockPaperScissors). Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
+- [4] Elowitz M., Bois J. and Marken J. (2022). ["Biological Circuits Design"](https://biocircuits.github.io/chapters/09_repressilator.html). California Institute of Technology.
