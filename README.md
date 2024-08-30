@@ -1,4 +1,4 @@
-# Rock, Scissors, Paper: the survival of the weakest 🪨✂️📄
+# Rock-Scissors-Paper: The Game That Sustains Biodiversity and Regulates Biological Clocks
 
 This project reproduces the experiments conducted by Frean et al. [[1]](#references) and Reichenbach et al. [[2], [3]](#references) to study a system involving three species in a competitive loop: a rock beats (and replicates into) a pair of scissors, scissors beat a sheet of paper and paper beats a rock. The self-referential nature of the competitive loop leads to counterintuitive phenomena, such as the expectation that the least competitive species will dominate in population. The proposed model is explored through various formalisms, and its properties are analyzed within each framework.
 
@@ -55,9 +55,9 @@ The project's directory structure includes the following main folders and files:
 rock-scissors-paper
   │── lattice_models        # folder storing Mesa implementations of lattice models
   │── long_range_models     # folder storing long-range dispersal models in different formalisms
-  |── notebooks             # folder storing Jupyter notebooks analyzing the models
-  |── results               # folder storing simulation results
-  |── requirements.txt      # requirements file for pip
+  │── notebooks             # folder storing Jupyter notebooks analyzing the models
+  │── results               # folder storing simulation results
+  │── requirements.txt      # requirements file for pip
   └── run_lattice_model.py  # script to run lattice models web interface
 ```
 

@@ -175,6 +175,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#dimensionless-formulation" id="toc-dimensionless-formulation" class="nav-link" data-scroll-target="#dimensionless-formulation">Dimensionless formulation</a></li>
   <li><a href="#oscillatory-behavior-and-stability-analysis" id="toc-oscillatory-behavior-and-stability-analysis" class="nav-link" data-scroll-target="#oscillatory-behavior-and-stability-analysis">Oscillatory behavior and stability analysis</a></li>
   <li><a href="#design-considerations-for-oscillatory-systems" id="toc-design-considerations-for-oscillatory-systems" class="nav-link" data-scroll-target="#design-considerations-for-oscillatory-systems">Design considerations for oscillatory systems</a></li>
+  <li><a href="#incorporating-mrna-dynamics-and-leaky-expression" id="toc-incorporating-mrna-dynamics-and-leaky-expression" class="nav-link" data-scroll-target="#incorporating-mrna-dynamics-and-leaky-expression">Incorporating mRNA dynamics and leaky expression</a></li>
+  <li><a href="#applications-of-the-repressilator-in-biological-research" id="toc-applications-of-the-repressilator-in-biological-research" class="nav-link" data-scroll-target="#applications-of-the-repressilator-in-biological-research">Applications of the repressilator in biological research</a></li>
   </ul></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
@@ -205,7 +207,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 <p>This notebook explores an oscillatory network of transcriptional regulators known as Repressilator. First, we will outline the protein production model, taking into account the effects of gene repressors. Then, we will introduce the Repressilator and simulate its dynamics. The following analysis is based on <a href="#references">[1]</a>.</p>
-<p>This oscillatory network was successfully implemented in <em>Escherichia coli</em>, leading to periodic production of green fluorescent protein by the cells <a href="#references">[2]</a>. Initially developed as a proof of concept, this system aimed to show that artificial biological constructs could consistently replicate the behavior of electrical circuits. While the Repressilator itself did not have a direct practical application, it paved the way for the development of biological circuits with more practical purposes, such as systems that can count events or activate functions after a fixed period. These advancements hold potential for applications in drug delivery, nano-construction, and other fields. Additionally, the study of oscillatory networks like the Repressilator is inspired by natural biological systems, such as the circadian clocks in organisms that track and anticipate daily environmental changes. This area of research is significant, as evidenced by the <a href="https://www.nobelprize.org/prizes/medicine/2017/summary/">2017 Nobel Prize</a> awarded to Jeffrey Hall, Michael Rosbash, and Michael Young for their discoveries on how internal clocks and biological rhythms govern human life.</p>
+<p>This oscillatory network was successfully implemented in <em>Escherichia coli</em>, leading to periodic production of green fluorescent protein by the cells <a href="#references">[2]</a>. Initially developed as a proof of concept, this system aimed to show that artificial biological constructs could consistently replicate the behavior of electrical circuits. It also paved the way for the development of biological circuits with more practical purposes, such as systems that can count events or activate functions after a fixed period. These advancements hold potential for applications in drug delivery, nano-construction, and other fields. Additionally, the study of oscillatory networks like the Repressilator is inspired by natural biological systems, such as the circadian clocks in organisms that track and anticipate daily environmental changes. This area of research is significant, as evidenced by the <a href="https://www.nobelprize.org/prizes/medicine/2017/summary/">2017 Nobel Prize</a> awarded to Jeffrey Hall, Michael Rosbash, and Michael Young for their discoveries on how internal clocks and biological rhythms govern human life.</p>
 <p>Importing the necessary libraries:</p>
 <div class="cell" data-execution_count="1">
 <details open="">
@@ -389,7 +391,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb6-8"><a href="#cb6-8"></a><span class="cf">for</span> i, (beta, n) <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="bu">zip</span>(params[<span class="st">'betas'</span>], params[<span class="st">'ns'</span>])):</span>
 <span id="cb6-9"><a href="#cb6-9"></a>    plt.scatter(n, beta, c<span class="op">=</span><span class="st">"black"</span>, zorder<span class="op">=</span><span class="dv">10</span>)</span>
 <span id="cb6-10"><a href="#cb6-10"></a>    plt.text(n<span class="op">-</span><span class="fl">0.02</span>, beta, <span class="ss">f"(</span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">)"</span>, fontsize<span class="op">=</span><span class="dv">10</span>, ha<span class="op">=</span><span class="st">'right'</span>)</span>
-<span id="cb6-11"><a href="#cb6-11"></a>plt.legend(loc<span class="op">=</span><span class="st">'center left'</span>, bbox_to_anchor<span class="op">=</span>(<span class="dv">1</span>, <span class="fl">0.5</span>))</span>
+<span id="cb6-11"><a href="#cb6-11"></a>plt.legend(loc<span class="op">=</span><span class="st">'upper right'</span>)</span>
 <span id="cb6-12"><a href="#cb6-12"></a>plt.grid(<span class="va">True</span>, zorder<span class="op">=</span><span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
@@ -398,12 +400,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>The plot indicates that, from a design perspective, maximizing both <span class="math inline">\(\beta\)</span> and <span class="math inline">\(n\)</span> is crucial for ensuring sustained oscillations in the system. This requires employing strong promoters and ultrasensitive repression curves to achieve the desired oscillatory behavior.</p>
 </section>
+<section id="incorporating-mrna-dynamics-and-leaky-expression" class="level3">
+<h3 class="anchored" data-anchor-id="incorporating-mrna-dynamics-and-leaky-expression">Incorporating mRNA dynamics and leaky expression</h3>
+<p>While this model focuses exclusively on protein dynamics, it could be enhanced by incorporating mRNA dynamics and considering ‘leaky expression’—the fact that gene repression never completely reduces expression to zero, resulting in a persistent ‘basal’ level. These enhancements provide valuable insights: (1) leaky transcription can diminish oscillations when the residual protein production is enough to suppress the next repressor’s expression, and (2) comparable mRNA and protein decay rates promote oscillations, allowing them to occur with reduced ultrasensitivity (i.e., at lower values of <span class="math inline">\(n\)</span>).</p>
+</section>
+<section id="applications-of-the-repressilator-in-biological-research" class="level3">
+<h3 class="anchored" data-anchor-id="applications-of-the-repressilator-in-biological-research">Applications of the repressilator in biological research</h3>
+<p>Riglar et al.&nbsp;<a href="#references">[3]</a> used the Repressilator phase as a tool to measure bacterial growth in the mammalian gut, an environment that is difficult to observe directly. By employing the Repressilator as a growth recorder, they were able to track cell growth, revealing how it varies under different conditions, such as inflammation or antibiotic treatment. They discovered that growth variability increased under certain conditions and differed across various spatial niches within the gut. This approach provided insights into bacterial growth patterns that would otherwise be difficult to observe.</p>
+</section>
 </section>
 <section id="references" class="level2">
 <h2 class="anchored" data-anchor-id="references">References</h2>
 <ul>
 <li>[1] Elowitz M., Bois J. and Marken J. (2022). <a href="https://biocircuits.github.io/chapters/09_repressilator.html">“Biological Circuits Design”</a>. California Institute of Technology.</li>
 <li>[2] Elowitz M. and Leibler S. “A synthetic oscillatory network of transcriptional regulators.” Nature 403.6767 (2000): 335-338.</li>
+<li>[3] Riglar, David T., et al.&nbsp;“Bacterial variability in the mammalian gut captured by a single-cell synthetic oscillator.” Nature communications 10.1 (2019): 4665.</li>
 </ul>
 
 
