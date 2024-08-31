@@ -199,13 +199,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
-<p>This notebook simulates the evolution of a three-species system with long-range dispersal, treating individuals as gas molecules with interactions occurring between any pair.</p>
+<p>This notebook simulates the evolution of a three-species system with long-range dispersal, where individuals are modeled as gas molecules, and interactions occur between any pair.</p>
 <section id="theoretical-framework" class="level2">
 <h2 class="anchored" data-anchor-id="theoretical-framework">Theoretical framework</h2>
-<p><strong>Finite population size</strong></p>
+<p><strong>Discrete-time model</strong></p>
 <p>Let’s consider a model world that has <span class="math inline">\(N\)</span> available sites. The sites are occupied by three species, namely species <span class="math inline">\(r\)</span> (rock), <span class="math inline">\(s\)</span> (scissors) and <span class="math inline">\(p\)</span> (paper), which occur in the proportions <span class="math inline">\(n_r\)</span> , <span class="math inline">\(n_s\)</span> and <span class="math inline">\(n_p\)</span> (with <span class="math inline">\(n_r + n_s + n_p = 1\)</span>). Two sites are chosen at each time-step. The occupant of the first replicates into the second with a given probability - individual of species <span class="math inline">\(r\)</span> can invade a species <span class="math inline">\(s\)</span> with probability <span class="math inline">\(P_r\)</span>, a species <span class="math inline">\(s\)</span> invades a species <span class="math inline">\(p\)</span> with probability <span class="math inline">\(P_s\)</span>, a species <span class="math inline">\(p\)</span> invades a species <span class="math inline">\(r\)</span> with probability <span class="math inline">\(P_p\)</span> and all other invasion probabilities are zero. This dynamic may represent individuals competing for food: the winner consumes the food and gains enough resources to reproduce asexually, while the loser dies.</p>
 <p><strong>Continuous-time model</strong></p>
-<p>In the limit of large <span class="math inline">\(N\)</span>, the rate of change of species population density is given by the mean-field equations:</p>
+<p>In the limit of large <span class="math inline">\(N\)</span>, the rate of change of species population density is given by the following mean-field equations</p>
 <span class="math display">\[\begin{cases}
 \frac{\partial n_r}{\partial t}=n_r\cdot (n_s\cdot P_r - n_p \cdot P_p)\\
 \frac{\partial n_s}{\partial t}=n_s\cdot (n_p\cdot P_s - n_r \cdot P_r)\\
@@ -215,7 +215,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>For example, in the first equation, <span class="math inline">\(n_s\cdot P_r\)</span> represents the rate at which the rock species increases due to its successful invasion of the scissors species, while <span class="math inline">\(n_p\cdot P_p\)</span> represents the rate at which the rock species decreases due to the successful invasion of the paper species. The difference between these terms is then multiplied by the population density of the rock species to ensure that the rate of change is properly scaled according to the availability of species <span class="math inline">\(r\)</span>. Similar considerations apply to the other equations.</p>
 <p>Note that in these equations a unit of time <span class="math inline">\(t\)</span> is <span class="math inline">\(N\)</span> individual time-steps, which we refer to as an epoch.</p>
 <p><strong>Fixed-point analysis</strong></p>
-<p>Trivial fixed points of the system are (<span class="math inline">\(n_r=0, n_s=0, n_p=1\)</span>), (<span class="math inline">\(n_r=0, n_s=1, n_p=0\)</span>) and (<span class="math inline">\(n_r=1, n_s=0, n_p=0\)</span>).</p>
+<p>Trivial fixed points of the system are &lt;<span class="math inline">\(n_r=0, n_s=0, n_p=1\)</span>&gt;, &lt;<span class="math inline">\(n_r=0, n_s=1, n_p=0\)</span>&gt; and &lt;<span class="math inline">\(n_r=1, n_s=0, n_p=0\)</span>&gt;.</p>
 <p>The non-trivial fixed point is obtained by setting the rates of change to zero:</p>
 <span class="math display">\[\begin{cases}
 \frac{\partial n_r}{\partial t}=n_r\cdot (n_s\cdot P_r - n_p \cdot P_p)=0 \implies n_p = \frac{n_s\cdot P_r}{P_p}&amp;\text{(1)}\\
@@ -242,17 +242,18 @@ n_r=\frac{n_p\cdot P_s}{P_r}=\frac{\cancel{P_r}\cdot P_s}{\cancel{P_r}\cdot (P_p
 <div class="cell" data-execution_count="1">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="im">import</span> numpy</span>
-<span id="cb1-2"><a href="#cb1-2"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-3"><a href="#cb1-3"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb1-4"><a href="#cb1-4"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb1-5"><a href="#cb1-5"></a><span class="im">import</span> plotly.express <span class="im">as</span> px</span>
-<span id="cb1-6"><a href="#cb1-6"></a><span class="im">import</span> plotly.graph_objects <span class="im">as</span> go</span>
-<span id="cb1-7"><a href="#cb1-7"></a><span class="im">from</span> matplotlib <span class="im">import</span> colormaps</span>
-<span id="cb1-8"><a href="#cb1-8"></a><span class="im">from</span> scipy.integrate <span class="im">import</span> odeint</span>
-<span id="cb1-9"><a href="#cb1-9"></a><span class="im">from</span> graphviz <span class="im">import</span> Source</span>
-<span id="cb1-10"><a href="#cb1-10"></a><span class="im">from</span> sympy <span class="im">import</span> symbols, Matrix, Eq, solve</span>
-<span id="cb1-11"><a href="#cb1-11"></a>np.random.seed(<span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="im">import</span> sys</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="im">import</span> numpy</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-6"><a href="#cb1-6"></a><span class="im">import</span> plotly.express <span class="im">as</span> px</span>
+<span id="cb1-7"><a href="#cb1-7"></a><span class="im">import</span> plotly.graph_objects <span class="im">as</span> go</span>
+<span id="cb1-8"><a href="#cb1-8"></a><span class="im">from</span> matplotlib <span class="im">import</span> colormaps</span>
+<span id="cb1-9"><a href="#cb1-9"></a><span class="im">from</span> scipy.integrate <span class="im">import</span> odeint</span>
+<span id="cb1-10"><a href="#cb1-10"></a><span class="im">from</span> graphviz <span class="im">import</span> Source</span>
+<span id="cb1-11"><a href="#cb1-11"></a><span class="im">from</span> sympy <span class="im">import</span> symbols, Matrix, Eq, solve</span>
+<span id="cb1-12"><a href="#cb1-12"></a>np.random.seed(<span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <section id="discrete-time-model" class="level3">
@@ -263,10 +264,10 @@ n_r=\frac{n_p\cdot P_s}{P_r}=\frac{\cancel{P_r}\cdot P_s}{\cancel{P_r}\cdot (P_p
 <div class="cell" data-execution_count="2">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">def</span> simulate_finite_N(Pr, Ps, Pp, nr_init, ns_init, N<span class="op">=</span><span class="dv">1000</span>, epochs<span class="op">=</span><span class="dv">100</span>):</span>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">def</span> simulate_discrete_finite_N(Pr, Ps, Pp, nr_init, ns_init, N<span class="op">=</span><span class="dv">1000</span>, epochs<span class="op">=</span><span class="dv">100</span>):</span>
 <span id="cb2-2"><a href="#cb2-2"></a>    <span class="co">'''</span></span>
-<span id="cb2-3"><a href="#cb2-3"></a><span class="co">    Simulate the evolution of a population of three species over time</span></span>
-<span id="cb2-4"><a href="#cb2-4"></a><span class="co">    on a model world that has N available sites.</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="co">    Simulate the evolution of a three-species population over time using a</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="co">    discrete-time model on a world with N available sites.</span></span>
 <span id="cb2-5"><a href="#cb2-5"></a></span>
 <span id="cb2-6"><a href="#cb2-6"></a><span class="co">    Parameters</span></span>
 <span id="cb2-7"><a href="#cb2-7"></a><span class="co">    ----------</span></span>
@@ -283,7 +284,7 @@ n_r=\frac{n_p\cdot P_s}{P_r}=\frac{\cancel{P_r}\cdot P_s}{\cancel{P_r}\cdot (P_p
 <span id="cb2-18"><a href="#cb2-18"></a><span class="co">    N : int</span></span>
 <span id="cb2-19"><a href="#cb2-19"></a><span class="co">        The number of sites.</span></span>
 <span id="cb2-20"><a href="#cb2-20"></a><span class="co">    epochs : int</span></span>
-<span id="cb2-21"><a href="#cb2-21"></a><span class="co">        The number of time units to simulate.</span></span>
+<span id="cb2-21"><a href="#cb2-21"></a><span class="co">        The number of epochs to simulate.</span></span>
 <span id="cb2-22"><a href="#cb2-22"></a><span class="co">    '''</span></span>
 <span id="cb2-23"><a href="#cb2-23"></a></span>
 <span id="cb2-24"><a href="#cb2-24"></a>    <span class="kw">def</span> check_P(P):</span>
@@ -301,7 +302,7 @@ n_r=\frac{n_p\cdot P_s}{P_r}=\frac{\cancel{P_r}\cdot P_s}{\cancel{P_r}\cdot (P_p
 <span id="cb2-36"><a href="#cb2-36"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">'Number of sites must be at least 1'</span>)</span>
 <span id="cb2-37"><a href="#cb2-37"></a>    </span>
 <span id="cb2-38"><a href="#cb2-38"></a>    <span class="cf">if</span> epochs <span class="op">&lt;</span> <span class="dv">1</span>:</span>
-<span id="cb2-39"><a href="#cb2-39"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">'Number of steps must be at least 1'</span>)</span>
+<span id="cb2-39"><a href="#cb2-39"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">'Number of epochs must be at least 1'</span>)</span>
 <span id="cb2-40"><a href="#cb2-40"></a>    </span>
 <span id="cb2-41"><a href="#cb2-41"></a>    sites <span class="op">=</span> numpy.zeros(N)</span>
 <span id="cb2-42"><a href="#cb2-42"></a></span>
@@ -435,7 +436,7 @@ n_r=\frac{n_p\cdot P_s}{P_r}=\frac{\cancel{P_r}\cdot P_s}{\cancel{P_r}\cdot (P_p
 <div class="cell" data-execution_count="4">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a>finite_N_df <span class="op">=</span> simulate_finite_N(Pr<span class="op">=</span><span class="fl">0.2</span>, Ps<span class="op">=</span><span class="fl">0.5</span>, Pp<span class="op">=</span><span class="fl">0.3</span>, nr_init<span class="op">=</span><span class="fl">0.5</span>, ns_init<span class="op">=</span><span class="fl">0.3</span>, N<span class="op">=</span><span class="dv">1000</span>, epochs<span class="op">=</span><span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a>finite_N_df <span class="op">=</span> simulate_discrete_finite_N(Pr<span class="op">=</span><span class="fl">0.2</span>, Ps<span class="op">=</span><span class="fl">0.5</span>, Pp<span class="op">=</span><span class="fl">0.3</span>, nr_init<span class="op">=</span><span class="fl">0.5</span>, ns_init<span class="op">=</span><span class="fl">0.3</span>, N<span class="op">=</span><span class="dv">1000</span>, epochs<span class="op">=</span><span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Plotting the evolution of the system:</p>
@@ -463,7 +464,7 @@ n_r=\frac{n_p\cdot P_s}{P_r}=\frac{\cancel{P_r}\cdot P_s}{\cancel{P_r}\cdot (P_p
 <p><img src="long_range_simulations_files/figure-html/cell-7-output-1.png" class="img-fluid"></p>
 </div>
 </div>
-<p>Replicating Figure 1b from <a href="#6-references">[1]</a>:</p>
+<p>Replicating Figure 1b from [1]:</p>
 <div class="cell" data-execution_count="7">
 <details open="">
 <summary>Code</summary>
@@ -477,7 +478,7 @@ n_r=\frac{n_p\cdot P_s}{P_r}=\frac{\cancel{P_r}\cdot P_s}{\cancel{P_r}\cdot (P_p
 </div>
 </div>
 <p>In a finite world, the populations oscillate with increasing amplitude, with two species (scissors and paper) eventually becoming extinct. The species that survives (rock) is the one that has the lowest invasion rate.</p>
-<p>Performing simulations for a range of invasion probabilities chosen to sum to unity, initializing the population densities close to the fixed point and recording the surviving species (replicating Figure 1c from <a href="#6-references">[1]</a>):</p>
+<p>Performing simulations for a range of invasion probabilities chosen to sum to unity, initializing the population densities close to the fixed point and recording the surviving species (replicating Figure 1c from [1]):</p>
 <div class="cell" data-execution_count="8">
 <details open="">
 <summary>Code</summary>
@@ -500,179 +501,34 @@ n_r=\frac{n_p\cdot P_s}{P_r}=\frac{\cancel{P_r}\cdot P_s}{\cancel{P_r}\cdot (P_p
 <span id="cb8-17"><a href="#cb8-17"></a><span class="co"># list to store the winner of each simulation</span></span>
 <span id="cb8-18"><a href="#cb8-18"></a>winners <span class="op">=</span> []</span>
 <span id="cb8-19"><a href="#cb8-19"></a></span>
-<span id="cb8-20"><a href="#cb8-20"></a><span class="co"># iterating over the invasion probabilities</span></span>
-<span id="cb8-21"><a href="#cb8-21"></a><span class="cf">for</span> i, (Pr, Ps, Pp) <span class="kw">in</span> <span class="bu">enumerate</span>(I):</span>
-<span id="cb8-22"><a href="#cb8-22"></a>    <span class="bu">print</span>(<span class="ss">f"[</span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>num_sim<span class="sc">}</span><span class="ss">] Running simulation for invasion probabilities: Pr=</span><span class="sc">{</span>Pr<span class="sc">:.2f}</span><span class="ss">, Ps=</span><span class="sc">{</span>Ps<span class="sc">:.2f}</span><span class="ss">, Pp=</span><span class="sc">{</span>Pp<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
-<span id="cb8-23"><a href="#cb8-23"></a>    <span class="co"># simulating with the current invasion probabilities</span></span>
-<span id="cb8-24"><a href="#cb8-24"></a>    results_df <span class="op">=</span> simulate_finite_N(</span>
-<span id="cb8-25"><a href="#cb8-25"></a>        Pr<span class="op">=</span>Pr, Ps<span class="op">=</span>Ps, Pp<span class="op">=</span>Pp,</span>
-<span id="cb8-26"><a href="#cb8-26"></a>        nr_init<span class="op">=</span>Ps, ns_init<span class="op">=</span>Pp,</span>
-<span id="cb8-27"><a href="#cb8-27"></a>        N<span class="op">=</span>N, epochs<span class="op">=</span>EPOCHS</span>
-<span id="cb8-28"><a href="#cb8-28"></a>    )</span>
-<span id="cb8-29"><a href="#cb8-29"></a>    <span class="co"># storing the winner</span></span>
-<span id="cb8-30"><a href="#cb8-30"></a>    <span class="cf">if</span> results_df.index.stop<span class="op">==</span>EPOCHS: <span class="co"># no winner</span></span>
-<span id="cb8-31"><a href="#cb8-31"></a>        winners.append(<span class="st">'None'</span>)</span>
-<span id="cb8-32"><a href="#cb8-32"></a>    <span class="cf">elif</span> np.isclose(results_df.iloc[<span class="op">-</span><span class="dv">1</span>][<span class="st">'$n_r$'</span>], <span class="dv">1</span>, <span class="fl">1e-4</span>): <span class="co"># rock wins</span></span>
-<span id="cb8-33"><a href="#cb8-33"></a>            winners.append(<span class="st">'Rock'</span>)</span>
-<span id="cb8-34"><a href="#cb8-34"></a>    <span class="cf">elif</span> np.isclose(results_df.iloc[<span class="op">-</span><span class="dv">1</span>][<span class="st">'$n_s$'</span>], <span class="dv">1</span>, <span class="fl">1e-4</span>): <span class="co"># scissors wins</span></span>
-<span id="cb8-35"><a href="#cb8-35"></a>        winners.append(<span class="st">'Scissors'</span>)</span>
-<span id="cb8-36"><a href="#cb8-36"></a>    <span class="cf">else</span>: <span class="co"># paper wins</span></span>
-<span id="cb8-37"><a href="#cb8-37"></a>        winners.append(<span class="st">'Paper'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-20"><a href="#cb8-20"></a><span class="co"># function to print a progress bar</span></span>
+<span id="cb8-21"><a href="#cb8-21"></a><span class="kw">def</span> print_progress_bar(iteration, total, length<span class="op">=</span><span class="dv">50</span>):</span>
+<span id="cb8-22"><a href="#cb8-22"></a>    percent <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span><span class="dv">100</span> <span class="op">*</span> (iteration <span class="op">/</span> <span class="bu">float</span>(total))<span class="sc">:.1f}</span><span class="ss">"</span></span>
+<span id="cb8-23"><a href="#cb8-23"></a>    filled_length <span class="op">=</span> <span class="bu">int</span>(length <span class="op">*</span> iteration <span class="op">//</span> total)</span>
+<span id="cb8-24"><a href="#cb8-24"></a>    bar <span class="op">=</span> <span class="st">'='</span> <span class="op">*</span> filled_length <span class="op">+</span> <span class="st">'-'</span> <span class="op">*</span> (length <span class="op">-</span> filled_length)</span>
+<span id="cb8-25"><a href="#cb8-25"></a>    sys.stdout.write(<span class="ss">f'</span><span class="ch">\r</span><span class="ss">Progress: |</span><span class="sc">{</span>bar<span class="sc">}</span><span class="ss">| </span><span class="sc">{</span>percent<span class="sc">}</span><span class="ss">% Complete'</span>)</span>
+<span id="cb8-26"><a href="#cb8-26"></a>    sys.stdout.flush()</span>
+<span id="cb8-27"><a href="#cb8-27"></a></span>
+<span id="cb8-28"><a href="#cb8-28"></a><span class="co"># iterating over the invasion probabilities</span></span>
+<span id="cb8-29"><a href="#cb8-29"></a><span class="cf">for</span> i, (Pr, Ps, Pp) <span class="kw">in</span> <span class="bu">enumerate</span>(I):</span>
+<span id="cb8-30"><a href="#cb8-30"></a>    print_progress_bar(i<span class="op">+</span><span class="dv">1</span>, num_sim)</span>
+<span id="cb8-31"><a href="#cb8-31"></a>    results_df <span class="op">=</span> simulate_discrete_finite_N(</span>
+<span id="cb8-32"><a href="#cb8-32"></a>        Pr<span class="op">=</span>Pr, Ps<span class="op">=</span>Ps, Pp<span class="op">=</span>Pp,</span>
+<span id="cb8-33"><a href="#cb8-33"></a>        nr_init<span class="op">=</span>Ps, ns_init<span class="op">=</span>Pp,</span>
+<span id="cb8-34"><a href="#cb8-34"></a>        N<span class="op">=</span>N, epochs<span class="op">=</span>EPOCHS</span>
+<span id="cb8-35"><a href="#cb8-35"></a>    )</span>
+<span id="cb8-36"><a href="#cb8-36"></a>    <span class="co"># storing the winner</span></span>
+<span id="cb8-37"><a href="#cb8-37"></a>    <span class="cf">if</span> results_df.index.stop<span class="op">==</span>EPOCHS: <span class="co"># no winner</span></span>
+<span id="cb8-38"><a href="#cb8-38"></a>        winners.append(<span class="st">'None'</span>)</span>
+<span id="cb8-39"><a href="#cb8-39"></a>    <span class="cf">elif</span> np.isclose(results_df.iloc[<span class="op">-</span><span class="dv">1</span>][<span class="st">'$n_r$'</span>], <span class="dv">1</span>, <span class="fl">1e-4</span>): <span class="co"># rock wins</span></span>
+<span id="cb8-40"><a href="#cb8-40"></a>            winners.append(<span class="st">'Rock'</span>)</span>
+<span id="cb8-41"><a href="#cb8-41"></a>    <span class="cf">elif</span> np.isclose(results_df.iloc[<span class="op">-</span><span class="dv">1</span>][<span class="st">'$n_s$'</span>], <span class="dv">1</span>, <span class="fl">1e-4</span>): <span class="co"># scissors wins</span></span>
+<span id="cb8-42"><a href="#cb8-42"></a>        winners.append(<span class="st">'Scissors'</span>)</span>
+<span id="cb8-43"><a href="#cb8-43"></a>    <span class="cf">else</span>: <span class="co"># paper wins</span></span>
+<span id="cb8-44"><a href="#cb8-44"></a>        winners.append(<span class="st">'Paper'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1/153] Running simulation for invasion probabilities: Pr=0.05, Ps=0.05, Pp=0.89
-[2/153] Running simulation for invasion probabilities: Pr=0.05, Ps=0.11, Pp=0.84
-[3/153] Running simulation for invasion probabilities: Pr=0.05, Ps=0.16, Pp=0.79
-[4/153] Running simulation for invasion probabilities: Pr=0.05, Ps=0.21, Pp=0.74
-[5/153] Running simulation for invasion probabilities: Pr=0.05, Ps=0.26, Pp=0.68
-[6/153] Running simulation for invasion probabilities: Pr=0.05, Ps=0.32, Pp=0.63
-[7/153] Running simulation for invasion probabilities: Pr=0.05, Ps=0.37, Pp=0.58
-[8/153] Running simulation for invasion probabilities: Pr=0.05, Ps=0.42, Pp=0.53
-[9/153] Running simulation for invasion probabilities: Pr=0.05, Ps=0.47, Pp=0.47
-[10/153] Running simulation for invasion probabilities: Pr=0.05, Ps=0.53, Pp=0.42
-[11/153] Running simulation for invasion probabilities: Pr=0.05, Ps=0.58, Pp=0.37
-[12/153] Running simulation for invasion probabilities: Pr=0.05, Ps=0.63, Pp=0.32
-[13/153] Running simulation for invasion probabilities: Pr=0.05, Ps=0.68, Pp=0.26
-[14/153] Running simulation for invasion probabilities: Pr=0.05, Ps=0.74, Pp=0.21
-[15/153] Running simulation for invasion probabilities: Pr=0.05, Ps=0.79, Pp=0.16
-[16/153] Running simulation for invasion probabilities: Pr=0.05, Ps=0.84, Pp=0.11
-[17/153] Running simulation for invasion probabilities: Pr=0.05, Ps=0.89, Pp=0.05
-[18/153] Running simulation for invasion probabilities: Pr=0.11, Ps=0.05, Pp=0.84
-[19/153] Running simulation for invasion probabilities: Pr=0.11, Ps=0.11, Pp=0.79
-[20/153] Running simulation for invasion probabilities: Pr=0.11, Ps=0.16, Pp=0.74
-[21/153] Running simulation for invasion probabilities: Pr=0.11, Ps=0.21, Pp=0.68
-[22/153] Running simulation for invasion probabilities: Pr=0.11, Ps=0.26, Pp=0.63
-[23/153] Running simulation for invasion probabilities: Pr=0.11, Ps=0.32, Pp=0.58
-[24/153] Running simulation for invasion probabilities: Pr=0.11, Ps=0.37, Pp=0.53
-[25/153] Running simulation for invasion probabilities: Pr=0.11, Ps=0.42, Pp=0.47
-[26/153] Running simulation for invasion probabilities: Pr=0.11, Ps=0.47, Pp=0.42
-[27/153] Running simulation for invasion probabilities: Pr=0.11, Ps=0.53, Pp=0.37
-[28/153] Running simulation for invasion probabilities: Pr=0.11, Ps=0.58, Pp=0.32
-[29/153] Running simulation for invasion probabilities: Pr=0.11, Ps=0.63, Pp=0.26
-[30/153] Running simulation for invasion probabilities: Pr=0.11, Ps=0.68, Pp=0.21
-[31/153] Running simulation for invasion probabilities: Pr=0.11, Ps=0.74, Pp=0.16
-[32/153] Running simulation for invasion probabilities: Pr=0.11, Ps=0.79, Pp=0.11
-[33/153] Running simulation for invasion probabilities: Pr=0.11, Ps=0.84, Pp=0.05
-[34/153] Running simulation for invasion probabilities: Pr=0.16, Ps=0.05, Pp=0.79
-[35/153] Running simulation for invasion probabilities: Pr=0.16, Ps=0.11, Pp=0.74
-[36/153] Running simulation for invasion probabilities: Pr=0.16, Ps=0.16, Pp=0.68
-[37/153] Running simulation for invasion probabilities: Pr=0.16, Ps=0.21, Pp=0.63
-[38/153] Running simulation for invasion probabilities: Pr=0.16, Ps=0.26, Pp=0.58
-[39/153] Running simulation for invasion probabilities: Pr=0.16, Ps=0.32, Pp=0.53
-[40/153] Running simulation for invasion probabilities: Pr=0.16, Ps=0.37, Pp=0.47
-[41/153] Running simulation for invasion probabilities: Pr=0.16, Ps=0.42, Pp=0.42
-[42/153] Running simulation for invasion probabilities: Pr=0.16, Ps=0.47, Pp=0.37
-[43/153] Running simulation for invasion probabilities: Pr=0.16, Ps=0.53, Pp=0.32
-[44/153] Running simulation for invasion probabilities: Pr=0.16, Ps=0.58, Pp=0.26
-[45/153] Running simulation for invasion probabilities: Pr=0.16, Ps=0.63, Pp=0.21
-[46/153] Running simulation for invasion probabilities: Pr=0.16, Ps=0.68, Pp=0.16
-[47/153] Running simulation for invasion probabilities: Pr=0.16, Ps=0.74, Pp=0.11
-[48/153] Running simulation for invasion probabilities: Pr=0.16, Ps=0.79, Pp=0.05
-[49/153] Running simulation for invasion probabilities: Pr=0.21, Ps=0.05, Pp=0.74
-[50/153] Running simulation for invasion probabilities: Pr=0.21, Ps=0.11, Pp=0.68
-[51/153] Running simulation for invasion probabilities: Pr=0.21, Ps=0.16, Pp=0.63
-[52/153] Running simulation for invasion probabilities: Pr=0.21, Ps=0.21, Pp=0.58
-[53/153] Running simulation for invasion probabilities: Pr=0.21, Ps=0.26, Pp=0.53
-[54/153] Running simulation for invasion probabilities: Pr=0.21, Ps=0.32, Pp=0.47
-[55/153] Running simulation for invasion probabilities: Pr=0.21, Ps=0.37, Pp=0.42
-[56/153] Running simulation for invasion probabilities: Pr=0.21, Ps=0.42, Pp=0.37
-[57/153] Running simulation for invasion probabilities: Pr=0.21, Ps=0.47, Pp=0.32
-[58/153] Running simulation for invasion probabilities: Pr=0.21, Ps=0.53, Pp=0.26
-[59/153] Running simulation for invasion probabilities: Pr=0.21, Ps=0.58, Pp=0.21
-[60/153] Running simulation for invasion probabilities: Pr=0.21, Ps=0.63, Pp=0.16
-[61/153] Running simulation for invasion probabilities: Pr=0.21, Ps=0.68, Pp=0.11
-[62/153] Running simulation for invasion probabilities: Pr=0.21, Ps=0.74, Pp=0.05
-[63/153] Running simulation for invasion probabilities: Pr=0.26, Ps=0.05, Pp=0.68
-[64/153] Running simulation for invasion probabilities: Pr=0.26, Ps=0.11, Pp=0.63
-[65/153] Running simulation for invasion probabilities: Pr=0.26, Ps=0.16, Pp=0.58
-[66/153] Running simulation for invasion probabilities: Pr=0.26, Ps=0.21, Pp=0.53
-[67/153] Running simulation for invasion probabilities: Pr=0.26, Ps=0.26, Pp=0.47
-[68/153] Running simulation for invasion probabilities: Pr=0.26, Ps=0.32, Pp=0.42
-[69/153] Running simulation for invasion probabilities: Pr=0.26, Ps=0.37, Pp=0.37
-[70/153] Running simulation for invasion probabilities: Pr=0.26, Ps=0.42, Pp=0.32
-[71/153] Running simulation for invasion probabilities: Pr=0.26, Ps=0.47, Pp=0.26
-[72/153] Running simulation for invasion probabilities: Pr=0.26, Ps=0.53, Pp=0.21
-[73/153] Running simulation for invasion probabilities: Pr=0.26, Ps=0.58, Pp=0.16
-[74/153] Running simulation for invasion probabilities: Pr=0.26, Ps=0.63, Pp=0.11
-[75/153] Running simulation for invasion probabilities: Pr=0.26, Ps=0.68, Pp=0.05
-[76/153] Running simulation for invasion probabilities: Pr=0.32, Ps=0.05, Pp=0.63
-[77/153] Running simulation for invasion probabilities: Pr=0.32, Ps=0.11, Pp=0.58
-[78/153] Running simulation for invasion probabilities: Pr=0.32, Ps=0.16, Pp=0.53
-[79/153] Running simulation for invasion probabilities: Pr=0.32, Ps=0.21, Pp=0.47
-[80/153] Running simulation for invasion probabilities: Pr=0.32, Ps=0.26, Pp=0.42
-[81/153] Running simulation for invasion probabilities: Pr=0.32, Ps=0.32, Pp=0.37
-[82/153] Running simulation for invasion probabilities: Pr=0.32, Ps=0.37, Pp=0.32
-[83/153] Running simulation for invasion probabilities: Pr=0.32, Ps=0.42, Pp=0.26
-[84/153] Running simulation for invasion probabilities: Pr=0.32, Ps=0.47, Pp=0.21
-[85/153] Running simulation for invasion probabilities: Pr=0.32, Ps=0.53, Pp=0.16
-[86/153] Running simulation for invasion probabilities: Pr=0.32, Ps=0.58, Pp=0.11
-[87/153] Running simulation for invasion probabilities: Pr=0.32, Ps=0.63, Pp=0.05
-[88/153] Running simulation for invasion probabilities: Pr=0.37, Ps=0.05, Pp=0.58
-[89/153] Running simulation for invasion probabilities: Pr=0.37, Ps=0.11, Pp=0.53
-[90/153] Running simulation for invasion probabilities: Pr=0.37, Ps=0.16, Pp=0.47
-[91/153] Running simulation for invasion probabilities: Pr=0.37, Ps=0.21, Pp=0.42
-[92/153] Running simulation for invasion probabilities: Pr=0.37, Ps=0.26, Pp=0.37
-[93/153] Running simulation for invasion probabilities: Pr=0.37, Ps=0.32, Pp=0.32
-[94/153] Running simulation for invasion probabilities: Pr=0.37, Ps=0.37, Pp=0.26
-[95/153] Running simulation for invasion probabilities: Pr=0.37, Ps=0.42, Pp=0.21
-[96/153] Running simulation for invasion probabilities: Pr=0.37, Ps=0.47, Pp=0.16
-[97/153] Running simulation for invasion probabilities: Pr=0.37, Ps=0.53, Pp=0.11
-[98/153] Running simulation for invasion probabilities: Pr=0.37, Ps=0.58, Pp=0.05
-[99/153] Running simulation for invasion probabilities: Pr=0.42, Ps=0.05, Pp=0.53
-[100/153] Running simulation for invasion probabilities: Pr=0.42, Ps=0.11, Pp=0.47
-[101/153] Running simulation for invasion probabilities: Pr=0.42, Ps=0.16, Pp=0.42
-[102/153] Running simulation for invasion probabilities: Pr=0.42, Ps=0.21, Pp=0.37
-[103/153] Running simulation for invasion probabilities: Pr=0.42, Ps=0.26, Pp=0.32
-[104/153] Running simulation for invasion probabilities: Pr=0.42, Ps=0.32, Pp=0.26
-[105/153] Running simulation for invasion probabilities: Pr=0.42, Ps=0.37, Pp=0.21
-[106/153] Running simulation for invasion probabilities: Pr=0.42, Ps=0.42, Pp=0.16
-[107/153] Running simulation for invasion probabilities: Pr=0.42, Ps=0.47, Pp=0.11
-[108/153] Running simulation for invasion probabilities: Pr=0.42, Ps=0.53, Pp=0.05
-[109/153] Running simulation for invasion probabilities: Pr=0.47, Ps=0.05, Pp=0.47
-[110/153] Running simulation for invasion probabilities: Pr=0.47, Ps=0.11, Pp=0.42
-[111/153] Running simulation for invasion probabilities: Pr=0.47, Ps=0.16, Pp=0.37
-[112/153] Running simulation for invasion probabilities: Pr=0.47, Ps=0.21, Pp=0.32
-[113/153] Running simulation for invasion probabilities: Pr=0.47, Ps=0.26, Pp=0.26
-[114/153] Running simulation for invasion probabilities: Pr=0.47, Ps=0.32, Pp=0.21
-[115/153] Running simulation for invasion probabilities: Pr=0.47, Ps=0.37, Pp=0.16
-[116/153] Running simulation for invasion probabilities: Pr=0.47, Ps=0.42, Pp=0.11
-[117/153] Running simulation for invasion probabilities: Pr=0.47, Ps=0.47, Pp=0.05
-[118/153] Running simulation for invasion probabilities: Pr=0.53, Ps=0.05, Pp=0.42
-[119/153] Running simulation for invasion probabilities: Pr=0.53, Ps=0.11, Pp=0.37
-[120/153] Running simulation for invasion probabilities: Pr=0.53, Ps=0.16, Pp=0.32
-[121/153] Running simulation for invasion probabilities: Pr=0.53, Ps=0.21, Pp=0.26
-[122/153] Running simulation for invasion probabilities: Pr=0.53, Ps=0.26, Pp=0.21
-[123/153] Running simulation for invasion probabilities: Pr=0.53, Ps=0.32, Pp=0.16
-[124/153] Running simulation for invasion probabilities: Pr=0.53, Ps=0.37, Pp=0.11
-[125/153] Running simulation for invasion probabilities: Pr=0.53, Ps=0.42, Pp=0.05
-[126/153] Running simulation for invasion probabilities: Pr=0.58, Ps=0.05, Pp=0.37
-[127/153] Running simulation for invasion probabilities: Pr=0.58, Ps=0.11, Pp=0.32
-[128/153] Running simulation for invasion probabilities: Pr=0.58, Ps=0.16, Pp=0.26
-[129/153] Running simulation for invasion probabilities: Pr=0.58, Ps=0.21, Pp=0.21
-[130/153] Running simulation for invasion probabilities: Pr=0.58, Ps=0.26, Pp=0.16
-[131/153] Running simulation for invasion probabilities: Pr=0.58, Ps=0.32, Pp=0.11
-[132/153] Running simulation for invasion probabilities: Pr=0.58, Ps=0.37, Pp=0.05
-[133/153] Running simulation for invasion probabilities: Pr=0.63, Ps=0.05, Pp=0.32
-[134/153] Running simulation for invasion probabilities: Pr=0.63, Ps=0.11, Pp=0.26
-[135/153] Running simulation for invasion probabilities: Pr=0.63, Ps=0.16, Pp=0.21
-[136/153] Running simulation for invasion probabilities: Pr=0.63, Ps=0.21, Pp=0.16
-[137/153] Running simulation for invasion probabilities: Pr=0.63, Ps=0.26, Pp=0.11
-[138/153] Running simulation for invasion probabilities: Pr=0.63, Ps=0.32, Pp=0.05
-[139/153] Running simulation for invasion probabilities: Pr=0.68, Ps=0.05, Pp=0.26
-[140/153] Running simulation for invasion probabilities: Pr=0.68, Ps=0.11, Pp=0.21
-[141/153] Running simulation for invasion probabilities: Pr=0.68, Ps=0.16, Pp=0.16
-[142/153] Running simulation for invasion probabilities: Pr=0.68, Ps=0.21, Pp=0.11
-[143/153] Running simulation for invasion probabilities: Pr=0.68, Ps=0.26, Pp=0.05
-[144/153] Running simulation for invasion probabilities: Pr=0.74, Ps=0.05, Pp=0.21
-[145/153] Running simulation for invasion probabilities: Pr=0.74, Ps=0.11, Pp=0.16
-[146/153] Running simulation for invasion probabilities: Pr=0.74, Ps=0.16, Pp=0.11
-[147/153] Running simulation for invasion probabilities: Pr=0.74, Ps=0.21, Pp=0.05
-[148/153] Running simulation for invasion probabilities: Pr=0.79, Ps=0.05, Pp=0.16
-[149/153] Running simulation for invasion probabilities: Pr=0.79, Ps=0.11, Pp=0.11
-[150/153] Running simulation for invasion probabilities: Pr=0.79, Ps=0.16, Pp=0.05
-[151/153] Running simulation for invasion probabilities: Pr=0.84, Ps=0.05, Pp=0.11
-[152/153] Running simulation for invasion probabilities: Pr=0.84, Ps=0.11, Pp=0.05
-[153/153] Running simulation for invasion probabilities: Pr=0.89, Ps=0.05, Pp=0.05</code></pre>
+<pre><code>Progress: |==================================================| 100.0% Complete</code></pre>
 </div>
 </div>
 <p>Plotting the surviving species on a ternary plot:</p>
@@ -714,7 +570,7 @@ n_p[t+\Delta_t]=n_p[t] + \Delta_t \cdot n_p[t](n_r[t]P_p - n_s[t] P_s)\\
 <div class="cell" data-execution_count="10">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1"></a><span class="kw">def</span> simulate_large_N(Pr, Ps, Pp, nr_init, ns_init, delta_t<span class="op">=</span><span class="fl">0.001</span>, epochs<span class="op">=</span><span class="dv">1000</span>):</span>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1"></a><span class="kw">def</span> simulate_discrete_large_N(Pr, Ps, Pp, nr_init, ns_init, delta_t<span class="op">=</span><span class="fl">0.001</span>, epochs<span class="op">=</span><span class="dv">1000</span>):</span>
 <span id="cb11-2"><a href="#cb11-2"></a>    <span class="co">'''</span></span>
 <span id="cb11-3"><a href="#cb11-3"></a><span class="co">    Simulate the evolution of a population of three species over time using </span></span>
 <span id="cb11-4"><a href="#cb11-4"></a><span class="co">    the recurrence relations under the large N assumption.</span></span>
@@ -734,7 +590,7 @@ n_p[t+\Delta_t]=n_p[t] + \Delta_t \cdot n_p[t](n_r[t]P_p - n_s[t] P_s)\\
 <span id="cb11-18"><a href="#cb11-18"></a><span class="co">    delta_t : float</span></span>
 <span id="cb11-19"><a href="#cb11-19"></a><span class="co">        The time step size.</span></span>
 <span id="cb11-20"><a href="#cb11-20"></a><span class="co">    epochs : int</span></span>
-<span id="cb11-21"><a href="#cb11-21"></a><span class="co">        The number of time units to simulate.</span></span>
+<span id="cb11-21"><a href="#cb11-21"></a><span class="co">        The number of time steps to simulate.</span></span>
 <span id="cb11-22"><a href="#cb11-22"></a><span class="co">    '''</span></span>
 <span id="cb11-23"><a href="#cb11-23"></a></span>
 <span id="cb11-24"><a href="#cb11-24"></a>    <span class="kw">def</span> check_P(P):</span>
@@ -777,7 +633,7 @@ n_p[t+\Delta_t]=n_p[t] + \Delta_t \cdot n_p[t](n_r[t]P_p - n_s[t] P_s)\\
 <div class="cell" data-execution_count="11">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1"></a>fp_large_N_df <span class="op">=</span> simulate_large_N(Pr<span class="op">=</span><span class="fl">0.2</span>, Ps<span class="op">=</span><span class="fl">0.5</span>, Pp<span class="op">=</span><span class="fl">0.3</span>, nr_init<span class="op">=</span><span class="fl">0.5</span>, ns_init<span class="op">=</span><span class="fl">0.3</span>, epochs<span class="op">=</span><span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1"></a>fp_large_N_df <span class="op">=</span> simulate_discrete_large_N(Pr<span class="op">=</span><span class="fl">0.2</span>, Ps<span class="op">=</span><span class="fl">0.5</span>, Pp<span class="op">=</span><span class="fl">0.3</span>, nr_init<span class="op">=</span><span class="fl">0.5</span>, ns_init<span class="op">=</span><span class="fl">0.3</span>, epochs<span class="op">=</span><span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Plotting the evolution of the system:</p>
@@ -794,11 +650,11 @@ n_p[t+\Delta_t]=n_p[t] + \Delta_t \cdot n_p[t](n_r[t]P_p - n_s[t] P_s)\\
 </div>
 </div>
 <p>By initializing the population densities equal to the fixed point, the system remains at the fixed point.</p>
-<p>Simulating the evolution of the system under the large <span class="math inline">\(N\)</span> assumption with <span class="math inline">\(P_r = 0.2\)</span>, <span class="math inline">\(P_s = 0.5\)</span>, <span class="math inline">\(P_p = 0.3\)</span>, initialized with equal population densities (<span class="math inline">\(n_r=1/3\)</span>, <span class="math inline">\(n_s=1/3\)</span>, <span class="math inline">\(n_p=1/3\)</span>) and using <span class="math inline">\(\Delta_t=1\)</span>:</p>
+<p>Simulating the evolution of the system of recurrent equations under the large <span class="math inline">\(N\)</span> assumption with <span class="math inline">\(P_r = 0.2\)</span>, <span class="math inline">\(P_s = 0.5\)</span>, <span class="math inline">\(P_p = 0.3\)</span>, initialized with equal population densities (<span class="math inline">\(n_r=1/3\)</span>, <span class="math inline">\(n_s=1/3\)</span>, <span class="math inline">\(n_p=1/3\)</span>) and using <span class="math inline">\(\Delta_t=1\)</span>:</p>
 <div class="cell" data-execution_count="13">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1"></a>eq_large_N_df <span class="op">=</span> simulate_large_N(Pr<span class="op">=</span><span class="fl">0.2</span>, Ps<span class="op">=</span><span class="fl">0.5</span>, Pp<span class="op">=</span><span class="fl">0.3</span>, nr_init<span class="op">=</span><span class="dv">1</span><span class="op">/</span><span class="dv">3</span>, ns_init<span class="op">=</span><span class="dv">1</span><span class="op">/</span><span class="dv">3</span>, delta_t<span class="op">=</span><span class="dv">1</span>, epochs<span class="op">=</span><span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1"></a>eq_large_N_df <span class="op">=</span> simulate_discrete_large_N(Pr<span class="op">=</span><span class="fl">0.2</span>, Ps<span class="op">=</span><span class="fl">0.5</span>, Pp<span class="op">=</span><span class="fl">0.3</span>, nr_init<span class="op">=</span><span class="dv">1</span><span class="op">/</span><span class="dv">3</span>, ns_init<span class="op">=</span><span class="dv">1</span><span class="op">/</span><span class="dv">3</span>, delta_t<span class="op">=</span><span class="dv">1</span>, epochs<span class="op">=</span><span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Plotting the evolution of the system:</p>
@@ -830,7 +686,7 @@ n_p[t+\Delta_t]=n_p[t] + \Delta_t \cdot n_p[t](n_r[t]P_p - n_s[t] P_s)\\
 <div class="cell" data-execution_count="16">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1"></a>eq_large_N_df <span class="op">=</span> simulate_large_N(Pr<span class="op">=</span><span class="fl">0.2</span>, Ps<span class="op">=</span><span class="fl">0.5</span>, Pp<span class="op">=</span><span class="fl">0.3</span>, nr_init<span class="op">=</span><span class="dv">1</span><span class="op">/</span><span class="dv">3</span>, ns_init<span class="op">=</span><span class="dv">1</span><span class="op">/</span><span class="dv">3</span>, delta_t<span class="op">=</span><span class="fl">0.01</span>, epochs<span class="op">=</span><span class="dv">100000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1"></a>eq_large_N_df <span class="op">=</span> simulate_discrete_large_N(Pr<span class="op">=</span><span class="fl">0.2</span>, Ps<span class="op">=</span><span class="fl">0.5</span>, Pp<span class="op">=</span><span class="fl">0.3</span>, nr_init<span class="op">=</span><span class="dv">1</span><span class="op">/</span><span class="dv">3</span>, ns_init<span class="op">=</span><span class="dv">1</span><span class="op">/</span><span class="dv">3</span>, delta_t<span class="op">=</span><span class="fl">0.01</span>, epochs<span class="op">=</span><span class="dv">100000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Plotting the evolution of the system:</p>
@@ -872,7 +728,7 @@ n_p[t+\Delta_t]=n_p[t] + \Delta_t \cdot n_p[t](n_r[t]P_p - n_s[t] P_s)\\
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1"></a><span class="kw">def</span> RSP_ODE_solver(t, P, x0):</span>
 <span id="cb20-2"><a href="#cb20-2"></a>    <span class="co">'''</span></span>
-<span id="cb20-3"><a href="#cb20-3"></a><span class="co">    Solve the initial value problem for the RSP ODE system.</span></span>
+<span id="cb20-3"><a href="#cb20-3"></a><span class="co">    Solve the RSP ODE system.</span></span>
 <span id="cb20-4"><a href="#cb20-4"></a><span class="co">    '''</span></span>
 <span id="cb20-5"><a href="#cb20-5"></a>    <span class="kw">def</span> RSP(x, t, P):</span>
 <span id="cb20-6"><a href="#cb20-6"></a>        nr <span class="op">=</span> x[<span class="dv">0</span>]</span>
@@ -894,7 +750,7 @@ n_p[t+\Delta_t]=n_p[t] + \Delta_t \cdot n_p[t](n_r[t]P_p - n_s[t] P_s)\\
 <span id="cb20-22"><a href="#cb20-22"></a><span class="kw">def</span> simulate_continuous(t, Pr, Ps, Pp, nr_init, ns_init):</span>
 <span id="cb20-23"><a href="#cb20-23"></a>    <span class="co">'''</span></span>
 <span id="cb20-24"><a href="#cb20-24"></a><span class="co">    Simulate the evolution of a population of three species over time in the</span></span>
-<span id="cb20-25"><a href="#cb20-25"></a><span class="co">    continuous setting, solving the initial value problem for the ODE system.</span></span>
+<span id="cb20-25"><a href="#cb20-25"></a><span class="co">    continuous setting, solving the ODE system.</span></span>
 <span id="cb20-26"><a href="#cb20-26"></a><span class="co">    '''</span></span>
 <span id="cb20-27"><a href="#cb20-27"></a>    <span class="cf">if</span> nr_init <span class="op">+</span> ns_init <span class="op">&gt;</span> <span class="dv">1</span>:</span>
 <span id="cb20-28"><a href="#cb20-28"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">'Initial species proportions must be less than 1'</span>)</span>
@@ -941,7 +797,7 @@ n_p[t+\Delta_t]=n_p[t] + \Delta_t \cdot n_p[t](n_r[t]P_p - n_s[t] P_s)\\
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1"></a>eq_continuous_df <span class="op">=</span> simulate_continuous(t<span class="op">=</span>np.linspace(<span class="dv">0</span>,<span class="dv">1000</span>,<span class="dv">1001</span>), Pr<span class="op">=</span><span class="fl">0.2</span>, Ps<span class="op">=</span><span class="fl">0.5</span>, Pp<span class="op">=</span><span class="fl">0.3</span>, nr_init<span class="op">=</span><span class="dv">1</span><span class="op">/</span><span class="dv">3</span>, ns_init<span class="op">=</span><span class="dv">1</span><span class="op">/</span><span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>Plottting the evolution of the system:</p>
+<p>Plotting the evolution of the system:</p>
 <div class="cell" data-execution_count="23">
 <details open="">
 <summary>Code</summary>
@@ -967,7 +823,7 @@ n_p[t+\Delta_t]=n_p[t] + \Delta_t \cdot n_p[t](n_r[t]P_p - n_s[t] P_s)\\
 </div>
 </div>
 <p>Again, the populations move along a periodic orbit around the fixed point.</p>
-<p>Performing simulations for different initial population densities and plotting the orbits on a ternary plot (replicating Figure 1a from <a href="#6-references">[1]</a>):</p>
+<p>Performing simulations for different initial population densities and plotting the orbits on a ternary plot (replicating Figure 1a from [1]):</p>
 <div class="cell" data-execution_count="25">
 <details open="">
 <summary>Code</summary>
@@ -1002,7 +858,7 @@ n_p[t+\Delta_t]=n_p[t] + \Delta_t \cdot n_p[t](n_r[t]P_p - n_s[t] P_s)\\
 <p><img src="long_range_simulations_files/figure-html/cell-26-output-1.png" class="img-fluid"></p>
 </div>
 </div>
-<p>The quantity <span class="math inline">\(\lambda=(\frac{n_r}{R})^R(\frac{n_s}{S})^S(\frac{n_p}{P})^P\)</span> is invariant along each orbit, with <span class="math inline">\(\lambda=1\)</span> when the populations are at the fixed point and <span class="math inline">\(\lambda=0\)</span> when one or more of the species become extinct <a href="#6-references">[2]</a>.</p>
+<p>The quantity <span class="math inline">\(\lambda=(\frac{n_r}{R})^R(\frac{n_s}{S})^S(\frac{n_p}{P})^P\)</span> is invariant along each orbit, with <span class="math inline">\(\lambda=1\)</span> when the populations are at the fixed point and <span class="math inline">\(\lambda=0\)</span> when one or more of the species become extinct [2].</p>
 <p>Defining a function to calculate the invariant:</p>
 <div class="cell" data-execution_count="26">
 <details open="">
@@ -1012,7 +868,7 @@ n_p[t+\Delta_t]=n_p[t] + \Delta_t \cdot n_p[t](n_r[t]P_p - n_s[t] P_s)\\
 <span id="cb27-3"><a href="#cb27-3"></a>    <span class="cf">return</span> df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>Computing and plotting the orbit invariant:</p>
+<p>Computing and plotting the orbit invariant to verify that it is constant:</p>
 <div class="cell" data-execution_count="27">
 <details open="">
 <summary>Code</summary>
@@ -1023,19 +879,16 @@ n_p[t+\Delta_t]=n_p[t] + \Delta_t \cdot n_p[t](n_r[t]P_p - n_s[t] P_s)\\
 <span id="cb28-5"><a href="#cb28-5"></a>    style<span class="op">=</span><span class="st">'-'</span>, label<span class="op">=</span><span class="st">'$\lambda$'</span>,</span>
 <span id="cb28-6"><a href="#cb28-6"></a>    title<span class="op">=</span><span class="st">'Orbit invariant</span><span class="ch">\n</span><span class="st">$P_r=0.2$, $P_s=0.5$, $P_p=0.3$, $n_r^0=1/3$, $n_s^0=1/3$, $n_p^0=1/3$'</span></span>
 <span id="cb28-7"><a href="#cb28-7"></a>)</span>
-<span id="cb28-8"><a href="#cb28-8"></a>plt.legend()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb28-8"><a href="#cb28-8"></a>plt.legend()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="27">
-<pre><code>&lt;matplotlib.legend.Legend at 0x2a380ec10&gt;</code></pre>
-</div>
 <div class="cell-output cell-output-display">
-<p><img src="long_range_simulations_files/figure-html/cell-28-output-2.png" class="img-fluid"></p>
+<p><img src="long_range_simulations_files/figure-html/cell-28-output-1.png" class="img-fluid"></p>
 </div>
 </div>
 </section>
 <section id="stochastic-simulation-of-chemical-reactions" class="level3">
 <h3 class="anchored" data-anchor-id="stochastic-simulation-of-chemical-reactions">3. Stochastic simulation of chemical reactions</h3>
-<p>While ODEs are deterministic and do not account for fluctuations in population densities, stochastic simulation methods offer greater accuracy, particularly when analyzing reaction systems with small quantities of molecules. Furthermore, unlike discrete time simulations, stochastic simulations use an exponential probability distribution to model the time between subsequent occurrences of an event.</p>
+<p>While ODEs are deterministic and do not account for fluctuations in population densities, stochastic simulation methods offer greater accuracy, , especially for systems with small populations. Furthermore, unlike discrete time simulations, stochastic simulations use an exponential probability distribution to model the time between subsequent occurrences of an event.</p>
 <p>To perform stochastic simulations, we need to translate the ODE system</p>
 <span class="math display">\[\begin{cases}
 \frac{\partial n_r}{\partial t}=\textcolor{violet}{n_r\cdot n_s\cdot P_r} - \textcolor{gold}{n_r \cdot n_p \cdot P_p}\\
@@ -1062,7 +915,7 @@ P + R \xrightarrow{P_p} 2P\\
 <div class="cell" data-execution_count="28">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1"></a><span class="im">import</span> stochpy</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1"></a><span class="im">import</span> stochpy</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>
@@ -1086,11 +939,11 @@ Output Directory: /Users/irenetesta/Stochpy
 Model Directory: /Users/irenetesta/Stochpy/pscmodels</code></pre>
 </div>
 </div>
-<p>To describe a system of chemical reaction, StochPy uses the <a href="https://stochpy.sourceforge.net/html/inputfile_doc.html#pysces-inputfile">PySCeS MDL</a>, an ASCII text based input file. We defined the system using such format and saved it in the file <code>../long_range_models/RSP_model_reduced.psc</code>:</p>
+<p>To describe a system of chemical reaction, <code>StochPy</code> uses the <a href="https://stochpy.sourceforge.net/html/inputfile_doc.html#pysces-inputfile">PySCeS MDL</a>, an ASCII text based input file. We defined the system using such format and saved it in the file <code>../long_range_models/RSP_model.psc</code>:</p>
 <div class="cell" data-execution_count="29">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1"></a><span class="op">!</span>cat ..<span class="op">/</span>long_range_models<span class="op">/</span>RSP_model_reduced.psc</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1"></a><span class="op">!</span>cat ..<span class="op">/</span>long_range_models<span class="op">/</span>RSP_model.psc</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code># Rock Scissors Paper model
@@ -1126,36 +979,36 @@ P = 33</code></pre>
 <div class="cell" data-execution_count="30">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1"></a>smod <span class="op">=</span> stochpy.SSA(IsQuiet<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb34-2"><a href="#cb34-2"></a>smod.Model(model_file<span class="op">=</span><span class="st">"RSP_model_reduced.psc"</span>,<span class="bu">dir</span><span class="op">=</span><span class="st">"../long_range_models/"</span>)</span>
-<span id="cb34-3"><a href="#cb34-3"></a>smod.ShowSpecies()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1"></a>smod <span class="op">=</span> stochpy.SSA(IsQuiet<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb33-2"><a href="#cb33-2"></a>smod.Model(model_file<span class="op">=</span><span class="st">"RSP_model.psc"</span>,<span class="bu">dir</span><span class="op">=</span><span class="st">"../long_range_models/"</span>)</span>
+<span id="cb33-3"><a href="#cb33-3"></a>smod.ShowSpecies()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Info: Direct method is selected to perform stochastic simulations.
 Parsing file: /Users/irenetesta/Stochpy/pscmodels/ImmigrationDeath.psc
 Info: No reagents have been fixed
-Parsing file: ../long_range_models/RSP_model_reduced.psc
+Parsing file: ../long_range_models/RSP_model.psc
 Info: No reagents have been fixed
 ['R', 'S', 'P']</code></pre>
 </div>
 </div>
-<p>Setting initial conditions (close to the fixed point) and parameters, using a high number of copies for each species to approximate the deterministic behavior of the system:</p>
+<p>Setting initial conditions (close to the fixed point) and parameters, using a high number of copies for each species to approximate the deterministic behavior, thereby verifying the consistency between the ODE and stochastic models:</p>
 <div class="cell" data-execution_count="31">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1"></a>smod.ChangeParameter(<span class="st">"Pr"</span>, <span class="fl">0.2</span>)</span>
-<span id="cb36-2"><a href="#cb36-2"></a>smod.ChangeParameter(<span class="st">"Ps"</span>, <span class="fl">0.5</span>)</span>
-<span id="cb36-3"><a href="#cb36-3"></a>smod.ChangeParameter(<span class="st">"Pp"</span>, <span class="fl">0.3</span>)</span>
-<span id="cb36-4"><a href="#cb36-4"></a>smod.ChangeInitialSpeciesCopyNumber(<span class="st">"R"</span>, <span class="dv">50000</span>)</span>
-<span id="cb36-5"><a href="#cb36-5"></a>smod.ChangeInitialSpeciesCopyNumber(<span class="st">"S"</span>, <span class="dv">30000</span>)</span>
-<span id="cb36-6"><a href="#cb36-6"></a>smod.ChangeInitialSpeciesCopyNumber(<span class="st">"P"</span>, <span class="dv">20000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1"></a>smod.ChangeParameter(<span class="st">"Pr"</span>, <span class="fl">0.2</span>)</span>
+<span id="cb35-2"><a href="#cb35-2"></a>smod.ChangeParameter(<span class="st">"Ps"</span>, <span class="fl">0.5</span>)</span>
+<span id="cb35-3"><a href="#cb35-3"></a>smod.ChangeParameter(<span class="st">"Pp"</span>, <span class="fl">0.3</span>)</span>
+<span id="cb35-4"><a href="#cb35-4"></a>smod.ChangeInitialSpeciesCopyNumber(<span class="st">"R"</span>, <span class="dv">50000</span>)</span>
+<span id="cb35-5"><a href="#cb35-5"></a>smod.ChangeInitialSpeciesCopyNumber(<span class="st">"S"</span>, <span class="dv">30000</span>)</span>
+<span id="cb35-6"><a href="#cb35-6"></a>smod.ChangeInitialSpeciesCopyNumber(<span class="st">"P"</span>, <span class="dv">20000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>The method to perform a stochastic simulation is <code>DoStochSim</code>:</p>
 <div class="cell" data-execution_count="32">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1"></a><span class="bu">help</span>(smod.DoStochSim)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1"></a><span class="bu">help</span>(smod.DoStochSim)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Help on method DoStochSim in module stochpy.modules.StochSim:
@@ -1186,15 +1039,15 @@ DoStochSim(end=False, mode=False, method=False, trajectories=False, epsilon=0.03
 <div class="cell" data-execution_count="33">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1"></a>smod.DoStochSim()</span>
-<span id="cb39-2"><a href="#cb39-2"></a>smod.PlotSpeciesTimeSeries(colors<span class="op">=</span>[<span class="st">"tab:red"</span>, <span class="st">"purple"</span>, <span class="st">"gold"</span>], xlabel<span class="op">=</span><span class="st">"Steps"</span>)</span>
-<span id="cb39-3"><a href="#cb39-3"></a>stochpy.plt.title(<span class="st">"$P_r=0.2$, $P_s=0.5$, $P_p=0.3$, $R=50000$, $S=30000$, $P=20000$"</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1"></a>smod.DoStochSim()</span>
+<span id="cb38-2"><a href="#cb38-2"></a>smod.PlotSpeciesTimeSeries(colors<span class="op">=</span>[<span class="st">"tab:red"</span>, <span class="st">"purple"</span>, <span class="st">"gold"</span>], xlabel<span class="op">=</span><span class="st">"Steps"</span>)</span>
+<span id="cb38-3"><a href="#cb38-3"></a>stochpy.plt.title(<span class="st">"$P_r=0.2$, $P_s=0.5$, $P_p=0.3$, $R=50000$, $S=30000$, $P=20000$"</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Info: 1 trajectory is generated
 simulation done!               
 Info: Number of time steps 1000 End time 1.0951329075756742e-06
-Info: Simulation time 0.00977</code></pre>
+Info: Simulation time 0.02465</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <p><img src="long_range_simulations_files/figure-html/cell-34-output-2.png" class="img-fluid"></p>
@@ -1205,25 +1058,25 @@ Info: Simulation time 0.00977</code></pre>
 <div class="cell" data-execution_count="34">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1"></a>smod.ChangeInitialSpeciesCopyNumber(<span class="st">"R"</span>, <span class="dv">50</span>)</span>
-<span id="cb41-2"><a href="#cb41-2"></a>smod.ChangeInitialSpeciesCopyNumber(<span class="st">"S"</span>, <span class="dv">30</span>)</span>
-<span id="cb41-3"><a href="#cb41-3"></a>smod.ChangeInitialSpeciesCopyNumber(<span class="st">"P"</span>, <span class="dv">20</span>)</span>
-<span id="cb41-4"><a href="#cb41-4"></a>smod.DoStochSim(end<span class="op">=</span><span class="dv">10000</span>, IsTrackPropensities<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb41-5"><a href="#cb41-5"></a>fp_stoch_df <span class="op">=</span> pd.DataFrame(smod.data_stochsim.species, columns<span class="op">=</span>[<span class="st">'R'</span>, <span class="st">'S'</span>, <span class="st">'P'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1"></a>smod.ChangeInitialSpeciesCopyNumber(<span class="st">"R"</span>, <span class="dv">50</span>)</span>
+<span id="cb40-2"><a href="#cb40-2"></a>smod.ChangeInitialSpeciesCopyNumber(<span class="st">"S"</span>, <span class="dv">30</span>)</span>
+<span id="cb40-3"><a href="#cb40-3"></a>smod.ChangeInitialSpeciesCopyNumber(<span class="st">"P"</span>, <span class="dv">20</span>)</span>
+<span id="cb40-4"><a href="#cb40-4"></a>smod.DoStochSim(end<span class="op">=</span><span class="dv">10000</span>, IsTrackPropensities<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb40-5"><a href="#cb40-5"></a>fp_stoch_df <span class="op">=</span> pd.DataFrame(smod.data_stochsim.species, columns<span class="op">=</span>[<span class="st">'R'</span>, <span class="st">'S'</span>, <span class="st">'P'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Info: 1 trajectory is generated
 simulation done!               
 Info: Number of time steps 1928 End time 2.519492477708811
-Info: Simulation time 0.02972</code></pre>
+Info: Simulation time 0.03769</code></pre>
 </div>
 </div>
 <p>Plotting the evolution of the system:</p>
 <div class="cell" data-execution_count="35">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1"></a>smod.PlotSpeciesTimeSeries(colors<span class="op">=</span>[<span class="st">"tab:red"</span>, <span class="st">"purple"</span>, <span class="st">"gold"</span>], xlabel<span class="op">=</span><span class="st">"Steps"</span>)</span>
-<span id="cb43-2"><a href="#cb43-2"></a>stochpy.plt.title(<span class="st">"$P_r=0.2$, $P_s=0.5$, $P_p=0.3$, $R=50$, $S=30$, $P=20$"</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1"></a>smod.PlotSpeciesTimeSeries(colors<span class="op">=</span>[<span class="st">"tab:red"</span>, <span class="st">"purple"</span>, <span class="st">"gold"</span>], xlabel<span class="op">=</span><span class="st">"Steps"</span>)</span>
+<span id="cb42-2"><a href="#cb42-2"></a>stochpy.plt.title(<span class="st">"$P_r=0.2$, $P_s=0.5$, $P_p=0.3$, $R=50$, $S=30$, $P=20$"</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <p><img src="long_range_simulations_files/figure-html/cell-36-output-1.png" class="img-fluid"></p>
@@ -1232,10 +1085,10 @@ Info: Simulation time 0.02972</code></pre>
 <div class="cell" data-execution_count="36">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1"></a>ternary_plot_species_evolution(</span>
-<span id="cb44-2"><a href="#cb44-2"></a>    fp_stoch_df,</span>
-<span id="cb44-3"><a href="#cb44-3"></a>    title<span class="op">=</span><span class="vs">r"$P_r=0.2, P_s=0.5, P_p=0.3, R=50, S=30, P=20$"</span>,</span>
-<span id="cb44-4"><a href="#cb44-4"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1"></a>ternary_plot_species_evolution(</span>
+<span id="cb43-2"><a href="#cb43-2"></a>    fp_stoch_df,</span>
+<span id="cb43-3"><a href="#cb43-3"></a>    title<span class="op">=</span><span class="vs">r"$P_r=0.2, P_s=0.5, P_p=0.3, R=50, S=30, P=20$"</span>,</span>
+<span id="cb43-4"><a href="#cb43-4"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <p><img src="long_range_simulations_files/figure-html/cell-37-output-1.png" class="img-fluid"></p>
@@ -1246,7 +1099,7 @@ Info: Simulation time 0.02972</code></pre>
 <div class="cell" data-execution_count="37">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1"></a>smod.PlotPropensitiesTimeSeries(title<span class="op">=</span><span class="st">'Reaction Propensities, direct method</span><span class="ch">\n</span><span class="st">$P_r=0.2$, $P_s=0.5$, $P_p=0.3$, $R=50$, $S=30$, $P=20$'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1"></a>smod.PlotPropensitiesTimeSeries(title<span class="op">=</span><span class="st">'Reaction Propensities, direct method</span><span class="ch">\n</span><span class="st">$P_r=0.2$, $P_s=0.5$, $P_p=0.3$, $R=50$, $S=30$, $P=20$'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <p><img src="long_range_simulations_files/figure-html/cell-38-output-1.png" class="img-fluid"></p>
@@ -1257,8 +1110,8 @@ Info: Simulation time 0.02972</code></pre>
 <div class="cell" data-execution_count="38">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1"></a>smod.PlotWaitingtimesDistributions(title<span class="op">=</span><span class="st">'Time between subsequent firings of reactions, direct method</span><span class="ch">\n</span><span class="st">$P_r=0.2$, $P_s=0.5$, $P_p=0.3$, $R=50$, $S=30$, $P=20$'</span>)</span>
-<span id="cb46-2"><a href="#cb46-2"></a>smod.PrintWaitingtimesMeans()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1"></a>smod.PlotWaitingtimesDistributions(title<span class="op">=</span><span class="st">'Time between subsequent firings of reactions, direct method</span><span class="ch">\n</span><span class="st">$P_r=0.2$, $P_s=0.5$, $P_p=0.3$, $R=50$, $S=30$, $P=20$'</span>)</span>
+<span id="cb45-2"><a href="#cb45-2"></a>smod.PrintWaitingtimesMeans()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Reaction    Mean
@@ -1270,267 +1123,46 @@ R3  0.004</code></pre>
 <p><img src="long_range_simulations_files/figure-html/cell-39-output-2.png" class="img-fluid"></p>
 </div>
 </div>
-<p>The three reactions have the same average time between two subsequent firings. <span class="math inline">\(R2\)</span> waiting times are longer than <span class="math inline">\(R1\)</span> and <span class="math inline">\(R3\)</span> because the number of molecules of species <span class="math inline">\(S\)</span> and <span class="math inline">\(P\)</span> is lower than the number of molecules of species <span class="math inline">\(R\)</span>.</p>
-<p>To approximate the deterministic behavior we can either perform multiple stochastic simulations and average the species copy numbers at each time point:</p>
+<p>The three reactions have the same average time between two subsequent firings. <span class="math inline">\(R2\)</span> waiting times are longer than <span class="math inline">\(R1\)</span> and <span class="math inline">\(R3\)</span> because, at the beginning, the number of molecules of species <span class="math inline">\(S\)</span> and <span class="math inline">\(P\)</span> is lower than the number of molecules of species <span class="math inline">\(R\)</span>.</p>
+<p>Alternatively, to approximate the deterministic behavior, we can perform multiple stochastic simulations and average the species copy numbers at each time point:</p>
 <div class="cell" data-execution_count="39">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1"></a>smod.DoStochSim(end<span class="op">=</span><span class="dv">100</span>, trajectories<span class="op">=</span><span class="dv">100</span>)</span>
-<span id="cb48-2"><a href="#cb48-2"></a>smod.GetRegularGrid(n_samples<span class="op">=</span><span class="dv">50</span>)</span>
-<span id="cb48-3"><a href="#cb48-3"></a>smod.PlotAverageSpeciesTimeSeries(</span>
-<span id="cb48-4"><a href="#cb48-4"></a>    colors<span class="op">=</span>[<span class="st">"tab:red"</span>, <span class="st">"purple"</span>, <span class="st">"gold"</span>],</span>
-<span id="cb48-5"><a href="#cb48-5"></a>    title<span class="op">=</span><span class="st">"Average species in 100 stochastic simulations, direct method</span><span class="ch">\n</span><span class="st">$P_r=0.2$, $P_s=0.5$, $P_p=0.3$, $R=50$, $S=30$, $P=20$"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1"></a>smod.DoStochSim(end<span class="op">=</span><span class="dv">100</span>, trajectories<span class="op">=</span><span class="dv">100</span>)</span>
+<span id="cb47-2"><a href="#cb47-2"></a>smod.GetRegularGrid(n_samples<span class="op">=</span><span class="dv">50</span>)</span>
+<span id="cb47-3"><a href="#cb47-3"></a>smod.PlotAverageSpeciesTimeSeries(</span>
+<span id="cb47-4"><a href="#cb47-4"></a>    colors<span class="op">=</span>[<span class="st">"tab:red"</span>, <span class="st">"purple"</span>, <span class="st">"gold"</span>],</span>
+<span id="cb47-5"><a href="#cb47-5"></a>    title<span class="op">=</span><span class="st">"Average species in 100 stochastic simulations, direct method</span><span class="ch">\n</span><span class="st">$P_r=0.2$, $P_s=0.5$, $P_p=0.3$, $R=50$, $S=30$, $P=20$"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Info: 100 trajectories are generated
-Info: Time simulation output of the trajectories is stored at RSP_model_reduced(trajectory).dat in directory: /Users/irenetesta/Stochpy/temp
-Info: Simulation time: 0.15464997291564941                                                   </code></pre>
+Info: Time simulation output of the trajectories is stored at RSP_model(trajectory).dat in directory: /Users/irenetesta/Stochpy/temp
+Info: Simulation time: 0.2224419116973877                                                   </code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <p><img src="long_range_simulations_files/figure-html/cell-40-output-2.png" class="img-fluid"></p>
 </div>
 </div>
-<p>To get an accurate prediction of the species distribution StochPy provides the function <code>DoCompleteStochSim()</code> that continues the simulation until the first four moments converge within a user-specified error (default = 0.001):</p>
+<p>To get an accurate prediction of the species distribution <code>StochPy</code> provides the function <code>DoCompleteStochSim()</code> that continues the simulation until the first four moments converge within a user-specified error (default = 0.001):</p>
 <div class="cell" data-execution_count="40">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1"></a>smod.DoCompleteStochSim()</span>
-<span id="cb50-2"><a href="#cb50-2"></a>smod.PlotSpeciesDistributions(</span>
-<span id="cb50-3"><a href="#cb50-3"></a>    colors<span class="op">=</span>[<span class="st">"tab:red"</span>, <span class="st">"purple"</span>, <span class="st">"gold"</span>],</span>
-<span id="cb50-4"><a href="#cb50-4"></a>    title<span class="op">=</span><span class="st">"Species distribution, direct method</span><span class="ch">\n</span><span class="st">$P_r=0.2$, $P_s=0.5$, $P_p=0.3$, $R=50$, $S=30$, $P=20$"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1"></a>smod.DoCompleteStochSim(quiet<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb49-2"><a href="#cb49-2"></a>smod.PlotSpeciesDistributions(</span>
+<span id="cb49-3"><a href="#cb49-3"></a>    colors<span class="op">=</span>[<span class="st">"tab:red"</span>, <span class="st">"purple"</span>, <span class="st">"gold"</span>],</span>
+<span id="cb49-4"><a href="#cb49-4"></a>    title<span class="op">=</span><span class="st">"Species distribution, direct method</span><span class="ch">\n</span><span class="st">$P_r=0.2$, $P_s=0.5$, $P_p=0.3$, $R=50$, $S=30$, $P=20$"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-stdout">
-<pre><code>Info: 100000 time steps simulated
-Info: 200000 time steps simulated
-Info: 300000 time steps simulated
-Info: 400000 time steps simulated
-Info: 500000 time steps simulated
-Info: 600000 time steps simulated
-Info: 700000 time steps simulated
-Info: 800000 time steps simulated
-Info: 900000 time steps simulated
-Info: 1000000 time steps simulated
-Info: 1100000 time steps simulated
-Info: 1200000 time steps simulated
-Info: 1300000 time steps simulated
-Info: 1400000 time steps simulated
-Info: 1500000 time steps simulated
-Info: 1600000 time steps simulated
-Info: 1700000 time steps simulated
-Info: 1800000 time steps simulated
-Info: 1900000 time steps simulated
-Info: 2000000 time steps simulated
-Info: 2100000 time steps simulated
-Info: 2200000 time steps simulated
-Info: 2300000 time steps simulated
-Info: 2400000 time steps simulated
-Info: 2500000 time steps simulated
-Info: 2600000 time steps simulated
-Info: 2700000 time steps simulated
-Info: 2800000 time steps simulated
-Info: 2900000 time steps simulated
-Info: 3000000 time steps simulated
-Info: 3100000 time steps simulated
-Info: 3200000 time steps simulated
-Info: 3300000 time steps simulated
-Info: 3400000 time steps simulated
-Info: 3500000 time steps simulated
-Info: 3600000 time steps simulated
-Info: 3700000 time steps simulated
-Info: 3800000 time steps simulated
-Info: 3900000 time steps simulated
-Info: 4000000 time steps simulated
-Info: 4100000 time steps simulated
-Info: 4200000 time steps simulated
-Info: 4300000 time steps simulated
-Info: 4400000 time steps simulated
-Info: 4500000 time steps simulated
-Info: 4600000 time steps simulated
-Info: 4700000 time steps simulated
-Info: 4800000 time steps simulated
-Info: 4900000 time steps simulated
-Info: 5000000 time steps simulated
-Info: 5100000 time steps simulated
-Info: 5200000 time steps simulated
-Info: 5300000 time steps simulated
-Info: 5400000 time steps simulated
-Info: 5500000 time steps simulated
-Info: 5600000 time steps simulated
-Info: 5700000 time steps simulated
-Info: 5800000 time steps simulated
-Info: 5900000 time steps simulated
-Info: 6000000 time steps simulated
-Info: 6100000 time steps simulated
-Info: 6200000 time steps simulated
-Info: 6300000 time steps simulated
-Info: 6400000 time steps simulated
-Info: 6500000 time steps simulated
-Info: 6600000 time steps simulated
-Info: 6700000 time steps simulated
-Info: 6800000 time steps simulated
-Info: 6900000 time steps simulated
-Info: 7000000 time steps simulated
-Info: 7100000 time steps simulated
-Info: 7200000 time steps simulated
-Info: 7300000 time steps simulated
-Info: 7400000 time steps simulated
-Info: 7500000 time steps simulated
-Info: 7600000 time steps simulated
-Info: 7700000 time steps simulated
-Info: 7800000 time steps simulated
-Info: 7900000 time steps simulated
-Info: 8000000 time steps simulated
-Info: 8100000 time steps simulated
-Info: 8200000 time steps simulated
-Info: 8300000 time steps simulated
-Info: 8400000 time steps simulated
-Info: 8500000 time steps simulated
-Info: 8600000 time steps simulated
-Info: 8700000 time steps simulated
-Info: 8800000 time steps simulated
-Info: 8900000 time steps simulated
-Info: 9000000 time steps simulated
-Info: 9100000 time steps simulated
-Info: 9200000 time steps simulated
-Info: 9300000 time steps simulated
-Info: 9400000 time steps simulated
-Info: 9500000 time steps simulated
-Info: 9600000 time steps simulated
-Info: 9700000 time steps simulated
-Info: 9800000 time steps simulated
-Info: 9900000 time steps simulated
-Info: 10000000 time steps simulated
-Info: 10100000 time steps simulated
-Info: 10200000 time steps simulated
-Info: 10300000 time steps simulated
-Info: 10400000 time steps simulated
-Info: 10500000 time steps simulated
-Info: 10600000 time steps simulated
-Info: 10700000 time steps simulated
-Info: 10800000 time steps simulated
-Info: 10900000 time steps simulated
-Info: 11000000 time steps simulated
-Info: 11100000 time steps simulated
-Info: 11200000 time steps simulated
-Info: 11300000 time steps simulated
-Info: 11400000 time steps simulated
-Info: 11500000 time steps simulated
-Info: 11600000 time steps simulated
-Info: 11700000 time steps simulated
-Info: 11800000 time steps simulated
-Info: 11900000 time steps simulated
-Info: 12000000 time steps simulated
-Info: 12100000 time steps simulated
-Info: 12200000 time steps simulated
-Info: 12300000 time steps simulated
-Info: 12400000 time steps simulated
-Info: 12500000 time steps simulated
-Info: 12600000 time steps simulated
-Info: 12700000 time steps simulated
-Info: 12800000 time steps simulated
-Info: 12900000 time steps simulated
-Info: 13000000 time steps simulated
-Info: 13100000 time steps simulated
-Info: 13200000 time steps simulated
-Info: 13300000 time steps simulated
-Info: 13400000 time steps simulated
-Info: 13500000 time steps simulated
-Info: 13600000 time steps simulated
-Info: 13700000 time steps simulated
-Info: 13800000 time steps simulated
-Info: 13900000 time steps simulated
-Info: 14000000 time steps simulated
-Info: 14100000 time steps simulated
-Info: 14200000 time steps simulated
-Info: 14300000 time steps simulated
-Info: 14400000 time steps simulated
-Info: 14500000 time steps simulated
-Info: 14600000 time steps simulated
-Info: 14700000 time steps simulated
-Info: 14800000 time steps simulated
-Info: 14900000 time steps simulated
-Info: 15000000 time steps simulated
-Info: 15100000 time steps simulated
-Info: 15200000 time steps simulated
-Info: 15300000 time steps simulated
-Info: 15400000 time steps simulated
-Info: 15500000 time steps simulated
-Info: 15600000 time steps simulated
-Info: 15700000 time steps simulated
-Info: 15800000 time steps simulated
-Info: 15900000 time steps simulated
-Info: 16000000 time steps simulated
-Info: 16100000 time steps simulated
-Info: 16200000 time steps simulated
-Info: 16300000 time steps simulated
-Info: 16400000 time steps simulated
-Info: 16500000 time steps simulated
-Info: 16600000 time steps simulated
-Info: 16700000 time steps simulated
-Info: 16800000 time steps simulated
-Info: 16900000 time steps simulated
-Info: 17000000 time steps simulated
-Info: 17100000 time steps simulated
-Info: 17200000 time steps simulated
-Info: 17300000 time steps simulated
-Info: 17400000 time steps simulated
-Info: 17500000 time steps simulated
-Info: 17600000 time steps simulated
-Info: 17700000 time steps simulated
-Info: 17800000 time steps simulated
-Info: 17900000 time steps simulated
-Info: 18000000 time steps simulated
-Info: 18100000 time steps simulated
-Info: 18200000 time steps simulated
-Info: 18300000 time steps simulated
-Info: 18400000 time steps simulated
-Info: 18500000 time steps simulated
-Info: 18600000 time steps simulated
-Info: 18700000 time steps simulated
-Info: 18800000 time steps simulated
-Info: 18900000 time steps simulated
-Info: 19000000 time steps simulated
-Info: 19100000 time steps simulated
-Info: 19200000 time steps simulated
-Info: 19300000 time steps simulated
-Info: 19400000 time steps simulated
-Info: 19500000 time steps simulated
-Info: 19600000 time steps simulated
-Info: 19700000 time steps simulated
-Info: 19800000 time steps simulated
-Info: 19900000 time steps simulated
-Info: 20000000 time steps simulated
-Info: 20100000 time steps simulated
-Info: 20200000 time steps simulated
-Info: 20300000 time steps simulated
-Info: 20400000 time steps simulated
-Info: 20500000 time steps simulated
-Info: 20600000 time steps simulated
-Info: 20700000 time steps simulated
-Info: 20800000 time steps simulated
-Info: 20900000 time steps simulated
-Info: 21000000 time steps simulated
-Info: 21100000 time steps simulated
-Info: 21200000 time steps simulated
-Info: 21300000 time steps simulated
-Info: 21400000 time steps simulated
-Info: 21500000 time steps simulated
-Info: 21600000 time steps simulated
-Info: 21700000 time steps simulated
-Info: 21800000 time steps simulated
-Info: Simulation time 13.30178</code></pre>
-</div>
 <div class="cell-output cell-output-display">
-<p><img src="long_range_simulations_files/figure-html/cell-41-output-2.png" class="img-fluid"></p>
+<p><img src="long_range_simulations_files/figure-html/cell-41-output-1.png" class="img-fluid"></p>
 </div>
 </div>
-<p>Species <span class="math inline">\(R\)</span> probability mass is concentrated at lower values, while species <span class="math inline">\(R\)</span> and <span class="math inline">\(S\)</span> have a more uniform distribution.</p>
+<p>Species <span class="math inline">\(P\)</span> probability mass is concentrated at lower values, while species <span class="math inline">\(R\)</span> and <span class="math inline">\(S\)</span> have a more uniform distribution.</p>
 <p>Computing mean and standard deviation of the species copy number is not straightforward as the time between two events is not constant, thus it is necessary to track the time spent in each state for each species. This computation is implemented by the following functions:</p>
 <div class="cell" data-execution_count="41">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1"></a>smod.PrintSpeciesMeans()</span>
-<span id="cb52-2"><a href="#cb52-2"></a>smod.PrintSpeciesStandardDeviations()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1"></a>smod.PrintSpeciesMeans()</span>
+<span id="cb50-2"><a href="#cb50-2"></a>smod.PrintSpeciesStandardDeviations()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Species Mean
@@ -1548,18 +1180,18 @@ P   18.520</code></pre>
 <div class="cell" data-execution_count="42">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1"></a>smod.SetDelayParameters({<span class="st">"R1"</span>:(<span class="st">"fixed"</span>,<span class="dv">5</span>)}, nonconsuming_reactions<span class="op">=</span>[<span class="st">"R1"</span>])</span>
-<span id="cb54-2"><a href="#cb54-2"></a>smod.DoDelayedStochSim(mode<span class="op">=</span><span class="st">"time"</span>, end<span class="op">=</span><span class="dv">10</span>, trajectories<span class="op">=</span><span class="dv">100</span>)</span>
-<span id="cb54-3"><a href="#cb54-3"></a>smod.PlotAverageSpeciesTimeSeries()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1"></a>smod.SetDelayParameters({<span class="st">"R1"</span>:(<span class="st">"fixed"</span>,<span class="dv">5</span>)}, nonconsuming_reactions<span class="op">=</span>[<span class="st">"R1"</span>])</span>
+<span id="cb52-2"><a href="#cb52-2"></a>smod.GetRegularGrid(n_samples<span class="op">=</span><span class="dv">50</span>)</span>
+<span id="cb52-3"><a href="#cb52-3"></a>smod.DoDelayedStochSim(method<span class="op">=</span><span class="st">'DelayedDirect'</span>, mode<span class="op">=</span><span class="st">"time"</span>, end<span class="op">=</span><span class="dv">10</span>, trajectories<span class="op">=</span><span class="dv">100</span>)</span>
+<span id="cb52-4"><a href="#cb52-4"></a>smod.PlotAverageSpeciesTimeSeries(colors<span class="op">=</span>[<span class="st">"tab:red"</span>, <span class="st">"purple"</span>, <span class="st">"gold"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>*** WARNING ***: an invalid method (Direct) was selected. Switching to the Delayed Direct Method.
-Info: Delayed Direct Method is selected to perform delayed stochastic simulations.
-Parsing file: ../long_range_models/RSP_model_reduced.psc
+<pre><code>Info: Delayed Direct Method is selected to perform delayed stochastic simulations.
+Parsing file: ../long_range_models/RSP_model.psc
 Info: No reagents have been fixed
 Info: 100 trajectories are generated
-Info: Time simulation output of the trajectories is stored at RSP_model_reduced(trajectory).dat in directory: /Users/irenetesta/Stochpy/temp
-Info: Simulation time: 17.422198057174683                                                   *** WARNING ***: No regular grid is created yet. Use GetRegularGrid(n_samples) if averaged results are unsatisfactory (e.g. more or less 'samples')</code></pre>
+Info: Time simulation output of the trajectories is stored at RSP_model(trajectory).dat in directory: /Users/irenetesta/Stochpy/temp
+Info: Simulation time: 17.505966901779175                                                   *** WARNING ***: No regular grid is created yet. Use GetRegularGrid(n_samples) if averaged results are unsatisfactory (e.g. more or less 'samples')</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <p><img src="long_range_simulations_files/figure-html/cell-43-output-2.png" class="img-fluid"></p>
@@ -1570,22 +1202,22 @@ Info: Simulation time: 17.422198057174683                                       
 <div class="cell" data-execution_count="43">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1"></a>smod.SetDelayParameters({})</span>
-<span id="cb56-2"><a href="#cb56-2"></a>smod.ChangeInitialSpeciesCopyNumber(<span class="st">"R"</span>, <span class="dv">33</span>)</span>
-<span id="cb56-3"><a href="#cb56-3"></a>smod.ChangeInitialSpeciesCopyNumber(<span class="st">"S"</span>, <span class="dv">33</span>)</span>
-<span id="cb56-4"><a href="#cb56-4"></a>smod.ChangeInitialSpeciesCopyNumber(<span class="st">"P"</span>, <span class="dv">33</span>)</span>
-<span id="cb56-5"><a href="#cb56-5"></a>smod.DoStochSim(end<span class="op">=</span><span class="dv">1000</span>, method<span class="op">=</span><span class="st">"direct"</span>)</span>
-<span id="cb56-6"><a href="#cb56-6"></a>smod.PlotSpeciesTimeSeries(colors<span class="op">=</span>[<span class="st">"tab:red"</span>, <span class="st">"purple"</span>, <span class="st">"gold"</span>], xlabel<span class="op">=</span><span class="st">"Steps"</span>)</span>
-<span id="cb56-7"><a href="#cb56-7"></a>stochpy.plt.title(<span class="st">"$P_r=0.2$, $P_s=0.5$, $P_p=0.3$, $R=33$, $S=33$, $P=33$"</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1"></a>smod.SetDelayParameters({})</span>
+<span id="cb54-2"><a href="#cb54-2"></a>smod.ChangeInitialSpeciesCopyNumber(<span class="st">"R"</span>, <span class="dv">33</span>)</span>
+<span id="cb54-3"><a href="#cb54-3"></a>smod.ChangeInitialSpeciesCopyNumber(<span class="st">"S"</span>, <span class="dv">33</span>)</span>
+<span id="cb54-4"><a href="#cb54-4"></a>smod.ChangeInitialSpeciesCopyNumber(<span class="st">"P"</span>, <span class="dv">33</span>)</span>
+<span id="cb54-5"><a href="#cb54-5"></a>smod.DoStochSim(end<span class="op">=</span><span class="dv">1000</span>, method<span class="op">=</span><span class="st">"direct"</span>)</span>
+<span id="cb54-6"><a href="#cb54-6"></a>smod.PlotSpeciesTimeSeries(colors<span class="op">=</span>[<span class="st">"tab:red"</span>, <span class="st">"purple"</span>, <span class="st">"gold"</span>], xlabel<span class="op">=</span><span class="st">"Steps"</span>)</span>
+<span id="cb54-7"><a href="#cb54-7"></a>stochpy.plt.title(<span class="st">"$P_r=0.2$, $P_s=0.5$, $P_p=0.3$, $R=33$, $S=33$, $P=33$"</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Info: Direct method is selected to perform stochastic simulations.
-Parsing file: ../long_range_models/RSP_model_reduced.psc
+Parsing file: ../long_range_models/RSP_model.psc
 Info: No reagents have been fixed
 Info: 1 trajectory is generated
 simulation done!               
 Info: Number of time steps 469 End time 1.0884810590458118
-Info: Simulation time 0.00356</code></pre>
+Info: Simulation time 0.00357</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <p><img src="long_range_simulations_files/figure-html/cell-44-output-2.png" class="img-fluid"></p>
@@ -1611,7 +1243,7 @@ P_3 \xrightarrow{r_{D_3}}\quad (9)\\
 <div class="cell" data-execution_count="44">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb58-1"><a href="#cb58-1"></a><span class="op">!</span>cat ..<span class="op">/</span>long_range_models<span class="op">/</span>negative_feedback_loop_model.psc</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1"></a><span class="op">!</span>cat ..<span class="op">/</span>long_range_models<span class="op">/</span>repressilator.psc</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code># Negative feedback loop
@@ -1705,31 +1337,31 @@ P3G1 = 0</code></pre>
 <div class="cell" data-execution_count="45">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb60-1"><a href="#cb60-1"></a>smod <span class="op">=</span> stochpy.SSA(IsQuiet<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb60-2"><a href="#cb60-2"></a>smod.Model(model_file<span class="op">=</span><span class="st">"negative_feedback_loop_model.psc"</span>,<span class="bu">dir</span><span class="op">=</span><span class="st">"../long_range_models/"</span>)</span>
-<span id="cb60-3"><a href="#cb60-3"></a>smod.DoStochSim(IsTrackPropensities<span class="op">=</span><span class="va">True</span>, end<span class="op">=</span><span class="dv">10000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb58-1"><a href="#cb58-1"></a>smod <span class="op">=</span> stochpy.SSA(IsQuiet<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb58-2"><a href="#cb58-2"></a>smod.Model(model_file<span class="op">=</span><span class="st">"repressilator.psc"</span>,<span class="bu">dir</span><span class="op">=</span><span class="st">"../long_range_models/"</span>)</span>
+<span id="cb58-3"><a href="#cb58-3"></a>smod.DoStochSim(IsTrackPropensities<span class="op">=</span><span class="va">True</span>, end<span class="op">=</span><span class="dv">10000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Info: Direct method is selected to perform stochastic simulations.
 Parsing file: /Users/irenetesta/Stochpy/pscmodels/ImmigrationDeath.psc
 Info: No reagents have been fixed
-Parsing file: ../long_range_models/negative_feedback_loop_model.psc
+Parsing file: ../long_range_models/repressilator.psc
 Info: No reagents have been fixed
 Info: 1 trajectory is generated
 simulation done!               
 Info: Number of time steps 10000 End time 6.3121454739530645
-Info: Simulation time 0.12413</code></pre>
+Info: Simulation time 0.12528</code></pre>
 </div>
 </div>
 <p>Visualizing the evolution of the system:</p>
 <div class="cell" data-execution_count="46">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb62-1"><a href="#cb62-1"></a>nfl_stoch_df <span class="op">=</span> pd.DataFrame(smod.data_stochsim.species, columns<span class="op">=</span>smod.data_stochsim.species_labels)</span>
-<span id="cb62-2"><a href="#cb62-2"></a>nfl_stoch_df[[<span class="st">'P1'</span>, <span class="st">'P2'</span>, <span class="st">'P3'</span>]].plot(figsize<span class="op">=</span>(<span class="dv">20</span>,<span class="dv">5</span>), color<span class="op">=</span>[<span class="st">'red'</span>, <span class="st">'green'</span>, <span class="st">'blue'</span>], xlabel<span class="op">=</span><span class="st">"Steps"</span>, ylabel<span class="op">=</span><span class="st">"Copy number"</span>, title<span class="op">=</span><span class="st">"Proteins"</span>)</span>
-<span id="cb62-3"><a href="#cb62-3"></a>nfl_stoch_df[[<span class="st">'P3G1'</span>, <span class="st">'G1'</span>]].plot(figsize<span class="op">=</span>(<span class="dv">20</span>,<span class="dv">5</span>), color<span class="op">=</span>[<span class="st">'black'</span>, <span class="st">'darkturquoise'</span>], xlabel<span class="op">=</span><span class="st">"Steps"</span>, ylabel<span class="op">=</span><span class="st">"Copy number"</span>, title<span class="op">=</span><span class="st">"G1 inhibition"</span>)</span>
-<span id="cb62-4"><a href="#cb62-4"></a>nfl_stoch_df[[<span class="st">'P1G2'</span>, <span class="st">'G2'</span>]].plot(figsize<span class="op">=</span>(<span class="dv">20</span>,<span class="dv">5</span>), color<span class="op">=</span>[<span class="st">'black'</span>, <span class="st">'magenta'</span>], xlabel<span class="op">=</span><span class="st">"Steps"</span>, ylabel<span class="op">=</span><span class="st">"Copy number"</span>, title<span class="op">=</span><span class="st">"G2 inhibition"</span>)</span>
-<span id="cb62-5"><a href="#cb62-5"></a>nfl_stoch_df[[<span class="st">'P2G3'</span>, <span class="st">'G3'</span>]].plot(figsize<span class="op">=</span>(<span class="dv">20</span>,<span class="dv">5</span>), color<span class="op">=</span>[<span class="st">'black'</span>, <span class="st">'gold'</span>], xlabel<span class="op">=</span><span class="st">"Steps"</span>, ylabel<span class="op">=</span><span class="st">"Copy number"</span>, title<span class="op">=</span><span class="st">"G3 inhibition"</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb60-1"><a href="#cb60-1"></a>nfl_stoch_df <span class="op">=</span> pd.DataFrame(smod.data_stochsim.species, columns<span class="op">=</span>smod.data_stochsim.species_labels)</span>
+<span id="cb60-2"><a href="#cb60-2"></a>nfl_stoch_df[[<span class="st">'P1'</span>, <span class="st">'P2'</span>, <span class="st">'P3'</span>]].plot(figsize<span class="op">=</span>(<span class="dv">20</span>,<span class="dv">5</span>), color<span class="op">=</span>[<span class="st">'red'</span>, <span class="st">'green'</span>, <span class="st">'blue'</span>], xlabel<span class="op">=</span><span class="st">"Steps"</span>, ylabel<span class="op">=</span><span class="st">"Copy number"</span>, title<span class="op">=</span><span class="st">"Proteins"</span>)</span>
+<span id="cb60-3"><a href="#cb60-3"></a>nfl_stoch_df[[<span class="st">'P3G1'</span>, <span class="st">'G1'</span>]].plot(figsize<span class="op">=</span>(<span class="dv">20</span>,<span class="dv">5</span>), color<span class="op">=</span>[<span class="st">'black'</span>, <span class="st">'darkturquoise'</span>], xlabel<span class="op">=</span><span class="st">"Steps"</span>, ylabel<span class="op">=</span><span class="st">"Copy number"</span>, title<span class="op">=</span><span class="st">"G1 inhibition"</span>)</span>
+<span id="cb60-4"><a href="#cb60-4"></a>nfl_stoch_df[[<span class="st">'P1G2'</span>, <span class="st">'G2'</span>]].plot(figsize<span class="op">=</span>(<span class="dv">20</span>,<span class="dv">5</span>), color<span class="op">=</span>[<span class="st">'black'</span>, <span class="st">'magenta'</span>], xlabel<span class="op">=</span><span class="st">"Steps"</span>, ylabel<span class="op">=</span><span class="st">"Copy number"</span>, title<span class="op">=</span><span class="st">"G2 inhibition"</span>)</span>
+<span id="cb60-5"><a href="#cb60-5"></a>nfl_stoch_df[[<span class="st">'P2G3'</span>, <span class="st">'G3'</span>]].plot(figsize<span class="op">=</span>(<span class="dv">20</span>,<span class="dv">5</span>), color<span class="op">=</span>[<span class="st">'black'</span>, <span class="st">'gold'</span>], xlabel<span class="op">=</span><span class="st">"Steps"</span>, ylabel<span class="op">=</span><span class="st">"Copy number"</span>, title<span class="op">=</span><span class="st">"G3 inhibition"</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <p><img src="long_range_simulations_files/figure-html/cell-47-output-1.png" class="img-fluid"></p>
@@ -1763,63 +1395,63 @@ Info: Simulation time 0.12413</code></pre>
 <div class="cell" data-execution_count="47">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb63-1"><a href="#cb63-1"></a><span class="kw">def</span> NFL_ODE_solver(t, rates, init):</span>
-<span id="cb63-2"><a href="#cb63-2"></a>    <span class="co">'''</span></span>
-<span id="cb63-3"><a href="#cb63-3"></a><span class="co">    Solve the initial value problem for ODE system modeling the genetic network with negative feedback loop.</span></span>
-<span id="cb63-4"><a href="#cb63-4"></a><span class="co">    '''</span></span>
-<span id="cb63-5"><a href="#cb63-5"></a>    <span class="kw">def</span> neg_feedback_loop(x0, t, rates):</span>
-<span id="cb63-6"><a href="#cb63-6"></a>        G1, G2, G3, P1, P2, P3, P1G2, P2G3, P3G1 <span class="op">=</span> x0</span>
-<span id="cb63-7"><a href="#cb63-7"></a>        d_G1_dt <span class="op">=</span> <span class="op">-</span>rates[<span class="st">'rB3'</span>]<span class="op">*</span>P3<span class="op">*</span>G1 <span class="op">+</span> rates[<span class="st">'rU3'</span>]<span class="op">*</span>P3G1</span>
-<span id="cb63-8"><a href="#cb63-8"></a>        d_G2_dt <span class="op">=</span> <span class="op">-</span>rates[<span class="st">'rB1'</span>]<span class="op">*</span>P1<span class="op">*</span>G2 <span class="op">+</span> rates[<span class="st">'rU1'</span>]<span class="op">*</span>P1G2</span>
-<span id="cb63-9"><a href="#cb63-9"></a>        d_G3_dt <span class="op">=</span> <span class="op">-</span>rates[<span class="st">'rB2'</span>]<span class="op">*</span>P2<span class="op">*</span>G3 <span class="op">+</span> rates[<span class="st">'rU2'</span>]<span class="op">*</span>P2G3</span>
-<span id="cb63-10"><a href="#cb63-10"></a>        d_P1_dt <span class="op">=</span> <span class="op">+</span>rates[<span class="st">'rP1'</span>]<span class="op">*</span>G1 <span class="op">-</span> rates[<span class="st">'rB1'</span>]<span class="op">*</span>P1<span class="op">*</span>G2 <span class="op">+</span> rates[<span class="st">'rU1'</span>]<span class="op">*</span>P1G2 <span class="op">-</span> rates[<span class="st">'rD1'</span>]<span class="op">*</span>P1</span>
-<span id="cb63-11"><a href="#cb63-11"></a>        d_P2_dt <span class="op">=</span> <span class="op">+</span>rates[<span class="st">'rP2'</span>]<span class="op">*</span>G2 <span class="op">-</span> rates[<span class="st">'rB2'</span>]<span class="op">*</span>P2<span class="op">*</span>G3 <span class="op">+</span> rates[<span class="st">'rU2'</span>]<span class="op">*</span>P2G3 <span class="op">-</span> rates[<span class="st">'rD2'</span>]<span class="op">*</span>P2</span>
-<span id="cb63-12"><a href="#cb63-12"></a>        d_P3_dt <span class="op">=</span> <span class="op">+</span>rates[<span class="st">'rP3'</span>]<span class="op">*</span>G3 <span class="op">-</span> rates[<span class="st">'rB3'</span>]<span class="op">*</span>P3<span class="op">*</span>G1 <span class="op">+</span> rates[<span class="st">'rU3'</span>]<span class="op">*</span>P3G1 <span class="op">-</span> rates[<span class="st">'rD3'</span>]<span class="op">*</span>P3</span>
-<span id="cb63-13"><a href="#cb63-13"></a>        d_P1G2_dt <span class="op">=</span> <span class="op">+</span>rates[<span class="st">'rB1'</span>]<span class="op">*</span>P1<span class="op">*</span>G2 <span class="op">-</span> rates[<span class="st">'rU1'</span>]<span class="op">*</span>P1G2</span>
-<span id="cb63-14"><a href="#cb63-14"></a>        d_P2G3_dt <span class="op">=</span> <span class="op">+</span>rates[<span class="st">'rB2'</span>]<span class="op">*</span>P2<span class="op">*</span>G3 <span class="op">-</span> rates[<span class="st">'rU2'</span>]<span class="op">*</span>P2G3</span>
-<span id="cb63-15"><a href="#cb63-15"></a>        d_P3G1_dt <span class="op">=</span> <span class="op">+</span>rates[<span class="st">'rB3'</span>]<span class="op">*</span>P3<span class="op">*</span>G1 <span class="op">-</span> rates[<span class="st">'rU3'</span>]<span class="op">*</span>P3G1</span>
-<span id="cb63-16"><a href="#cb63-16"></a>        <span class="cf">return</span> [d_G1_dt, d_G2_dt, d_G3_dt, d_P1_dt, d_P2_dt, d_P3_dt, d_P1G2_dt, d_P2G3_dt, d_P3G1_dt]</span>
-<span id="cb63-17"><a href="#cb63-17"></a></span>
-<span id="cb63-18"><a href="#cb63-18"></a>    x0 <span class="op">=</span> [init[<span class="st">'G1'</span>], init[<span class="st">'G2'</span>], init[<span class="st">'G3'</span>], init[<span class="st">'P1'</span>], init[<span class="st">'P2'</span>], init[<span class="st">'P3'</span>], init[<span class="st">'P1G2'</span>], init[<span class="st">'P2G3'</span>], init[<span class="st">'P3G1'</span>]]</span>
-<span id="cb63-19"><a href="#cb63-19"></a>    y <span class="op">=</span> odeint(neg_feedback_loop, x0, t, args<span class="op">=</span>(rates,))</span>
-<span id="cb63-20"><a href="#cb63-20"></a>    results_df <span class="op">=</span> pd.DataFrame(y, columns<span class="op">=</span>[<span class="st">'$G_1$'</span>, <span class="st">'$G_2$'</span>, <span class="st">'$G_3$'</span>, <span class="st">'$P_1$'</span>, <span class="st">'$P_2$'</span>, <span class="st">'$P_3$'</span>, <span class="st">'$P_1G_2$'</span>, <span class="st">'$P_2G_3$'</span>, <span class="st">'$P_3G_1$'</span>])</span>
-<span id="cb63-21"><a href="#cb63-21"></a>    <span class="cf">return</span> results_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb61-1"><a href="#cb61-1"></a><span class="kw">def</span> NFL_ODE_solver(t, rates, init):</span>
+<span id="cb61-2"><a href="#cb61-2"></a>    <span class="co">'''</span></span>
+<span id="cb61-3"><a href="#cb61-3"></a><span class="co">    Solve the ODE system modeling the genetic network with negative feedback loop.</span></span>
+<span id="cb61-4"><a href="#cb61-4"></a><span class="co">    '''</span></span>
+<span id="cb61-5"><a href="#cb61-5"></a>    <span class="kw">def</span> neg_feedback_loop(x0, t, rates):</span>
+<span id="cb61-6"><a href="#cb61-6"></a>        G1, G2, G3, P1, P2, P3, P1G2, P2G3, P3G1 <span class="op">=</span> x0</span>
+<span id="cb61-7"><a href="#cb61-7"></a>        d_G1_dt <span class="op">=</span> <span class="op">-</span>rates[<span class="st">'rB3'</span>]<span class="op">*</span>P3<span class="op">*</span>G1 <span class="op">+</span> rates[<span class="st">'rU3'</span>]<span class="op">*</span>P3G1</span>
+<span id="cb61-8"><a href="#cb61-8"></a>        d_G2_dt <span class="op">=</span> <span class="op">-</span>rates[<span class="st">'rB1'</span>]<span class="op">*</span>P1<span class="op">*</span>G2 <span class="op">+</span> rates[<span class="st">'rU1'</span>]<span class="op">*</span>P1G2</span>
+<span id="cb61-9"><a href="#cb61-9"></a>        d_G3_dt <span class="op">=</span> <span class="op">-</span>rates[<span class="st">'rB2'</span>]<span class="op">*</span>P2<span class="op">*</span>G3 <span class="op">+</span> rates[<span class="st">'rU2'</span>]<span class="op">*</span>P2G3</span>
+<span id="cb61-10"><a href="#cb61-10"></a>        d_P1_dt <span class="op">=</span> <span class="op">+</span>rates[<span class="st">'rP1'</span>]<span class="op">*</span>G1 <span class="op">-</span> rates[<span class="st">'rB1'</span>]<span class="op">*</span>P1<span class="op">*</span>G2 <span class="op">+</span> rates[<span class="st">'rU1'</span>]<span class="op">*</span>P1G2 <span class="op">-</span> rates[<span class="st">'rD1'</span>]<span class="op">*</span>P1</span>
+<span id="cb61-11"><a href="#cb61-11"></a>        d_P2_dt <span class="op">=</span> <span class="op">+</span>rates[<span class="st">'rP2'</span>]<span class="op">*</span>G2 <span class="op">-</span> rates[<span class="st">'rB2'</span>]<span class="op">*</span>P2<span class="op">*</span>G3 <span class="op">+</span> rates[<span class="st">'rU2'</span>]<span class="op">*</span>P2G3 <span class="op">-</span> rates[<span class="st">'rD2'</span>]<span class="op">*</span>P2</span>
+<span id="cb61-12"><a href="#cb61-12"></a>        d_P3_dt <span class="op">=</span> <span class="op">+</span>rates[<span class="st">'rP3'</span>]<span class="op">*</span>G3 <span class="op">-</span> rates[<span class="st">'rB3'</span>]<span class="op">*</span>P3<span class="op">*</span>G1 <span class="op">+</span> rates[<span class="st">'rU3'</span>]<span class="op">*</span>P3G1 <span class="op">-</span> rates[<span class="st">'rD3'</span>]<span class="op">*</span>P3</span>
+<span id="cb61-13"><a href="#cb61-13"></a>        d_P1G2_dt <span class="op">=</span> <span class="op">+</span>rates[<span class="st">'rB1'</span>]<span class="op">*</span>P1<span class="op">*</span>G2 <span class="op">-</span> rates[<span class="st">'rU1'</span>]<span class="op">*</span>P1G2</span>
+<span id="cb61-14"><a href="#cb61-14"></a>        d_P2G3_dt <span class="op">=</span> <span class="op">+</span>rates[<span class="st">'rB2'</span>]<span class="op">*</span>P2<span class="op">*</span>G3 <span class="op">-</span> rates[<span class="st">'rU2'</span>]<span class="op">*</span>P2G3</span>
+<span id="cb61-15"><a href="#cb61-15"></a>        d_P3G1_dt <span class="op">=</span> <span class="op">+</span>rates[<span class="st">'rB3'</span>]<span class="op">*</span>P3<span class="op">*</span>G1 <span class="op">-</span> rates[<span class="st">'rU3'</span>]<span class="op">*</span>P3G1</span>
+<span id="cb61-16"><a href="#cb61-16"></a>        <span class="cf">return</span> [d_G1_dt, d_G2_dt, d_G3_dt, d_P1_dt, d_P2_dt, d_P3_dt, d_P1G2_dt, d_P2G3_dt, d_P3G1_dt]</span>
+<span id="cb61-17"><a href="#cb61-17"></a></span>
+<span id="cb61-18"><a href="#cb61-18"></a>    x0 <span class="op">=</span> [init[<span class="st">'G1'</span>], init[<span class="st">'G2'</span>], init[<span class="st">'G3'</span>], init[<span class="st">'P1'</span>], init[<span class="st">'P2'</span>], init[<span class="st">'P3'</span>], init[<span class="st">'P1G2'</span>], init[<span class="st">'P2G3'</span>], init[<span class="st">'P3G1'</span>]]</span>
+<span id="cb61-19"><a href="#cb61-19"></a>    y <span class="op">=</span> odeint(neg_feedback_loop, x0, t, args<span class="op">=</span>(rates,))</span>
+<span id="cb61-20"><a href="#cb61-20"></a>    results_df <span class="op">=</span> pd.DataFrame(y, columns<span class="op">=</span>[<span class="st">'$G_1$'</span>, <span class="st">'$G_2$'</span>, <span class="st">'$G_3$'</span>, <span class="st">'$P_1$'</span>, <span class="st">'$P_2$'</span>, <span class="st">'$P_3$'</span>, <span class="st">'$P_1G_2$'</span>, <span class="st">'$P_2G_3$'</span>, <span class="st">'$P_3G_1$'</span>])</span>
+<span id="cb61-21"><a href="#cb61-21"></a>    <span class="cf">return</span> results_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Simulate the system for 50 time units:</p>
 <div class="cell" data-execution_count="48">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb64-1"><a href="#cb64-1"></a>nfl_rates <span class="op">=</span> {</span>
-<span id="cb64-2"><a href="#cb64-2"></a>    <span class="st">'rP1'</span>: <span class="dv">10</span>,</span>
-<span id="cb64-3"><a href="#cb64-3"></a>    <span class="st">'rP2'</span>: <span class="dv">10000</span>,</span>
-<span id="cb64-4"><a href="#cb64-4"></a>    <span class="st">'rP3'</span>: <span class="dv">10</span>,</span>
-<span id="cb64-5"><a href="#cb64-5"></a>    <span class="st">'rB1'</span>: <span class="dv">10</span>,</span>
-<span id="cb64-6"><a href="#cb64-6"></a>    <span class="st">'rB2'</span>: <span class="fl">0.1</span>,</span>
-<span id="cb64-7"><a href="#cb64-7"></a>    <span class="st">'rB3'</span>: <span class="dv">10</span>,</span>
-<span id="cb64-8"><a href="#cb64-8"></a>    <span class="st">'rU1'</span>: <span class="dv">2</span>,</span>
-<span id="cb64-9"><a href="#cb64-9"></a>    <span class="st">'rU2'</span>: <span class="dv">20</span>,</span>
-<span id="cb64-10"><a href="#cb64-10"></a>    <span class="st">'rU3'</span>: <span class="dv">20</span>,</span>
-<span id="cb64-11"><a href="#cb64-11"></a>    <span class="st">'rD1'</span>: <span class="dv">1</span>,</span>
-<span id="cb64-12"><a href="#cb64-12"></a>    <span class="st">'rD2'</span>: <span class="dv">100</span>,</span>
-<span id="cb64-13"><a href="#cb64-13"></a>    <span class="st">'rD3'</span>: <span class="dv">1</span></span>
-<span id="cb64-14"><a href="#cb64-14"></a>}</span>
-<span id="cb64-15"><a href="#cb64-15"></a>nfl_init <span class="op">=</span> {</span>
-<span id="cb64-16"><a href="#cb64-16"></a>    <span class="st">'G1'</span>: <span class="dv">1</span>,</span>
-<span id="cb64-17"><a href="#cb64-17"></a>    <span class="st">'G2'</span>: <span class="dv">1</span>,</span>
-<span id="cb64-18"><a href="#cb64-18"></a>    <span class="st">'G3'</span>: <span class="dv">1</span>,</span>
-<span id="cb64-19"><a href="#cb64-19"></a>    <span class="st">'P1'</span>: <span class="dv">0</span>,</span>
-<span id="cb64-20"><a href="#cb64-20"></a>    <span class="st">'P2'</span>: <span class="dv">0</span>,</span>
-<span id="cb64-21"><a href="#cb64-21"></a>    <span class="st">'P3'</span>: <span class="dv">0</span>,</span>
-<span id="cb64-22"><a href="#cb64-22"></a>    <span class="st">'P1G2'</span>: <span class="dv">0</span>,</span>
-<span id="cb64-23"><a href="#cb64-23"></a>    <span class="st">'P2G3'</span>: <span class="dv">0</span>,</span>
-<span id="cb64-24"><a href="#cb64-24"></a>    <span class="st">'P3G1'</span>: <span class="dv">0</span></span>
-<span id="cb64-25"><a href="#cb64-25"></a>}</span>
-<span id="cb64-26"><a href="#cb64-26"></a>nfl_cont_df <span class="op">=</span> NFL_ODE_solver(np.linspace(<span class="dv">0</span>,<span class="dv">50</span>,<span class="dv">51</span>), nfl_rates, nfl_init)</span>
-<span id="cb64-27"><a href="#cb64-27"></a>nfl_cont_df[[<span class="st">'$P_1$'</span>, <span class="st">'$P_2$'</span>, <span class="st">'$P_3$'</span>]].plot(figsize<span class="op">=</span>(<span class="dv">20</span>,<span class="dv">5</span>), color<span class="op">=</span>[<span class="st">'red'</span>, <span class="st">'green'</span>, <span class="st">'blue'</span>], xlabel<span class="op">=</span><span class="st">"Time"</span>, ylabel<span class="op">=</span><span class="st">"Value"</span>, title<span class="op">=</span><span class="st">"Proteins"</span>)</span>
-<span id="cb64-28"><a href="#cb64-28"></a>nfl_cont_df[[<span class="st">'$P_3G_1$'</span>, <span class="st">'$G_1$'</span>]].plot(figsize<span class="op">=</span>(<span class="dv">20</span>,<span class="dv">5</span>), color<span class="op">=</span>[<span class="st">'black'</span>, <span class="st">'darkturquoise'</span>], xlabel<span class="op">=</span><span class="st">"Time"</span>, ylabel<span class="op">=</span><span class="st">"Value"</span>, title<span class="op">=</span><span class="st">"G1 inhibition"</span>)</span>
-<span id="cb64-29"><a href="#cb64-29"></a>nfl_cont_df[[<span class="st">'$P_1G_2$'</span>, <span class="st">'$G_2$'</span>]].plot(figsize<span class="op">=</span>(<span class="dv">20</span>,<span class="dv">5</span>), color<span class="op">=</span>[<span class="st">'black'</span>, <span class="st">'magenta'</span>], xlabel<span class="op">=</span><span class="st">"Time"</span>, ylabel<span class="op">=</span><span class="st">"Value"</span>, title<span class="op">=</span><span class="st">"G2 inhibition"</span>)</span>
-<span id="cb64-30"><a href="#cb64-30"></a>nfl_cont_df[[<span class="st">'$P_2G_3$'</span>, <span class="st">'$G_3$'</span>]].plot(figsize<span class="op">=</span>(<span class="dv">20</span>,<span class="dv">5</span>), color<span class="op">=</span>[<span class="st">'black'</span>, <span class="st">'gold'</span>], xlabel<span class="op">=</span><span class="st">"Time"</span>, ylabel<span class="op">=</span><span class="st">"Value"</span>, title<span class="op">=</span><span class="st">"G3 inhibition"</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb62-1"><a href="#cb62-1"></a>nfl_rates <span class="op">=</span> {</span>
+<span id="cb62-2"><a href="#cb62-2"></a>    <span class="st">'rP1'</span>: <span class="dv">10</span>,</span>
+<span id="cb62-3"><a href="#cb62-3"></a>    <span class="st">'rP2'</span>: <span class="dv">10000</span>,</span>
+<span id="cb62-4"><a href="#cb62-4"></a>    <span class="st">'rP3'</span>: <span class="dv">10</span>,</span>
+<span id="cb62-5"><a href="#cb62-5"></a>    <span class="st">'rB1'</span>: <span class="dv">10</span>,</span>
+<span id="cb62-6"><a href="#cb62-6"></a>    <span class="st">'rB2'</span>: <span class="fl">0.1</span>,</span>
+<span id="cb62-7"><a href="#cb62-7"></a>    <span class="st">'rB3'</span>: <span class="dv">10</span>,</span>
+<span id="cb62-8"><a href="#cb62-8"></a>    <span class="st">'rU1'</span>: <span class="dv">2</span>,</span>
+<span id="cb62-9"><a href="#cb62-9"></a>    <span class="st">'rU2'</span>: <span class="dv">20</span>,</span>
+<span id="cb62-10"><a href="#cb62-10"></a>    <span class="st">'rU3'</span>: <span class="dv">20</span>,</span>
+<span id="cb62-11"><a href="#cb62-11"></a>    <span class="st">'rD1'</span>: <span class="dv">1</span>,</span>
+<span id="cb62-12"><a href="#cb62-12"></a>    <span class="st">'rD2'</span>: <span class="dv">100</span>,</span>
+<span id="cb62-13"><a href="#cb62-13"></a>    <span class="st">'rD3'</span>: <span class="dv">1</span></span>
+<span id="cb62-14"><a href="#cb62-14"></a>}</span>
+<span id="cb62-15"><a href="#cb62-15"></a>nfl_init <span class="op">=</span> {</span>
+<span id="cb62-16"><a href="#cb62-16"></a>    <span class="st">'G1'</span>: <span class="dv">1</span>,</span>
+<span id="cb62-17"><a href="#cb62-17"></a>    <span class="st">'G2'</span>: <span class="dv">1</span>,</span>
+<span id="cb62-18"><a href="#cb62-18"></a>    <span class="st">'G3'</span>: <span class="dv">1</span>,</span>
+<span id="cb62-19"><a href="#cb62-19"></a>    <span class="st">'P1'</span>: <span class="dv">0</span>,</span>
+<span id="cb62-20"><a href="#cb62-20"></a>    <span class="st">'P2'</span>: <span class="dv">0</span>,</span>
+<span id="cb62-21"><a href="#cb62-21"></a>    <span class="st">'P3'</span>: <span class="dv">0</span>,</span>
+<span id="cb62-22"><a href="#cb62-22"></a>    <span class="st">'P1G2'</span>: <span class="dv">0</span>,</span>
+<span id="cb62-23"><a href="#cb62-23"></a>    <span class="st">'P2G3'</span>: <span class="dv">0</span>,</span>
+<span id="cb62-24"><a href="#cb62-24"></a>    <span class="st">'P3G1'</span>: <span class="dv">0</span></span>
+<span id="cb62-25"><a href="#cb62-25"></a>}</span>
+<span id="cb62-26"><a href="#cb62-26"></a>nfl_cont_df <span class="op">=</span> NFL_ODE_solver(np.linspace(<span class="dv">0</span>,<span class="dv">50</span>,<span class="dv">51</span>), nfl_rates, nfl_init)</span>
+<span id="cb62-27"><a href="#cb62-27"></a>nfl_cont_df[[<span class="st">'$P_1$'</span>, <span class="st">'$P_2$'</span>, <span class="st">'$P_3$'</span>]].plot(figsize<span class="op">=</span>(<span class="dv">20</span>,<span class="dv">5</span>), color<span class="op">=</span>[<span class="st">'red'</span>, <span class="st">'green'</span>, <span class="st">'blue'</span>], xlabel<span class="op">=</span><span class="st">"Time"</span>, ylabel<span class="op">=</span><span class="st">"Value"</span>, title<span class="op">=</span><span class="st">"Proteins"</span>)</span>
+<span id="cb62-28"><a href="#cb62-28"></a>nfl_cont_df[[<span class="st">'$P_3G_1$'</span>, <span class="st">'$G_1$'</span>]].plot(figsize<span class="op">=</span>(<span class="dv">20</span>,<span class="dv">5</span>), color<span class="op">=</span>[<span class="st">'black'</span>, <span class="st">'darkturquoise'</span>], xlabel<span class="op">=</span><span class="st">"Time"</span>, ylabel<span class="op">=</span><span class="st">"Value"</span>, title<span class="op">=</span><span class="st">"G1 inhibition"</span>)</span>
+<span id="cb62-29"><a href="#cb62-29"></a>nfl_cont_df[[<span class="st">'$P_1G_2$'</span>, <span class="st">'$G_2$'</span>]].plot(figsize<span class="op">=</span>(<span class="dv">20</span>,<span class="dv">5</span>), color<span class="op">=</span>[<span class="st">'black'</span>, <span class="st">'magenta'</span>], xlabel<span class="op">=</span><span class="st">"Time"</span>, ylabel<span class="op">=</span><span class="st">"Value"</span>, title<span class="op">=</span><span class="st">"G2 inhibition"</span>)</span>
+<span id="cb62-30"><a href="#cb62-30"></a>nfl_cont_df[[<span class="st">'$P_2G_3$'</span>, <span class="st">'$G_3$'</span>]].plot(figsize<span class="op">=</span>(<span class="dv">20</span>,<span class="dv">5</span>), color<span class="op">=</span>[<span class="st">'black'</span>, <span class="st">'gold'</span>], xlabel<span class="op">=</span><span class="st">"Time"</span>, ylabel<span class="op">=</span><span class="st">"Value"</span>, title<span class="op">=</span><span class="st">"G3 inhibition"</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <p><img src="long_range_simulations_files/figure-html/cell-49-output-1.png" class="img-fluid"></p>
@@ -1834,18 +1466,18 @@ Info: Simulation time 0.12413</code></pre>
 <p><img src="long_range_simulations_files/figure-html/cell-49-output-4.png" class="img-fluid"></p>
 </div>
 </div>
-<p>Indeed, this simulation shows a completely different behavior. Over time, the negative feedback loop stabilizes the levels of all proteins, leading the system to reach a steady state. This dynamic does not occur in nature, as the system is inherently stochastic and discrete.</p>
+<p>Indeed, this simulation shows a completely different behavior. Over time, the negative feedback loop stabilizes the levels of all proteins, leading the system to reach a steady state. This dynamics does not occur in nature, as the system is inherently stochastic and discrete.</p>
 </section>
 </section>
 <section id="stochastic-model-checking" class="level3">
 <h3 class="anchored" data-anchor-id="stochastic-model-checking">4. Stochastic model checking</h3>
 <p>Stochastic model checking enables the verification of properties in stochastic systems by quantifying their probabilities through systematic exploration of all possible system behaviors.</p>
-<p>To perform stochastic model checking we need to translate the model into a Continuous Time Markov Chain (CTMC) and specify the properties we want to verify. Dynamical properties of the resulting CTMC could then be analyzed using the stochastic model checker <a href="https://www.prismmodelchecker.org">PRISM</a>.</p>
-<p>PRISM represents CTMC states using a set of bounded integer variables, necessitating the assumption of a discrete state space. This results in the following CTMC specification in PRISM’s input language (stored in the file <code>../long_range_models/RSP.prism</code>), where model parameters are defined by <code>Pr</code>, <code>Ps</code> and <code>Pp</code> constants (initialized with the same values used in the previous simulations), <code>MAX</code> is the maximum number of molecules per species (set to 100 due to the prohibitive computational time required for higher values) and we have three transitions describing the three possible reactions:</p>
+<p>To perform stochastic model checking we need to translate the model into a Continuous Time Markov Chain (CTMC) and specify the properties we want to verify. Dynamical properties of the resulting CTMC could then be analyzed using the stochastic model checker <a href="https://www.prismmodelchecker.org"><code>PRISM</code></a>.</p>
+<p><code>PRISM</code> represents CTMC states using a set of bounded integer variables, necessitating the assumption of a discrete state space. This results in the following CTMC specification in <code>PRISM</code>’s input language (stored in the file <code>../long_range_models/RSP.prism</code>), where model parameters are defined by <code>Pr</code>, <code>Ps</code> and <code>Pp</code> constants (initialized with the same values used in the previous simulations), <code>MAX</code> is the maximum number of molecules per species (set to 100 due to the prohibitive computational time required for higher values) and we have three transitions describing the three possible reactions:</p>
 <div class="cell" data-execution_count="49">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb65-1"><a href="#cb65-1"></a><span class="op">!</span>cat ..<span class="op">/</span>long_range_models<span class="op">/</span>RSP.prism</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb63-1"><a href="#cb63-1"></a><span class="op">!</span>cat ..<span class="op">/</span>long_range_models<span class="op">/</span>RSP.prism</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>ctmc
@@ -1869,11 +1501,11 @@ module RSP
 endmodule</code></pre>
 </div>
 </div>
-<p>Noting that <code>r + s + p = 1</code>, we can simplify the model to reduce computational time by eliminating the variable <code>p</code>. This results in the following PRISM input:</p>
+<p>Noting that <code>r + s + p = 1</code>, we can simplify the model to reduce computational time by eliminating the variable <code>p</code>. This results in the following <code>PRISM</code> input:</p>
 <div class="cell" data-execution_count="50">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb67-1"><a href="#cb67-1"></a><span class="op">!</span>cat ..<span class="op">/</span>long_range_models<span class="op">/</span>RSP_reduced.prism</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb65-1"><a href="#cb65-1"></a><span class="op">!</span>cat ..<span class="op">/</span>long_range_models<span class="op">/</span>RSP_reduced.prism</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>ctmc
@@ -1896,14 +1528,14 @@ module RSP
 endmodule</code></pre>
 </div>
 </div>
-<p>Let’s visualize the graphical representation of the CTMC (that can be exported from PRISM) for a system with <code>MAX=10</code>:</p>
+<p>Let’s visualize the graphical representation of the CTMC (exported from <code>PRISM</code>) for a system with <code>MAX=10</code>:</p>
 <div class="cell" data-execution_count="51">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb69-1"><a href="#cb69-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">'../results/ctmc.dot'</span>, <span class="st">'r'</span>) <span class="im">as</span> <span class="bu">file</span>:</span>
-<span id="cb69-2"><a href="#cb69-2"></a>    dot_data <span class="op">=</span> <span class="bu">file</span>.read()</span>
-<span id="cb69-3"><a href="#cb69-3"></a>graph <span class="op">=</span> Source(dot_data)</span>
-<span id="cb69-4"><a href="#cb69-4"></a>graph</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb67-1"><a href="#cb67-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">'../results/ctmc.dot'</span>, <span class="st">'r'</span>) <span class="im">as</span> <span class="bu">file</span>:</span>
+<span id="cb67-2"><a href="#cb67-2"></a>    dot_data <span class="op">=</span> <span class="bu">file</span>.read()</span>
+<span id="cb67-3"><a href="#cb67-3"></a>graph <span class="op">=</span> Source(dot_data)</span>
+<span id="cb67-4"><a href="#cb67-4"></a>graph</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display" data-execution_count="51">
 <p><img src="long_range_simulations_files/figure-html/cell-52-output-1.svg" class="img-fluid"></p>
@@ -1914,7 +1546,7 @@ endmodule</code></pre>
 <div class="cell" data-execution_count="52">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb70-1"><a href="#cb70-1"></a><span class="op">!</span>cat ..<span class="op">/</span>long_range_models<span class="op">/</span>RSP_properties.csl</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb68-1"><a href="#cb68-1"></a><span class="op">!</span>cat ..<span class="op">/</span>long_range_models<span class="op">/</span>RSP_properties.csl</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>P=?[ F r=0 ]
@@ -1954,11 +1586,11 @@ P=? [ F=1 s&gt;=x &amp; s&lt;x+10 ]
 P=? [ F=1 (MAX-r-s)&gt;=x &amp; (MAX-r-s)&lt;x+10 ]</code></pre>
 </div>
 </div>
-<p>and then use PRISM to verify these properties. PRISM saves the results in a log file, which we can load and analyze:</p>
+<p>and then use <code>PRISM</code> to verify these properties. <code>PRISM</code> saves the results in a log file, which we can load and analyze:</p>
 <div class="cell" data-execution_count="53">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb72-1"><a href="#cb72-1"></a><span class="op">!</span>sed <span class="op">-</span>n <span class="st">'9,128p'</span> ..<span class="op">/</span>results<span class="op">/</span>prism_log.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb70-1"><a href="#cb70-1"></a><span class="op">!</span>sed <span class="op">-</span>n <span class="st">'9,128p'</span> ..<span class="op">/</span>results<span class="op">/</span>prism_log.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Type:        CTMC
@@ -2085,11 +1717,11 @@ Result: 0.8745308920684021 (+/- 8.735542417834342E-6 estimated; rel err 9.988832
 </div>
 <p>By inspecting the log file, we can see that the model has <span class="math inline">\(5151\)</span> states and <span class="math inline">\(14853\)</span> transitions.</p>
 <p>The probabilities of extinction for species <code>r</code>, <code>s</code>, and <code>p</code> are <span class="math inline">\(0.14\)</span>, <span class="math inline">\(0.98\)</span>, and <span class="math inline">\(0.87\)</span>, respectively. Again, the population with the lowest invasion rate is the least likely to become extinct.</p>
-<p>Loading subsequent lines of PRISM log file:</p>
+<p>Loading subsequent lines of <code>PRISM</code> log file:</p>
 <div class="cell" data-execution_count="54">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb74-1"><a href="#cb74-1"></a><span class="op">!</span>sed <span class="op">-</span>n <span class="st">'128,278p'</span> ..<span class="op">/</span>results<span class="op">/</span>PRISM_log.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb72-1"><a href="#cb72-1"></a><span class="op">!</span>sed <span class="op">-</span>n <span class="st">'128,278p'</span> ..<span class="op">/</span>results<span class="op">/</span>PRISM_log.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>---------------------------------------------------------------------
@@ -2246,11 +1878,11 @@ Result: 0.28962347433238994
 </div>
 </div>
 <p>The probability of a species to go extinct after having reached a density of <span class="math inline">\(0.7\)</span> is <span class="math inline">\(0.14\)</span> for species <code>r</code>, <span class="math inline">\(0.65\)</span> for species <code>s</code>, and <span class="math inline">\(0.29\)</span> for species <code>p</code>. If species <code>s</code>and <code>p</code> reach a density of <span class="math inline">\(0.7\)</span>, they are less likely to become extinct in the future as compared to the extinction probability of these species from the initial state.</p>
-<p>Loading subsequent lines of PRISM log file:</p>
+<p>Loading subsequent lines of <code>PRISM</code> log file:</p>
 <div class="cell" data-execution_count="55">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb76-1"><a href="#cb76-1"></a><span class="op">!</span>sed <span class="op">-</span>n <span class="st">'278,375p'</span> ..<span class="op">/</span>results<span class="op">/</span>PRISM_log.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb74-1"><a href="#cb74-1"></a><span class="op">!</span>sed <span class="op">-</span>n <span class="st">'278,375p'</span> ..<span class="op">/</span>results<span class="op">/</span>PRISM_log.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>---------------------------------------------------------------------
@@ -2373,14 +2005,14 @@ P=? [ F=1 s&gt;=x &amp; s&lt;x+10 ]
 P=? [ F=1 (MAX-r-s)&gt;=x &amp; (MAX-r-s)&lt;x+10 ]</code></pre>
 <p><img align="center" src="../results/individuals_fixed.png" width="600px"></p>
 <p>After a time step, the probability mass of species <code>s</code> and <code>p</code> is concentrated at lower values, while species <code>r</code> has a more uniform distribution.</p>
-<p>PRISM can also be used to conduct stochastic simulations. For example, here is a simulation of the system where, similar to the simulation performed with <code>StochPy</code>, species <code>r</code> is the only one to survive.</p>
+<p><code>PRISM</code> can also be used to conduct stochastic simulations. For example, here is a simulation of the system where, similar to the simulation performed with <code>StochPy</code>, species <code>r</code> is the only one to survive.</p>
 <p><img align="center" src="../results/prism_simulation.png" width="600px"></p>
 </section>
 <section id="petri-net-analysis" class="level3">
 <h3 class="anchored" data-anchor-id="petri-net-analysis">5. Petri net analysis</h3>
 <p>A graphical representation of a system of chemical reaction can also be given in terms of Petri nets. Several variants of Petri nets exist, here we consider stochastic Petri nets, a variant that allows the modeling of stochastic systems.</p>
 <p>For the rock-scissors-paper model, analyzing the net through property verification is relatively straightforward and doesn’t provide substantial insights. However, we will carry out this verification as a tutorial to illustrate the step-by-step approach to modeling and analyzing more complex biochemical networks.</p>
-<p>The Petri net representing the system was created using the <a href="https://www-dssz.informatik.tu-cottbus.de/DSSZ/Software/Snoopy">Snoopy tool</a>, saved as <code>./long_range_models/rsp.spn</code>, and subsequently imported into the <a href="https://www-dssz.informatik.tu-cottbus.de/DSSZ/Software/Charlie">Charlie tool</a> for analysis.</p>
+<p>The Petri net representing the system was created using the <a href="https://www-dssz.informatik.tu-cottbus.de/DSSZ/Software/Snoopy"><code>Snoopy</code></a> tool, saved as <code>./long_range_models/rsp.spn</code>, and subsequently imported into the <a href="https://www-dssz.informatik.tu-cottbus.de/DSSZ/Software/Charlie"><code>Charlie</code></a> tool for analysis.</p>
 <p>Let’s introduce some definitions, necessary for the analysis of the Petri net.</p>
 <p>A Stochastic Petri net consists of places, transitions with corresponding kinetic functions, arcs and tokens. Places represent the species, transitions represent the reactions, arcs represent the flow of species between reactions and tokens represent the number of molecules of each species. The distribution of the tokens in the places is formalized by the notion of marking.</p>
 <p>More formally, a stochastic Petri net is a quintuple <span class="math inline">\(N = (P, T, f, \nu, m_0)\)</span>, where</p>
@@ -2396,11 +2028,11 @@ P=? [ F=1 (MAX-r-s)&gt;=x &amp; (MAX-r-s)&lt;x+10 ]</code></pre>
 <p>Given a set of places <span class="math inline">\(S=p_1, p_2, \ldots\)</span>, the pre-transition of a set of places <span class="math inline">\(S\)</span> is defined as <span class="math inline">\(•S=•p_1 \cup •p_2 \cup \ldots\)</span>, while the post-transition of a set of places <span class="math inline">\(S\)</span> is defined as <span class="math inline">\(S•=p_1• \cup p_2• \cup \ldots\)</span>.</p>
 <p>In this particular net, the pretransition and posttransition of the sites are as follows: - <span class="math inline">\(•P=\{Pp\}\)</span> - <span class="math inline">\(•R=\{Pr\}\)</span> - <span class="math inline">\(•S=\{Ps\}\)</span> - <span class="math inline">\(P•=\{Pp,Ps\}\)</span> - <span class="math inline">\(R•=\{Pr,Pp\}\)</span> - <span class="math inline">\(S•=\{Ps,Pr\}\)</span></p>
 <p>The <strong>incidence matrix</strong> of <span class="math inline">\(\mathcal{N}\)</span> is a matrix <span class="math inline">\(C:P\times T \rightarrow \mathbb{Z}\)</span>, indexed by <span class="math inline">\(P\)</span> and <span class="math inline">\(T\)</span>, such that <span class="math inline">\(C(p,t)=f(t,p)−f(p,t)\)</span>.</p>
-<p>Loading the file containing the incidence matrix produced by Charlie:</p>
+<p>Loading the file containing the incidence matrix produced by <code>Charlie</code>:</p>
 <div class="cell" data-execution_count="56">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb81-1"><a href="#cb81-1"></a><span class="op">!</span>cat ..<span class="op">/</span>results<span class="op">/</span>petri_net_incidence_matrix.txtm</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb79-1"><a href="#cb79-1"></a><span class="op">!</span>cat ..<span class="op">/</span>results<span class="op">/</span>petri_net_incidence_matrix.txtm</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>placeNames = {P R S };
@@ -2427,9 +2059,9 @@ C=[
 <div class="cell" data-execution_count="57">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb83-1"><a href="#cb83-1"></a>C <span class="op">=</span> Matrix([[<span class="dv">1</span>, <span class="dv">0</span>, <span class="op">-</span><span class="dv">1</span>], [<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>], [<span class="dv">0</span>, <span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>]])</span>
-<span id="cb83-2"><a href="#cb83-2"></a>rank <span class="op">=</span> C.rank()</span>
-<span id="cb83-3"><a href="#cb83-3"></a>rank</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb81-1"><a href="#cb81-1"></a>C <span class="op">=</span> Matrix([[<span class="dv">1</span>, <span class="dv">0</span>, <span class="op">-</span><span class="dv">1</span>], [<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>], [<span class="dv">0</span>, <span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>]])</span>
+<span id="cb81-2"><a href="#cb81-2"></a>rank <span class="op">=</span> C.rank()</span>
+<span id="cb81-3"><a href="#cb81-3"></a>rank</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display" data-execution_count="57">
 <pre><code>2</code></pre>
@@ -2442,22 +2074,22 @@ C=[
 <div class="cell" data-execution_count="58">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb85-1"><a href="#cb85-1"></a>x1, x2, x3 <span class="op">=</span> symbols(<span class="st">'x1 x2 x3'</span>)</span>
-<span id="cb85-2"><a href="#cb85-2"></a>x <span class="op">=</span> Matrix([x1, x2, x3])</span>
-<span id="cb85-3"><a href="#cb85-3"></a>equation <span class="op">=</span> Eq(x.T <span class="op">*</span> C, Matrix([[<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>]]))</span>
-<span id="cb85-4"><a href="#cb85-4"></a>solution <span class="op">=</span> solve(equation, (x1, x2, x3), <span class="bu">dict</span><span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb85-5"><a href="#cb85-5"></a>solution</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb83-1"><a href="#cb83-1"></a>x1, x2, x3 <span class="op">=</span> symbols(<span class="st">'x1 x2 x3'</span>)</span>
+<span id="cb83-2"><a href="#cb83-2"></a>x <span class="op">=</span> Matrix([x1, x2, x3])</span>
+<span id="cb83-3"><a href="#cb83-3"></a>equation <span class="op">=</span> Eq(x.T <span class="op">*</span> C, Matrix([[<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>]]))</span>
+<span id="cb83-4"><a href="#cb83-4"></a>solution <span class="op">=</span> solve(equation, (x1, x2, x3), <span class="bu">dict</span><span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb83-5"><a href="#cb83-5"></a>solution</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display" data-execution_count="58">
 <pre><code>[{x1: x3, x2: x3}]</code></pre>
 </div>
 </div>
 <p>Any vector of the form <span class="math inline">\([x,x,x]\)</span> is a place invariant. In fact it is trivial that the sum of the number of tokens in the places is constant (equal to <span class="math inline">\(100\)</span>).</p>
-<p>Checking the file containing the P-invariants computed by Charlie:</p>
+<p>Checking the file containing the P-invariants computed by <code>Charlie</code>:</p>
 <div class="cell" data-execution_count="59">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb87-1"><a href="#cb87-1"></a><span class="op">!</span>cat ..<span class="op">/</span>results<span class="op">/</span>rsp_P.inv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb85-1"><a href="#cb85-1"></a><span class="op">!</span>cat ..<span class="op">/</span>results<span class="op">/</span>rsp_P.inv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>minimal semipositive place invariants=
@@ -2471,22 +2103,22 @@ C=[
 <div class="cell" data-execution_count="60">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb89"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb89-1"><a href="#cb89-1"></a>y1, y2, y3 <span class="op">=</span> symbols(<span class="st">'y1 y2 y3'</span>)</span>
-<span id="cb89-2"><a href="#cb89-2"></a>y <span class="op">=</span> Matrix([y1, y2, y3])</span>
-<span id="cb89-3"><a href="#cb89-3"></a>equation <span class="op">=</span> Eq(C <span class="op">*</span> y, Matrix([[<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>]]).T)</span>
-<span id="cb89-4"><a href="#cb89-4"></a>solution <span class="op">=</span> solve(equation, (y1, y2, y3), <span class="bu">dict</span><span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb89-5"><a href="#cb89-5"></a>solution</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb87-1"><a href="#cb87-1"></a>y1, y2, y3 <span class="op">=</span> symbols(<span class="st">'y1 y2 y3'</span>)</span>
+<span id="cb87-2"><a href="#cb87-2"></a>y <span class="op">=</span> Matrix([y1, y2, y3])</span>
+<span id="cb87-3"><a href="#cb87-3"></a>equation <span class="op">=</span> Eq(C <span class="op">*</span> y, Matrix([[<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>]]).T)</span>
+<span id="cb87-4"><a href="#cb87-4"></a>solution <span class="op">=</span> solve(equation, (y1, y2, y3), <span class="bu">dict</span><span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb87-5"><a href="#cb87-5"></a>solution</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display" data-execution_count="60">
 <pre><code>[{y1: y3, y2: y3}]</code></pre>
 </div>
 </div>
 <p>Any vector of the form <span class="math inline">\([y,y,y]\)</span> is a transition invariant. In fact it is trivial that applying the three transitions an equal number of times will not change the marking of the net.</p>
-<p>Checking the file containing the T-invariants computed by Charlie:</p>
+<p>Checking the file containing the T-invariants computed by <code>Charlie</code>:</p>
 <div class="cell" data-execution_count="61">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb91-1"><a href="#cb91-1"></a><span class="op">!</span>cat ..<span class="op">/</span>results<span class="op">/</span>rsp_T.inv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb89"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb89-1"><a href="#cb89-1"></a><span class="op">!</span>cat ..<span class="op">/</span>results<span class="op">/</span>rsp_T.inv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>minimal semipositive transition invariants=
@@ -2504,11 +2136,11 @@ C=[
 <p>Once a siphon becomes empty (i.e., contains no tokens), it cannot be refilled with tokens by the firing of any transitions (i.e.&nbsp;such part of the system becomes permanently disabled). This means that once a species (or a couple of species) goes extinct, it cannot be reintroduced in the system.</p>
 <p>A siphon is minimal if it does not properly contain a non-empty siphon.</p>
 <p>In this particular net, <span class="math inline">\(\{P\}, \{R\}, \{S\}\)</span> are minimal siphons.</p>
-<p>Checking the file containing the minimal siphons computed by Charlie:</p>
+<p>Checking the file containing the minimal siphons computed by <code>Charlie</code>:</p>
 <div class="cell" data-execution_count="62">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb93-1"><a href="#cb93-1"></a><span class="op">!</span>cat ..<span class="op">/</span>results<span class="op">/</span>rsp_DLS.res</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb91-1"><a href="#cb91-1"></a><span class="op">!</span>cat ..<span class="op">/</span>results<span class="op">/</span>rsp_DLS.res</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code> minimal proper siphon ( place )= 
@@ -2527,11 +2159,11 @@ C=[
 <p>In this particular net, we have: - <span class="math inline">\(\{P\}•=\{Pp, Ps\} \nsubseteq •\{P\} = \{Pp\}\implies \{P\}\)</span> is not a trap - <span class="math inline">\(\{R\}•=\{Pr, Pp\} \nsubseteq •\{R\} = \{Pr\} \implies \{R\}\)</span> is not a trap - <span class="math inline">\(\{S\}•=\{Ps, Pr\} \nsubseteq •\{S\} = \{Ps\} \implies \{S\}\)</span> is not a trap - <span class="math inline">\(\{R,S\}•=\{Pr, Pp, Ps\} \nsubseteq •\{R,S\}=\{Pr, Ps\} \implies \{R,S\}\)</span> is not a trap - <span class="math inline">\(\{P, R\}• = \{Pp, Ps, Pr\} \nsubseteq •\{P, R\} = \{Pp, Pr\} \implies \{P, R\}\)</span> is not a trap - <span class="math inline">\(\{P, S\}• = \{Pp, Ps, Pr\} \nsubseteq •\{P, S\} = \{Pp, Ps\} \implies \{P, S\}\)</span> is not a trap - <span class="math inline">\(\{P, R, S\}• = \{Pp, Pr, Ps\} = •\{P, R, S\} = \{Pp, Pr, Ps\} \implies \{P, R, S\}\)</span> is a trap</p>
 <p>A trap is minimal if it does not properly contain a non-empty trap.</p>
 <p>In this particular net, <span class="math inline">\(\{P, R, S\}\)</span> is a minimal trap.</p>
-<p>Checking the file containing the minimal traps computed by Charlie:</p>
+<p>Checking the file containing the minimal traps computed by <code>Charlie</code>:</p>
 <div class="cell" data-execution_count="63">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb95"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb95-1"><a href="#cb95-1"></a><span class="op">!</span>cat ..<span class="op">/</span>results<span class="op">/</span>rsp_TPS.res</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb93-1"><a href="#cb93-1"></a><span class="op">!</span>cat ..<span class="op">/</span>results<span class="op">/</span>rsp_TPS.res</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code> minimal traps ( place )= 
@@ -2541,9 +2173,9 @@ C=[
     |2.S    :1</code></pre>
 </div>
 </div>
-<p>The “Net Properties” dialog in Charlie provides an overview of the key properties of the net. For this particular net, they are shown below:</p>
+<p>The “Net Properties” dialog in <code>Charlie</code> provides an overview of the key properties of the net. For this particular net, they are shown below:</p>
 <p><img align="center" src="../results/petri_net_props.png" width="400px"></p>
-<p>The properties are described in the following Table (sourced from <a href="#6-references">[3]</a>).</p>
+<p>The properties are described in the following Table (sourced from [3]).</p>
 <table class="table">
 <colgroup>
 <col style="width: 12%">
@@ -2623,7 +2255,7 @@ C=[
 <tr class="odd">
 <td>CON</td>
 <td>connected</td>
-<td>A Petri net is connected if it holds for every two nodes <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> that there is an undirected path between <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span>. Disconnected parts of a Petri net cannot influence each other, so they can usually be analysed separately.</td>
+<td>A Petri net is connected if it holds for every two nodes <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> that there is an undirected path between <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span>. Disconnected parts of a Petri net cannot influence each other, so they can usually be analyzed separately.</td>
 <td>✅</td>
 </tr>
 <tr class="even">
@@ -2683,7 +2315,7 @@ C=[
 <tr class="odd">
 <td>DCF</td>
 <td>dynamically conflict free</td>
-<td>Dynamic conflict is a behavioural property which refers to a marking enabling two transitions, but the firing of one transition disables the other one. The occurrence of dynamic conflicts causes alternative (branching) system behaviour, whereby the decision between these alternatives is taken nondeterministically.</td>
+<td>Dynamic conflict is a behavioral property which refers to a marking enabling two transitions, but the firing of one transition disables the other one. The occurrence of dynamic conflicts causes alternative (branching) system behavior, whereby the decision between these alternatives is taken nondeterministically.</td>
 <td>❌</td>
 </tr>
 <tr class="even">
@@ -2712,11 +2344,11 @@ C=[
 </tr>
 </tbody>
 </table>
-<p>Charlie checks these properties by applying a set of rules, as shown in the log file generated by the tool:</p>
+<p><code>Charlie</code> checks these properties by applying a set of rules, as shown in the log file generated by the tool:</p>
 <div class="cell" data-execution_count="64">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb97"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb97-1"><a href="#cb97-1"></a><span class="op">!</span>cat ..<span class="op">/</span>results<span class="op">/</span>charlie_log.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb95"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb95-1"><a href="#cb95-1"></a><span class="op">!</span>cat ..<span class="op">/</span>results<span class="op">/</span>charlie_log.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>
@@ -2913,11 +2545,11 @@ PUR   ORD   HOM   NBM   CSV   SCF   FT0   TF0   FP0   PF0   CON   SC    NC
    Y      2     1     3</code></pre>
 </div>
 </div>
-<p>Since a stochastic Petri net can be translated into a CTMC, Charlie provides the possibility to export the net in the PRISM input language. Let’s check whether the PRISM model produced by Charlie corresponds to the one we manually created:</p>
+<p>Since a stochastic Petri net can be translated into a CTMC, <code>Charlie</code> provides the possibility to export the net in the <code>PRISM</code> input language. Let’s check whether the <code>PRISM</code> model produced by <code>Charlie</code> corresponds to the one we manually created:</p>
 <div class="cell" data-execution_count="65">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb99"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb99-1"><a href="#cb99-1"></a><span class="op">!</span>cat ..<span class="op">/</span>long_range_models<span class="op">/</span>rsp.sm</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb97"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb97-1"><a href="#cb97-1"></a><span class="op">!</span>cat ..<span class="op">/</span>long_range_models<span class="op">/</span>rsp.sm</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>//created by Snoopy 2

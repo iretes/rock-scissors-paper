@@ -209,7 +209,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
-<p>This notebook simulates the evolution of the system with local dispersal, featuring three variants of the rock-paper-scissors game. All lattice-based model were developed using the <a href="https://mesa.readthedocs.io/en/stable/">Mesa</a> framework, which provides visualization tools to observe the spatial structures emerging from agent interactions.</p>
+<p>This notebook simulates the evolution of the system with local dispersal, featuring three variants of the rock-scissors-paper game. All lattice-based model were developed using the <a href="https://mesa.readthedocs.io/en/stable/"><code>Mesa</code></a> framework, which provides visualization tools to observe the spatial structures emerging from agent interactions.</p>
 <p>Importing the necessary libraries:</p>
 <div class="cell" data-execution_count="1">
 <details open="">
@@ -234,7 +234,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <section id="frean-and-abraham-model" class="level2">
 <h2 class="anchored" data-anchor-id="frean-and-abraham-model">1. Frean and Abraham model</h2>
-<p>In this model the <span class="math inline">\(N\)</span> sites are taken to be sites in a periodic, rectangular lattice and each agent is activated once per time-step, in random order. During each activation, an agent competes with a randomly chosen neighboring agent. If the neighboring agent can be defeated, the agent wins the competition with a probability determined by the invasion rate. If the agent wins the competition, the neighboring agent is transformed into an individual of the same species of the winning agent. For more details, see the original paper <a href="#32-simulations">[1]</a>.</p>
+<p>In the Frean and Abraham model [1], the <span class="math inline">\(N\)</span> sites are taken to be sites in a periodic, rectangular lattice and each agent is activated once per time-step, in random order. During each activation, an agent competes with a randomly chosen neighboring agent. If the neighboring agent can be defeated, the agent wins the competition with a probability determined by the invasion rate. If the agent wins the competition, the neighboring agent is transformed into an individual of the same species of the winning agent.</p>
 <section id="implementation-details" class="level3">
 <h3 class="anchored" data-anchor-id="implementation-details">1.1. Implementation details</h3>
 <p>The model is defined by the class <code>RSPRandAct</code> in the file <code>../lattice_models/model_rand_act.py</code>:</p>
@@ -250,8 +250,11 @@ from mesa.datacollection import DataCollector
 
 class RSPRandAct(mesa.Model):
     """
-    A system with three species in a competitive loop: a rock beats a pair of scissors,
-    scissors beat a sheet of paper and paper beats a rock.
+    This model is based on the Rock-Paper-Scissors model proposed by Frean and Abraham.
+
+    Reference:
+    Frean, Marcus, and Edward R. Abraham. "Rock-scissors-paper and the survival of the weakest." 
+    Proceedings of the Royal Society of London. Series B: Biological Sciences 268.1474 (2001): 1323-1327.
     """
 
     # key: species, value: list of species that the key species can beat
@@ -268,7 +271,7 @@ class RSPRandAct(mesa.Model):
                  increase_rate=False,
                  width=50, height=50):
         """
-        Create a new playing area of (width, height) patches.
+        Initialize the model with the given parameters.
         """
         super().__init__()
 
@@ -308,7 +311,7 @@ class RSPRandAct(mesa.Model):
         for i in range(self.n_species):
             model_reporter[i] = lambda model, species=i: model.count_patches(species)
         if self.increase_rate:
-           model_reporter['increased_rate'] = lambda model: model.invasion_rates[0] # TODO: lambda model: model.compute_average_invrate0()=
+           model_reporter['increased_rate'] = lambda model: model.invasion_rates[0]
         self.datacollector = DataCollector(
             model_reporter
         )
@@ -319,10 +322,6 @@ class RSPRandAct(mesa.Model):
         Helper method to count the number of patches in the given state.
         """
         return sum([1 for patch in self.schedule.agents if patch.state == species])
-    
-    def compute_average_invrate0(self): # TODO: delete?
-        rates = [patch.invasion_rate for patch in self.schedule.agents if patch.state == 0]
-        return sum(rates) / len(rates)
 
     def step(self):
         """
@@ -364,7 +363,6 @@ class PatchRandAct(mesa.Agent):
         self.color_map = model.color_map
         self.x, self.y = pos
         self.state = init_state
-        self.invasion_rate = self.model.invasion_rates[self.state] # TODO: delete?
         self._nextState = None
 
     def step(self):
@@ -394,47 +392,13 @@ class PatchRandAct(mesa.Agent):
                 rand = self.random.uniform(0, 1e-4)
                 new_rate = self.model.invasion_rates[self.state] + rand
                 if 0 &lt; new_rate &lt; 1:
-                    self.model.invasion_rates[self.state] = new_rate
-
-    def alternative_step(self):
-        """
-        Compute the next state of the patch according to the rules of the game
-        and the invasion rates of the species.
-        """
-        # get the neighbors
-        neighbors = self.model.grid.get_neighbors((self.x, self.y), moore=True)
-
-        # select a random neighbor
-        neighbor = self.random.choice(neighbors)
-        
-        # if the neighbor can be defeated
-        if neighbor.state in self.rules[self.state]:
-            # change the neighbor state according to the invasion rate
-            win_rate = self.invasion_rate
-            new_neigh_state = self.random.choices(
-                [self.state, neighbor.state],
-                weights=[win_rate, 1-win_rate],
-                k=1)[0]
-            if new_neigh_state != neighbor.state:
-                if self.state==0:
-                    neighbor.invasion_rate = self.invasion_rate
-                else: 
-                    neighbor.invasion_rate = self.model.invasion_rates[neighbor.state]
-            neighbor.state = new_neigh_state
-            
-            # increase species 0 individuals invasion rate if needed
-            if (self.model.increase_rate and self.state==0 and \
-                new_neigh_state==self.state and self.model.schedule.steps&gt;100):
-                rand = self.random.uniform(-1e-2, 1e-2)
-                new_rate = self.invasion_rate + rand
-                if 0 &lt; new_rate &lt; 1:
-                    self.invasion_rate = new_rate</code></pre>
+                    self.model.invasion_rates[self.state] = new_rate</code></pre>
 </div>
 </div>
 <ul>
 <li>Each patch has a Moore neighborhood, i.e.&nbsp;the eight cells surrounding it.</li>
-<li>At each step, a neighbor is randomly chosen and the agent in the patch interacts with it. According on the invasion rates, the neighboring agent can be overtaken and transformed into the same species as the agent in the patch.</li>
-<li>If the parameter <code>increase_rate</code> is set to <code>True</code>, after <span class="math inline">\(100\)</span> steps the invasion rate of species <span class="math inline">\(0\)</span> is increased whenever it replicates onto a new site. The increment is a random number uniformly distributed between <span class="math inline">\(0\)</span> and <span class="math inline">\(10^{-4}\)</span> and the new invasion rate is accepted if it is in the range <span class="math inline">\(0&lt;P_0&lt;1\)</span>). This is done to replicate the experiment of Figure 3 in <a href="#4-references">[1]</a>.</li>
+<li>At each step, a neighbor is randomly chosen and the agent in the patch interacts with it. According to the invasion rates, the neighboring agent can be overtaken and transformed into the same species of the agent in the patch.</li>
+<li>If the parameter <code>increase_rate</code> is set to <code>True</code>, after <span class="math inline">\(100\)</span> steps the invasion rate of species <span class="math inline">\(0\)</span> is increased whenever it replicates onto a new site. The increment is a random number uniformly distributed between <span class="math inline">\(0\)</span> and <span class="math inline">\(10^{-4}\)</span> and the new invasion rate is accepted if it is in the range <span class="math inline">\(0&lt;P_0&lt;1\)</span>). This is done to replicate the experiment of Figure 3 in [1].</li>
 </ul>
 </section>
 <section id="simulations" class="level3">
@@ -723,7 +687,7 @@ class PatchRandAct(mesa.Agent):
 <span id="cb9-42"><a href="#cb9-42"></a>    <span class="cf">return</span> title</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>Plotting the evolution of the system (replicating Figure 2a from <a href="#4-references">[1]</a>):</p>
+<p>Plotting the evolution of the system (replicating Figure 2a from [1]):</p>
 <div class="cell" data-execution_count="8">
 <details open="">
 <summary>Code</summary>
@@ -733,7 +697,7 @@ class PatchRandAct(mesa.Agent):
 <p><img src="lattice_simulations_files/figure-html/cell-9-output-1.png" class="img-fluid"></p>
 </div>
 </div>
-<p>Unlike the long-range dispersal model, where in the same setting the weakest species outcompetes the others, here the dynamics stabilize, and the population densities converge towards the fixed point.</p>
+<p>Unlike the long-range dispersal model, where in the same setting the weakest species outcompetes the others, here the dynamics stabilizes, and the population densities converge towards the fixed point.</p>
 <p>Let’s define the parameters to perform a simulation of a system with <span class="math inline">\(3\)</span> species, on a square lattice with <span class="math inline">\(N=200\cdot 200\)</span> sites and equal invasion rates (<span class="math inline">\(Pr_=0.33, P_s=0.33, P_p=0.33\)</span>). The grid will be initialized with the sites being randomly assigned to each of the three species in fixed-point proportions (<span class="math inline">\(n_r=0.33, n_s=0.33, n_p=0.33\)</span>).</p>
 <div class="cell" data-execution_count="9">
 <details open="">
@@ -770,11 +734,11 @@ class PatchRandAct(mesa.Agent):
 </details>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"eecbba6a5167423fb0a6d6889e47bf03","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+{"model_id":"0378e990d49e405cb563b779ae8dd0ec","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
 </script>
 </div>
 </div>
-<p>Running a simulation and plotting the grid after <span class="math inline">\(100\)</span> steps (replicating Figure 2b from <a href="#4-references">[1]</a>) and the evolution of the species proportions over time:</p>
+<p>Running a simulation and plotting the grid after <span class="math inline">\(100\)</span> steps (replicating Figure 2b from [1]) and the evolution of the species proportions over time:</p>
 <div class="cell" data-execution_count="11">
 <details open="">
 <summary>Code</summary>
@@ -843,11 +807,11 @@ class PatchRandAct(mesa.Agent):
 </details>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"e0a54c0d97d44f73b29cc112199749a4","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+{"model_id":"f2470c83fa3444e6997642a27d5d8deb","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
 </script>
 </div>
 </div>
-<p>Running a simulation and plotting the grid after <span class="math inline">\(100\)</span> steps (replicating Figure 2c from <a href="#4-references">[1]</a>) and the evolution of the species proportions over time:</p>
+<p>Running a simulation and plotting the grid after <span class="math inline">\(100\)</span> steps (replicating Figure 2c from [1]) and the evolution of the species proportions over time:</p>
 <div class="cell" data-execution_count="16">
 <details open="">
 <summary>Code</summary>
@@ -879,7 +843,7 @@ class PatchRandAct(mesa.Agent):
 <p><img src="lattice_simulations_files/figure-html/cell-19-output-1.png" class="img-fluid"></p>
 </div>
 </div>
-<p>When species <span class="math inline">\(S\)</span> invasion rates is much larger than the other two, species <span class="math inline">\(R\)</span> and <span class="math inline">\(P\)</span> form disconnected islands amongst species <span class="math inline">\(S\)</span>.</p>
+<p>When species <span class="math inline">\(P\)</span> invasion rate is much larger than the other two, species <span class="math inline">\(R\)</span> and <span class="math inline">\(P\)</span> form disconnected islands amongst species <span class="math inline">\(S\)</span>.</p>
 <p>Let’s define the parameters to perform a simulation of a system with <span class="math inline">\(3\)</span> species, on a square lattice with <span class="math inline">\(N=200\cdot 200\)</span> sites and invasion rates <span class="math inline">\(P_r=0.05, P_s=0.475, P_p=0.475\)</span>. The grid is initialized with the sites being randomly assigned to each of the three species in fixed-point proportions (<span class="math inline">\(n_r=0.475, n_s=0.475, n_p=0.05\)</span>).</p>
 <div class="cell" data-execution_count="19">
 <details open="">
@@ -916,11 +880,11 @@ class PatchRandAct(mesa.Agent):
 </details>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"8c065b60c1c841ff93b1453b85ef5749","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+{"model_id":"199aad8533f34c61be73650e3bcfe895","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
 </script>
 </div>
 </div>
-<p>Running a simulation and plotting the grid after <span class="math inline">\(100\)</span> steps (replicating Figure 2d from <a href="#4-references">[1]</a>) and the evolution of the species proportions over time:</p>
+<p>Running a simulation and plotting the grid after <span class="math inline">\(100\)</span> steps (replicating Figure 2d from [1]) and the evolution of the species proportions over time:</p>
 <div class="cell" data-execution_count="21">
 <details open="">
 <summary>Code</summary>
@@ -934,7 +898,7 @@ class PatchRandAct(mesa.Agent):
 <span id="cb24-2"><a href="#cb24-2"></a>    model4_100.grid,</span>
 <span id="cb24-3"><a href="#cb24-3"></a>    agent_portrayal,</span>
 <span id="cb24-4"><a href="#cb24-4"></a>    title<span class="op">=</span>build_title(params<span class="op">=</span>model_params4, steps<span class="op">=</span><span class="dv">100</span>)</span>
-<span id="cb24-5"><a href="#cb24-5"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb24-5"><a href="#cb24-5"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display" data-execution_count="22">
 <p><img src="lattice_simulations_files/figure-html/cell-23-output-1.png" class="img-fluid"></p>
@@ -952,7 +916,7 @@ class PatchRandAct(mesa.Agent):
 <p><img src="lattice_simulations_files/figure-html/cell-24-output-1.png" class="img-fluid"></p>
 </div>
 </div>
-<p>Running a simulation and plotting the grid after <span class="math inline">\(300\)</span> steps (replicating Figure 2d from <a href="#4-references">[1]</a>) and the evolution of the species proportions over time.</p>
+<p>Running a simulation and plotting the grid after <span class="math inline">\(300\)</span> steps (replicating Figure 2d from [1]) and the evolution of the species proportions over time.</p>
 <div class="cell" data-execution_count="24">
 <details open="">
 <summary>Code</summary>
@@ -966,7 +930,7 @@ class PatchRandAct(mesa.Agent):
 <span id="cb27-2"><a href="#cb27-2"></a>    model4_300.grid,</span>
 <span id="cb27-3"><a href="#cb27-3"></a>    agent_portrayal,</span>
 <span id="cb27-4"><a href="#cb27-4"></a>    title<span class="op">=</span>build_title(params<span class="op">=</span>model_params4, steps<span class="op">=</span><span class="dv">300</span>)</span>
-<span id="cb27-5"><a href="#cb27-5"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb27-5"><a href="#cb27-5"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display" data-execution_count="25">
 <p><img src="lattice_simulations_files/figure-html/cell-26-output-1.png" class="img-fluid"></p>
@@ -1062,7 +1026,7 @@ class PatchRandAct(mesa.Agent):
 <span id="cb31-34"><a href="#cb31-34"></a>    batch_results_df <span class="op">=</span> pd.read_csv(<span class="st">"../results/lattice_simulations_results.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>Plotting contours summarizing the results of <span class="math inline">\(28\)</span> simulations that are each <span class="math inline">\(300\)</span> epochs long on a square lattice with <span class="math inline">\(N=100\cdot 100\)</span> sites and showing the mean value of <span class="math inline">\(n_s\)</span> over the final <span class="math inline">\(100\)</span> epochs of each model run (replicating Figure 2e from <a href="#4-references">[1]</a>). Data are only shown for the region that had all its invasion probabilities greater than <span class="math inline">\(0.01\)</span> as outside this region, with such a small invasion probability, the grid is too small to stabilize fluctuations in the population densities.</p>
+<p>Plotting contours summarizing the results of <span class="math inline">\(28\)</span> simulations that are each <span class="math inline">\(300\)</span> epochs long on a square lattice with <span class="math inline">\(N=100\cdot 100\)</span> sites and showing the mean value of <span class="math inline">\(n_s\)</span> over the final <span class="math inline">\(100\)</span> epochs of each model run (replicating Figure 2e from [1]). Data are only shown for the region that has all its invasion probabilities greater than <span class="math inline">\(0.01\)</span> as outside this region, with such a small invasion probability, the grid is too small to stabilize fluctuations in the population densities.</p>
 <div class="cell" data-execution_count="30">
 <details open="">
 <summary>Code</summary>
@@ -1087,7 +1051,7 @@ class PatchRandAct(mesa.Agent):
 </div>
 </div>
 <p>The value of <span class="math inline">\(n_s\)</span> after <span class="math inline">\(300\)</span> epochs varies linearly from the base of the triangle to the top. Deviations from the mean-field approximation are seen toward the corners of the triangle.</p>
-<p>Despite the large clumps that may develop when the invasion rates are unequal, the population densities remain close to the fixed point of the mean-field equations (<span class="math inline">\(S=\frac{P_p}{P_p+P_r+P_s}=P_p\)</span>) over much of the parameter space of the invasion probabilities (the values of <span class="math inline">\(n_s\)</span> are close to the values of <span class="math inline">\(P_p\)</span>). The paradox that the most aggressive species does not have the largest population still holds (when <span class="math inline">\(P_p\)</span> is the largest, <span class="math inline">\(n_s\)</span> is the largest).</p>
+<p>Despite the large clumps that may develop when the invasion rates are unequal, the population densities remain close to the fixed point of the mean-field equations (<span class="math inline">\(S=\frac{P_p}{P_p+P_r+P_s}=P_p\)</span>) over much of the parameter space of the invasion probabilities (i.e., the values of <span class="math inline">\(n_s\)</span> are close to the values of <span class="math inline">\(P_p\)</span>). The paradox that the most aggressive species does not have the largest population still holds (when <span class="math inline">\(P_p\)</span> is the largest, <span class="math inline">\(n_s\)</span> is the largest).</p>
 <p>Let’s define the parameters to perform a simulation of a system with <span class="math inline">\(3\)</span> species in which the invasion rate of a species (species <span class="math inline">\(R\)</span>) is increased over time (<code>increase_rate=True</code>), on a square lattice with <span class="math inline">\(N=200\cdot 200\)</span> sites and initial invasion rates <span class="math inline">\(P_r=0.05, P_s=0.5, P_p=0.3\)</span>. The grid is initialized with the sites being randomly assigned to each of the three species in fixed-point proportions (<span class="math inline">\(n_r=0.5, n_s=0.3, n_p=0.05\)</span>).</p>
 <div class="cell" data-execution_count="31">
 <details open="">
@@ -1125,11 +1089,11 @@ class PatchRandAct(mesa.Agent):
 </details>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"1d6753324851435ca10243757e56a450","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+{"model_id":"aa4f7e99049b4594aa76e8e28e0c5b45","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
 </script>
 </div>
 </div>
-<p>Running a simulation and plotting the evolution of the species proportions over time and the evolution of the invasion rate of species <span class="math inline">\(R\)</span> (replicating a scenario similar to that analyzed in Figure 3 of <a href="#4-references">[1]</a>):</p>
+<p>Running a simulation and plotting the evolution of the species proportions over time and the evolution of the invasion rate of species <span class="math inline">\(R\)</span> (replicating a scenario similar to that analyzed in Figure 3 of [1]):</p>
 <div class="cell" data-execution_count="33">
 <details open="">
 <summary>Code</summary>
@@ -1181,17 +1145,18 @@ from mesa.datacollection import DataCollector
 
 class RSPSimAct(mesa.Model):
     """
-    A system with three species in a competitive loop: a rock beats a pair of scissors,
-    scissors beat a sheet of paper and paper beats a rock.
+    This implementation of the Rock-Paper-Scissors model uses simultaneous activations of agents.
     """
 
+    # key: species, value: list of species that the key species can beat
+    # e.g. ROCK (0) beats SCISSOR (1), SCISSOR (1) beats PAPER (2), PAPER (2) beats ROCK (0)
     rules3 = {0: [1], 1: [2], 2: [0]}
     rules4 = {0: [1], 1: [2], 2: [3], 3: [0]}
     rules5 = {0: [1,2], 1: [2,3], 2: [3,4], 3: [4,0], 4: [0,1]}
 
     def __init__(self, init0, init1, init2, init3, init4, n_species, color_map, width=50, height=50):
         """
-        Create a new playing area of (width, height) patches.
+        Initialize the model with the given parameters.
         """
         super().__init__()
 
@@ -1359,7 +1324,7 @@ class PatchSimAct(mesa.Agent):
 </details>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"f2e1c93310d34b1dab4604d35831215f","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+{"model_id":"c04b7fdda19e4089a356ad400766f379","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
 </script>
 </div>
 </div>
@@ -1405,7 +1370,7 @@ class PatchSimAct(mesa.Agent):
 <p><img src="lattice_simulations_files/figure-html/cell-44-output-1.png" class="img-fluid"></p>
 </div>
 </div>
-<p>The system dynamics lead to the formation of a spiraling pattern, with population densities remaining roughly equal.</p>
+<p>The system dynamics leads to the formation of a spiraling pattern, with population densities remaining roughly equal.</p>
 <p>Let’s define the parameters to perform a simulation of a system with <span class="math inline">\(3\)</span> species, on a square lattice with <span class="math inline">\(N=200\cdot 200\)</span> sites, initialized with the sites being randomly assigned to each of the three species according to the following probabilities <code>init0</code>=0.2, <code>init1</code>=0.4, <code>init2</code>=0.4.</p>
 <div class="cell" data-execution_count="44">
 <details open="">
@@ -1437,7 +1402,7 @@ class PatchSimAct(mesa.Agent):
 </details>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"99143fbcf3f544329485340084eb570c","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+{"model_id":"fe6f641f85044fc28e4f4fa5a1acc444","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
 </script>
 </div>
 </div>
@@ -1515,15 +1480,15 @@ class PatchSimAct(mesa.Agent):
 </details>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"66c27b9707c1483383a3b23064512adb","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+{"model_id":"31af2dcb8aee49559578093d0fae7422","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
 </script>
 </div>
 </div>
-<p>Running a simulation and plotting the evolution of the species proportions during <span class="math inline">\(100\)</span> steps:</p>
+<p>Running a simulation and plotting the evolution of the species proportions during <span class="math inline">\(300\)</span> steps:</p>
 <div class="cell" data-execution_count="52">
 <details open="">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1"></a>model8 <span class="op">=</span> run_model(model_class<span class="op">=</span>RSPSimAct, params<span class="op">=</span>model_params8, steps<span class="op">=</span><span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1"></a>model8 <span class="op">=</span> run_model(model_class<span class="op">=</span>RSPSimAct, params<span class="op">=</span>model_params8, steps<span class="op">=</span><span class="dv">300</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell" data-execution_count="53">
@@ -1539,7 +1504,7 @@ class PatchSimAct(mesa.Agent):
 </div>
 </div>
 <p>This time the species with lower initial population density (species <span class="math inline">\(R\)</span>) dominates the system and the other two species go extinct.</p>
-<p>Let’s define the parameters to perform a simulation of a system with <span class="math inline">\(4\)</span> species, on a square lattice with <span class="math inline">\(N=200\cdot 200\)</span> sites, initialized with the sites being randomly assigned to each of the three species in equal proportions (<code>init0</code>=0.25, <code>init1</code>=0.25, <code>init2</code>=0.25, <code>init3</code>=0.25, <code>init4</code>=0).</p>
+<p>Let’s define the parameters to perform a simulation of a system with <span class="math inline">\(4\)</span> species, on a square lattice with <span class="math inline">\(N=200\cdot 200\)</span> sites, initialized with the sites being randomly assigned to each of the three species in equal proportions (<code>init0</code>=0.25, <code>init1</code>=0.25, <code>init2</code>=0.25, <code>init3</code>=0.25).</p>
 <div class="cell" data-execution_count="54">
 <details open="">
 <summary>Code</summary>
@@ -1575,7 +1540,7 @@ class PatchSimAct(mesa.Agent):
 </details>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"c9571d5414f44e2e8d62fa029623571c","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+{"model_id":"289ae39783c64538985ae19f9abbcaeb","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
 </script>
 </div>
 </div>
@@ -1611,7 +1576,7 @@ class PatchSimAct(mesa.Agent):
 <p><img src="lattice_simulations_files/figure-html/cell-59-output-1.png" class="img-fluid"></p>
 </div>
 </div>
-<p>With <span class="math inline">\(4\)</span> species, initially distributed in equal proportions, the system dynamics stabilize and regular spiral patterns emerge.</p>
+<p>With <span class="math inline">\(4\)</span> species, initially distributed in equal proportions, the system dynamics stabilizes and regular spiral patterns emerge.</p>
 <p>Let’s define the parameters to perform a simulation of a system with <span class="math inline">\(5\)</span> species, on a square lattice with <span class="math inline">\(N=200\cdot 200\)</span> sites, initialized with the sites being randomly assigned to each of the three species in equal proportions (<code>init0</code>=0.2, <code>init1</code>=0.2, <code>init2</code>=0.2, <code>init3</code>=0.2, <code>init4</code>=0.2).</p>
 <div class="cell" data-execution_count="59">
 <details open="">
@@ -1649,7 +1614,7 @@ class PatchSimAct(mesa.Agent):
 </details>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"b013abab64fb41f9b3de95f7763a65ea","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+{"model_id":"d538667a4b494594852e22c3b17241eb","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
 </script>
 </div>
 </div>
@@ -1685,14 +1650,14 @@ class PatchSimAct(mesa.Agent):
 <p><img src="lattice_simulations_files/figure-html/cell-64-output-1.png" class="img-fluid"></p>
 </div>
 </div>
-<p>With <span class="math inline">\(5\)</span> species, initially distributed in equal proportions, again the system dynamics lead to the formation of a spiral pattern.</p>
+<p>With <span class="math inline">\(5\)</span> species, initially distributed in equal proportions, the system dynamics once again leads to the formation of a spiral pattern.</p>
 </section>
 </section>
 <section id="reichenbach-mobilia-and-frey-model" class="level2">
 <h2 class="anchored" data-anchor-id="reichenbach-mobilia-and-frey-model">3. Reichenbach, Mobilia and Frey model</h2>
-<p>In this model the <span class="math inline">\(N\)</span> sites are taken to be sites in a periodic, rectangular lattice. Each patch can be occupied by one of the species or can be blank. Each tick, the following types of events happen at defined average rates: - <strong>Select event</strong>: Two random neighbors compete with each other. The losing patch becomes blanks. - <strong>Reproduce event</strong>: Two random neighbors attempt to reproduce. If one of the neighbors is blank, it acquires the color of the other. Nothing happens if neither neighbor is blank. - <strong>Swap event</strong>: Two random neighbors swap color. This represents the organisms moving on the lattice.</p>
-<p>Therefore, this model combines the local competition and reproduction from the Frean and Abraham model <a href="#4-references">[1]</a> with spatial migration, a ubiquitous feature of real ecosystems. For more details, see the original paper <a href="#6-references">[2]</a> and the NetLogo model <a href="#6-references">[3]</a>.</p>
-<p>The exact number of, for instance, swap events that occur each tick is drawn from a Poisson distribution with mean equal to <span class="math inline">\((number\_ of\_ patches) * 10 ^{swap-exponent}\)</span>. A Poisson distribution defines how many times a particular event occurs given an average rate for that event assuming that the occurrences of that event are independent. Here, the occurrences of the events are approximately independent since they’re being performed by different organisms. The events occur in a random order involving random pairs of neighbors.</p>
+<p>In this model the <span class="math inline">\(N\)</span> sites are taken to be sites in a periodic, rectangular lattice. Each patch can be occupied by one of the species or can be blank. Each tick, the following types of events happen at defined average rates: - <strong>Select event</strong>: Two random neighbors compete with each other. The losing patch becomes blank. - <strong>Reproduce event</strong>: Two random neighbors attempt to reproduce. If one of the neighbors is blank, it acquires the color of the other. Nothing happens if neither neighbor is blank. - <strong>Swap event</strong>: Two random neighbors swap color. This event represents the organisms moving on the lattice.</p>
+<p>Therefore, this model combines the local competition and reproduction from the Frean and Abraham model [1] with spatial migration, a ubiquitous feature of real ecosystems. For more details, see the original paper [2] and the NetLogo model [3].</p>
+<p>The exact number of select, reproduce or swap events that occur each tick is drawn from a Poisson distribution with mean equal to <span class="math inline">\((\frac{number\_ of\_ patches}{3}) * 10 ^{swap-exponent}\)</span>. A Poisson distribution defines how many times a particular event occurs given an average rate for that event, assuming that the occurrences of that event are independent. Here, the occurrences of the events are approximately independent since they’re being performed by different agents. The events occur in a random order involving random pairs of neighbors.</p>
 <section id="implementation-details-2" class="level3">
 <h3 class="anchored" data-anchor-id="implementation-details-2">3.1. Implementation details</h3>
 <p>The model is defined by the class <code>RSPMobility</code> in the file <code>../lattice_models/model_mobility.py</code>:</p>
@@ -1709,9 +1674,19 @@ from mesa.datacollection import DataCollector
 
 class RSPMobility(mesa.Model):
     """
-    Represents the 2-dimensional array of patches in Rock-Scissors-Paper Game.
+    This model is based on the Rock-Paper-Scissors model implemented in NetLogo.
+
+    References:
+    [1] Reichenbach, Tobias, Mauro Mobilia, and Erwin Frey.
+    "Mobility promotes and jeopardizes biodiversity in rock-paper-scissors games."
+    Nature 448.7157 (2007): 1046-1049.
+    [2] Head, B., Grider, R. and Wilensky, U. (2017). NetLogo Rock Paper Scissors model.
+    http://ccl.northwestern.edu/netlogo/models/RockPaperScissors.
+    Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
     """
 
+    # key: species, value: list of species that the key species can beat
+    # e.g. ROCK (0) beats SCISSOR (1), SCISSOR (1) beats PAPER (2), PAPER (2) beats ROCK (0)
     rules3 = {1: [2], 2: [3], 3: [1]}
     rules4 = {1: [2], 2: [3], 3: [4], 4: [1]}
     rules5 = {1: [2,3], 2: [3,4], 3: [4,5], 4: [5,1], 5: [1,2]}
@@ -1723,7 +1698,7 @@ class RSPMobility(mesa.Model):
             n_species, color_map, width=50, height=50
         ):
         """
-        Create a new playing area of (width, height) patches.
+        Initialize the model with the given parameters.
         """
         super().__init__()
 
@@ -1804,8 +1779,8 @@ class RSPMobility(mesa.Model):
 <li>The model can be simulated with <span class="math inline">\(3\)</span>, <span class="math inline">\(4\)</span>, or <span class="math inline">\(5\)</span> species. <code>init0</code> represents the initial proportion of empty patches. When there are <span class="math inline">\(4\)</span> species, species <span class="math inline">\(&lt;1,3&gt;\)</span> and <span class="math inline">\(&lt;2,4&gt;\)</span> do not compete with each other.</li>
 <li>Each agent is activated once per step, in random order, with the order reshuffled each step, through the <code>mesa.time.RandomActivation</code> scheduler.</li>
 <li>Agents are situated on a rectangular, periodic grid (i.e.&nbsp;torus), where each cell contains exactly at most one agent. Such a grid is created by the <code>mesa.space.SingleGrid</code> class.</li>
-<li>The grid is randomly initialized by placing agents in each cell according to the initial proportions of the species (the parameters <code>init*</code> are used as weights in the <a href="https://docs.python.org/3/library/random.html#random.choices"><code>random.choice</code></a> function).</li>
-<li>This model uses an event-based approach. It calculates how many events of each type should occur each tick and then makes agents execute those events in a random order. Hence, this code creates a list with an entry for each event type that should occur each tick and then shuffles that list so that the events are in a random order. Agents are randomly activated sequentially, and each agent pops an event off the list and, together with a random neighboring patch, runs the corresponding event.</li>
+<li>The grid is randomly initialized by placing agents in each cell according to the initial proportions of the species (the parameters <code>init*</code> are used as weights in the <a href="https://docs.python.org/3/library/random.html#random.choices"><code>random.choices</code></a> function).</li>
+<li>This model uses an event-based approach. It calculates how many events of each type should occur each tick and then makes agents execute those events in a random order. Hence, this code creates a list with an entry for each event type that should occur each tick and then shuffles that list so that the events are in a random order. Agents are randomly activated sequentially. Each agent pops an event off the list and, together with a random neighboring patch, runs the corresponding event.</li>
 </ul>
 <p>The behavior of each agent (grid patch) is defined by the class <code>PatchMobility</code> in the file <code>../lattice_models/patch_mobility.py</code>:</p>
 <div class="cell" data-execution_count="65">
@@ -1869,7 +1844,7 @@ class PatchMobility(mesa.Agent):
 <li>Agent state <code>0</code> represents an empty patch.</li>
 <li>At each step, a neighbor is randomly chosen and the agent in the patch interacts with it, according to the event type.</li>
 </ul>
-<p>Defining a function to compute the percentage of each event type at each step:</p>
+<p>Defining a function to print the percentage of each event type at each step:</p>
 <div class="cell" data-execution_count="66">
 <details open="">
 <summary>Code</summary>
@@ -1992,7 +1967,7 @@ Select %: 8.33
 <div class="sourceCode cell-code" id="cb79"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb79-1"><a href="#cb79-1"></a>model14 <span class="op">=</span> run_model(model_class<span class="op">=</span>RSPMobility, params<span class="op">=</span>model_params14, steps<span class="op">=</span><span class="dv">300</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>Visualizing the grid after <span class="math inline">\(300\)</span> steps (replicating Figure 2a from <a href="#6-references">[2]</a>):</p>
+<p>Visualizing the grid after <span class="math inline">\(300\)</span> steps (replicating Figure 2a from [2]):</p>
 <div class="cell" data-execution_count="73">
 <details open="">
 <summary>Code</summary>
@@ -2155,7 +2130,7 @@ Select %: 1.92</code></pre>
 </details>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"423e7a4c5f054cfdbfb48358cff5b9c8","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+{"model_id":"ddb59e9833b64912abd5545508e597f0","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
 </script>
 </div>
 </div>
@@ -2191,7 +2166,7 @@ Select %: 1.92</code></pre>
 <p><img src="lattice_simulations_files/figure-html/cell-84-output-1.png" class="img-fluid"></p>
 </div>
 </div>
-<p>With <span class="math inline">\(4\)</span> species, the system dynamics stabilize with non competing species forming islands surrounded by the other species.</p>
+<p>With <span class="math inline">\(4\)</span> species, initially distributed in equal proportions, the system dynamics stabilize with non competing species forming islands surrounded by the other species.</p>
 <p>Let’s define the parameters to perform a simulation of a system with <span class="math inline">\(5\)</span> species, on a square lattice with <span class="math inline">\(N=150\cdot 150\)</span> sites, initialized with the sites being randomly assigned to each of the five species and empty sites in equal proportions and setting swap, reproduce and select exponents to <span class="math inline">\(0\)</span>.</p>
 <div class="cell" data-execution_count="84">
 <details open="">
@@ -2234,7 +2209,7 @@ Select %: 1.92</code></pre>
 </details>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"e7fedb5f6bc847f3ae3522f9a795228e","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+{"model_id":"3de739bcb49e4a89a6648117e7f9ed27","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
 </script>
 </div>
 </div>
@@ -2270,7 +2245,7 @@ Select %: 1.92</code></pre>
 <p><img src="lattice_simulations_files/figure-html/cell-89-output-1.png" class="img-fluid"></p>
 </div>
 </div>
-<p>Also with <span class="math inline">\(5\)</span> species, entangled rotating spiral waves emerge.</p>
+<p>Also with <span class="math inline">\(5\)</span> species, initially distributed in equal proportions, entangled rotating spiral waves emerge.</p>
 </section>
 </section>
 <section id="references" class="level2">
@@ -2278,7 +2253,7 @@ Select %: 1.92</code></pre>
 <ul>
 <li>[1] Frean, Marcus, and Edward R. Abraham. “Rock–scissors–paper and the survival of the weakest.” Proceedings of the Royal Society of London. Series B: Biological Sciences 268.1474 (2001): 1323-1327.</li>
 <li>[2] Reichenbach, Tobias, Mauro Mobilia, and Erwin Frey. “Mobility promotes and jeopardizes biodiversity in rock–paper–scissors games.” Nature 448.7157 (2007): 1046-1049.</li>
-<li>[3] Head, B., Grider, R. and Wilensky, U. (2017). NetLogo Rock Paper Scissors model.&nbsp;http://ccl.northwestern.edu/netlogo/models/RockPaperScissors.&nbsp;Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.</li>
+<li>[3] Head, B., Grider, R. and Wilensky, U. (2017). <a href="http://ccl.northwestern.edu/netlogo/models/RockPaperScissors">NetLogo Rock Paper Scissors model</a>.&nbsp;Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.</li>
 </ul>
 
 
