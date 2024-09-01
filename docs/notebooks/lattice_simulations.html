@@ -698,7 +698,7 @@ class PatchRandAct(mesa.Agent):
 </div>
 </div>
 <p>Unlike the long-range dispersal model, where in the same setting the weakest species outcompetes the others, here the dynamics stabilizes, and the population densities converge towards the fixed point.</p>
-<p>Let’s define the parameters to perform a simulation of a system with <span class="math inline">\(3\)</span> species, on a square lattice with <span class="math inline">\(N=200\cdot 200\)</span> sites and equal invasion rates (<span class="math inline">\(Pr_=0.33, P_s=0.33, P_p=0.33\)</span>). The grid will be initialized with the sites being randomly assigned to each of the three species in fixed-point proportions (<span class="math inline">\(n_r=0.33, n_s=0.33, n_p=0.33\)</span>).</p>
+<p>Let’s define the parameters to perform a simulation of a system with <span class="math inline">\(3\)</span> species, on a square lattice with <span class="math inline">\(N=200\cdot 200\)</span> sites and equal invasion rates (<span class="math inline">\(P_r=0.33, P_s=0.33, P_p=0.33\)</span>). The grid will be initialized with the sites being randomly assigned to each of the three species in fixed-point proportions (<span class="math inline">\(n_r=0.33, n_s=0.33, n_p=0.33\)</span>).</p>
 <div class="cell" data-execution_count="9">
 <details open="">
 <summary>Code</summary>
@@ -1448,7 +1448,7 @@ class PatchSimAct(mesa.Agent):
 <p><img src="lattice_simulations_files/figure-html/cell-50-output-1.png" class="img-fluid"></p>
 </div>
 </div>
-<p>The system eventually stabilizes at a fixed point with equal population densities, resulting in the formation of intricate octagonal patterns.</p>
+<p>The system dynamics leads to the formation of intricate octagonal patterns.</p>
 <p>Let’s define the parameters to perform a simulation of a system with <span class="math inline">\(3\)</span> species, on a square lattice with <span class="math inline">\(N=200\cdot 200\)</span> sites, initialized with the sites being randomly assigned to each of the three species according to the following probabilities <code>init0</code>=0.1, <code>init1</code>=0.3, <code>init2</code>=0.5.</p>
 <div class="cell" data-execution_count="50">
 <details open="">
@@ -2035,7 +2035,7 @@ Select %: 8.33
 </div>
 </div>
 <p>Increasing the swap exponent leads to oscillations with larger amplitudes in the population densities.</p>
-<p>Let’s define the parameters to perform a simulation of a system with <span class="math inline">\(3\)</span> species, on a square lattice with <span class="math inline">\(N=150\cdot 150\)</span> sites, initialized with the sites being randomly assigned to each of the three species and empty sites in equal proportions (<code>init0</code>=0.25, <code>init1</code>=0.25, <code>init2</code>=0.25, <code>init3</code>=0.25), and setting the swap exponent to <span class="math inline">\(1\)</span> and the reproduce and select exponents to <span class="math inline">\(-0.7\)</span>.</p>
+<p>Let’s define the parameters to perform a simulation of a system with <span class="math inline">\(3\)</span> species, on a square lattice with <span class="math inline">\(N=100\cdot 100\)</span> sites, initialized with the sites being randomly assigned to each of the three species and empty sites in equal proportions (<code>init0</code>=0.25, <code>init1</code>=0.25, <code>init2</code>=0.25, <code>init3</code>=0.25), and setting the swap exponent to <span class="math inline">\(1\)</span> and the reproduce and select exponents to <span class="math inline">\(-0.7\)</span>.</p>
 <div class="cell" data-execution_count="75">
 <details open="">
 <summary>Code</summary>

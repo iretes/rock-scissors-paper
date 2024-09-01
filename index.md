@@ -1,8 +1,8 @@
 # Rock-Scissors-Paper: The Game That Sustains Biodiversity and Regulates Biological Clocks
 
-This project reproduces the experiments conducted by Frean et al. [[1]](#references) and Reichenbach et al. [[2], [3]](#references) to study a system involving three species in a competitive loop: a rock beats (and replicates into) a pair of scissors, scissors beat a sheet of paper and paper beats a rock. The self-referential nature of the competitive loop leads to counterintuitive phenomena, such as the expectation that the least competitive species will have the largest population. The proposed model is explored through various formalisms, and its properties are analyzed within each framework.
+This project reproduces the experiments conducted by Frean et al. [[1]](#references) and Reichenbach et al. [[2], [3]](#references) to study a system involving three species in a competitive loop: a rock beats (and replicates into) a pair of scissors, scissors beat a sheet of paper and paper beats a rock. The self-referential nature of the competitive loop leads to counterintuitive phenomena, such as the expectation that the least competitive species will have the largest population. The proposed model is examined through various formalisms, and its properties are analyzed within each framework.
 
-Additionally, we explore an oscillatory network of transcriptional regulators known as Repressilator. This network consists of a feedback loop involving three genes, each encoding a protein that represses the expression of the next gene in the loop. The dynamic behavior of the Repressilator mirrors the competitive interactions of the rock-scissors-paper game, as each component cyclically inhibits the next. We investigate how this cyclical repression creates oscillatory patterns and maintains biological rhythms. This analysis is based on [[4]](#references).
+Additionally, an oscillatory network of transcriptional regulators known as the Repressilator is explored. This network consists of a feedback loop involving three genes, each encoding a protein that represses the expression of the next gene in the loop. The dynamic behavior of the Repressilator mirrors the competitive interactions of the rock-scissors-paper game, as each component cyclically inhibits the next. The analysis centers on how this cyclical repression generates oscillatory patterns and sustains biological rhythms, as detailed in [[4]](#references).
 
 ## Ecological models
 
@@ -50,7 +50,7 @@ The sliders 'Swap rate', 'Reproduce rate' and 'Select rate' in the model based o
 
 ## Repressilator model
 
-The dynamics of this system were simulated by solving the differential equations governing protein concentration changes, using the [`scipy.integrate`](https://docs.scipy.org/doc/scipy/reference/integrate.html#module-scipy.integrate) package.
+The dynamics of this system are simulated by solving the differential equations governing protein concentration changes, using the [`scipy.integrate`](https://docs.scipy.org/doc/scipy/reference/integrate.html#module-scipy.integrate) package.
 
 [View Model Analysis](./notebooks/repressilator.html){.btn .btn-outline-primary .btn role="button"}
 
