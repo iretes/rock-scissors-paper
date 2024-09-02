@@ -1,8 +1,8 @@
 # Rock-Scissors-Paper: The Game That Sustains Biodiversity and Regulates Biological Clocks
 
-This project reproduces the experiments conducted by Frean et al. [[1]](#references) and Reichenbach et al. [[2], [3]](#references) to study a system involving three species in a competitive loop: a rock beats (and replicates into) a pair of scissors, scissors beat a sheet of paper and paper beats a rock. The self-referential nature of the competitive loop leads to counterintuitive phenomena, such as the expectation that the least competitive species will have the largest population. The proposed model is examined through various formalisms, and its properties are analyzed within each framework.
+This project reproduces the experiments conducted by Frean et al. [[1]](#references) and Reichenbach et al. [[2], [3]](#references) to study a system involving three species in a competitive loop: a rock beats (and replicates into) a pair of scissors, scissors beat a sheet of paper and paper beats a rock. The self-referential nature of the competitive loop leads to counterintuitive phenomena, such as the expectation that the least competitive species will have the largest population, ultimately preserving diversity. The proposed model is examined through various formalisms, and its properties are analyzed within each framework.
 
-Additionally, an oscillatory network of transcriptional regulators known as the Repressilator is explored. This network consists of a feedback loop involving three genes, each encoding a protein that represses the expression of the next gene in the loop. The dynamic behavior of the Repressilator mirrors the competitive interactions of the rock-scissors-paper game, as each component cyclically inhibits the next. The analysis centers on how this cyclical repression generates oscillatory patterns and sustains biological rhythms, as detailed in [[4]](#references).
+Additionally, an oscillatory network of transcriptional regulators known as the Repressilator is explored. This network consists of a feedback loop involving three genes, each encoding a protein that represses the expression of the next gene in the loop. The dynamic behavior of the Repressilator mirrors the competitive interactions of the rock-scissors-paper game, as each component cyclically inhibits the next. The analysis centers on how this cyclical repression generates oscillatory patterns, enabling the implementation of a biological clock in *Escherichia Coli*, as detailed in [[4]](#references).
 
 ## Ecological models
 
@@ -32,7 +32,7 @@ To interactively run the model, execute the following command:
 python ./run_lattice_model.py
 ```
 
-Set the grid's width and height, choose the model to run (either the one based on [[1]](#references), [[2]](#references), or a variant where agents activate simultaneously), and then open your browser to http://127.0.0.1:8521/.
+Set the grid's width and height, choose the model to run (either the one based on [[1]](#references), [[2]](#references), or a variant where agents activate simultaneously; see [here](./notebooks/lattice_simulations.ipynb) for more details), and then open your browser to http://127.0.0.1:8521/.
 
 The sliders labeled 'Initial weight of species *' allow you to set the weights used by the [`random.choices`](https://docs.python.org/3/library/random.html#random.choices) method (from the Python Standard Library) for initializing grid patches with individuals. These weights don't need to sum to $1$.
 
@@ -66,3 +66,6 @@ rock-scissors-paper
 - [2] Reichenbach, Tobias, Mauro Mobilia, and Erwin Frey. "Mobility promotes and jeopardizes biodiversity in rock–paper–scissors games." Nature 448.7157 (2007): 1046-1049.
 - [3] Head, B., Grider, R. and Wilensky, U. (2017). [NetLogo Rock Paper Scissors model](http://ccl.northwestern.edu/netlogo/models/RockPaperScissors). Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
 - [4] Elowitz M., Bois J. and Marken J. (2022). ["Biological Circuits Design"](https://biocircuits.github.io/chapters/09_repressilator.html). California Institute of Technology.
+
+---
+This project was developed for the “Computational Models for Complex Systems” course at the University of Pisa (a.y. 2023/2024).
