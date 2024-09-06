@@ -6,6 +6,8 @@ Additionally, an oscillatory network of transcriptional regulators known as the 
 
 ## Ecological models
 
+[Here](./ecological_models_summary.md) is a summary of all simulations and properties analyzed in the ecological models.
+
 ### Long range dispersal model
 
 The notebook [`long_range_simulations.ipynb`](./notebooks/long_range_simulations.ipynb) analyzes simulations of the long-range dispersal model, where individuals are modeled as gas molecules, and interactions occur between any pair.
