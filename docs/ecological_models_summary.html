@@ -188,7 +188,7 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 <tr class="odd">
 <td>PRISM CTMC</td>
-<td></td>
+<td><code>ctmc</code><br><code>const double Pr = 0.2;</code><br><code>const double Ps = 0.5;</code><br><code>const double Pp = 0.3;</code><br><code>const int MAX = 100;</code><br><code>module RSP</code><br><code>r : [0..MAX] init 50;</code><br><code>s : [0..MAX] init 30;</code><br><code>[] r&gt;0 &amp; r&lt;MAX &amp; s&gt;0 -&gt; Pr*r*s : (r'=r+1) &amp; (s'=s-1);</code><br><code>[] s&gt;0 &amp; s&lt;MAX &amp; (MAX-r-s)&gt;0 -&gt; Ps*s*(MAX-r-s) : (s'=s+1);</code><br><code>[] (MAX-r-s)&gt;0 &amp; (MAX-r-s)&lt;MAX &amp; r&gt;0 -&gt; Pp*(MAX-r-s)*r : (r'=r-1);</code><br><code>endmodule</code></td>
 </tr>
 <tr class="even">
 <td>Petri Net</td>

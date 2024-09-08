@@ -9,7 +9,7 @@
 | Continuous time | $\begin{cases}\frac{\partial n_r}{\partial t}=n_r\cdot (n_s\cdot P_r - n_p \cdot P_p)\\ \frac{\partial n_s}{\partial t}=n_s\cdot (n_p\cdot P_s - n_r \cdot P_r)\\ \frac{\partial n_p}{\partial t}=n_p\cdot (n_r\cdot P_p - n_s \cdot P_s)\\ \end{cases}$ |
 | Discrete time <br>(mean field recurrence relations) | $\begin{cases} n_r[t+\Delta_t]=n_r[t] + \Delta_t \cdot n_r[t](n_s[t]P_r - n_p[t] P_p)\\ n_s[t+\Delta_t]=n_s[t] + \Delta_t \cdot n_s[t](n_p[t]P_s - n_r[t] P_r)\\ n_p[t+\Delta_t]=n_p[t] + \Delta_t \cdot n_p[t](n_r[t]P_p - n_s[t] P_s)\\ \end{cases}$ |
 | Chemical reactions | $\begin{cases} R + S \xrightarrow{P_r} 2R\\ S + P \xrightarrow{P_s} 2S\\ P + R \xrightarrow{P_p} 2P\\ \end{cases}$ |
-| PRISM CTMC | <pre>`ctmc`<br><br>`const double Pr = 0.2;`<br>`const double Ps = 0.5;`<br>`const double Pp = 0.3;`<br>`const int MAX = 100;`<br><br>`module RSP`<br>`  r : [0..MAX] init 50;`<br>`  s : [0..MAX] init 30;`<br>`  [] r>0 & r<MAX & s>0 -> Pr*r*s : (r'=r+1) & (s'=s-1);`<br>`  [] s>0 & s<MAX & (MAX-r-s)>0 -> Ps*s*(MAX-r-s) : (s'=s+1);`<br>`  [] (MAX-r-s)>0 & (MAX-r-s)<MAX & r>0 -> Pp*(MAX-r-s)*r : (r'=r-1);`<br>`endmodule`</pre> |
+| PRISM CTMC | `ctmc`<br>`const double Pr = 0.2;`<br>`const double Ps = 0.5;`<br>`const double Pp = 0.3;`<br>`const int MAX = 100;`<br>`module RSP`<br>`r : [0..MAX] init 50;`<br>`s : [0..MAX] init 30;`<br>`[] r>0 & r<MAX & s>0 -> Pr*r*s : (r'=r+1) & (s'=s-1);`<br>`[] s>0 & s<MAX & (MAX-r-s)>0 -> Ps*s*(MAX-r-s) : (s'=s+1);`<br>`[] (MAX-r-s)>0 & (MAX-r-s)<MAX & r>0 -> Pp*(MAX-r-s)*r : (r'=r-1);`<br>`endmodule` |
 | Petri Net | <img width="150" src=./results/petri_net.png> |
 
 ## Lattice models
